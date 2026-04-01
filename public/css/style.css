@@ -1,1 +1,214 @@
-/* Add css */
+/* =============================================
+   RESET & BASE
+   ============================================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Inter", sans-serif;
+  background-color: #ede3c7; /* warm cream background */
+  color: #222;
+}
+
+/* =============================================
+   NAVBAR
+   ============================================= */
+.navbar {
+  background-color: #9db4d6; /* soft blue */
+  padding: 12px 40px;
+}
+
+.nav-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Logo area */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  font-size: 16px;
+  font-family: "Playfair Display", serif;
+}
+
+.logo img {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+}
+
+/* Navigation links */
+.nav-links {
+  display: flex;
+  gap: 10px;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #333;
+  padding: 7px 18px;
+  border-radius: 20px;
+  background-color: #f5f5f5;
+  font-size: 14px;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+}
+
+.nav-links a:hover {
+  background-color: #e0e0e0;
+}
+
+/* Active tab — dark pill */
+.nav-links a.active {
+  background-color: #111;
+  color: #fff;
+}
+
+/* Login button */
+.login-btn {
+  text-decoration: none;
+  padding: 7px 18px;
+  border-radius: 20px;
+  background-color: #f5f5f5;
+  color: #333;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.login-btn:hover {
+  background-color: #e0e0e0;
+}
+
+/* =============================================
+   MAIN CONTENT SECTIONS
+   ============================================= */
+.main-content {
+  padding: 30px 40px;
+}
+
+/* Register Now button (top-right of hero) */
+.register-bar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+}
+
+.register-btn {
+  text-decoration: none;
+  background-color: #d6e4f7;
+  color: #222;
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  border: 1px solid #b5cce8;
+  transition: background-color 0.2s;
+}
+
+.register-btn:hover {
+  background-color: #c0d6ef;
+}
+
+/* ---- Section blocks ---- */
+/* Each section: image + text side by side */
+.section-block {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  background-color: #fdf6e3; /* slightly lighter cream card */
+  border-radius: 12px;
+  padding: 30px;
+  margin-bottom: 20px;
+}
+
+/* Alternate layout: text left, image right */
+.section-block.reverse {
+  flex-direction: row-reverse;
+}
+
+/* Section images */
+.section-block img {
+  width: 240px;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+/* Section text */
+.section-text h2 {
+  font-family: "Playfair Display", serif;
+  font-size: 24px;
+  font-weight: 500;
+  margin-bottom: 14px;
+  /* Small-caps style to match screenshot */
+  font-variant: small-caps;
+}
+
+.section-text p {
+  font-size: 14px;
+  line-height: 1.7;
+  color: #444;
+  margin-bottom: 8px;
+}
+
+/* =============================================
+   FOOTER
+   ============================================= */
+.footer {
+  background-color: #9db4d6;
+  padding: 22px 40px;
+  margin-top: 20px;
+}
+
+.footer-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+/* Footer logo */
+.footer-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: "Playfair Display", serif;
+  font-weight: 600;
+  font-size: 15px;
+  font-variant: small-caps;
+}
+
+.footer-logo img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+
+/* Footer address under logo */
+.footer-left p {
+  font-size: 13px;
+  margin-top: 6px;
+  color: #333;
+}
+
+/* Footer contact info */
+.footer-center p {
+  font-size: 13px;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+/* Footer copyright */
+.footer-right p {
+  font-size: 13px;
+  color: #333;
+}
