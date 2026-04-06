@@ -1,5 +1,5 @@
 /* =============================================
-   RESET & BASE
+   1. RESET & BASE
    ============================================= */
 * {
   margin: 0;
@@ -9,15 +9,16 @@
 
 body {
   font-family: "Inter", sans-serif;
-  background-color: #ede3c7; /* warm cream background */
+  background-color: #ede3c7; /* Warm cream background */
   color: #222;
+  line-height: 1.6;
 }
 
 /* =============================================
-   NAVBAR
+   2. NAVBAR
    ============================================= */
 .navbar {
-  background-color: #9db4d6; /* soft blue */
+  background-color: #9db4d6; /* Soft blue */
   padding: 12px 40px;
 }
 
@@ -27,7 +28,6 @@ body {
   align-items: center;
 }
 
-/* Logo area */
 .logo {
   display: flex;
   align-items: center;
@@ -43,57 +43,37 @@ body {
   object-fit: contain;
 }
 
-/* Navigation links */
 .nav-links {
   display: flex;
   gap: 10px;
 }
 
-.nav-links a {
+.nav-links a, .login-btn {
   text-decoration: none;
   color: #333;
   padding: 7px 18px;
   border-radius: 20px;
   background-color: #f5f5f5;
   font-size: 14px;
-  transition:
-    background-color 0.2s,
-    color 0.2s;
+  transition: background-color 0.2s, color 0.2s;
 }
 
-.nav-links a:hover {
+.nav-links a:hover, .login-btn:hover {
   background-color: #e0e0e0;
 }
 
-/* Active tab — dark pill */
 .nav-links a.active {
   background-color: #111;
   color: #fff;
 }
 
-/* Login button */
-.login-btn {
-  text-decoration: none;
-  padding: 7px 18px;
-  border-radius: 20px;
-  background-color: #f5f5f5;
-  color: #333;
-  font-size: 14px;
-  transition: background-color 0.2s;
-}
-
-.login-btn:hover {
-  background-color: #e0e0e0;
-}
-
 /* =============================================
-   MAIN CONTENT SECTIONS
+   3. MAIN CONTENT LAYOUT
    ============================================= */
 .main-content {
   padding: 30px 40px;
 }
 
-/* Register Now button (top-right of hero) */
 .register-bar {
   display: flex;
   justify-content: flex-end;
@@ -116,24 +96,23 @@ body {
   background-color: #c0d6ef;
 }
 
-/* ---- Section blocks ---- */
-/* Each section: image + text side by side */
+/* =============================================
+   4. LANDING PAGE SECTION BLOCKS
+   ============================================= */
 .section-block {
   display: flex;
   align-items: center;
   gap: 30px;
-  background-color: #fdf6e3; /* slightly lighter cream card */
+  background-color: #fdf6e3;
   border-radius: 12px;
   padding: 30px;
   margin-bottom: 20px;
 }
 
-/* Alternate layout: text left, image right */
 .section-block.reverse {
   flex-direction: row-reverse;
 }
 
-/* Section images */
 .section-block img {
   width: 240px;
   height: 180px;
@@ -142,30 +121,145 @@ body {
   flex-shrink: 0;
 }
 
-/* Section text */
 .section-text h2 {
   font-family: "Playfair Display", serif;
   font-size: 24px;
   font-weight: 500;
   margin-bottom: 14px;
-  /* Small-caps style to match screenshot */
   font-variant: small-caps;
 }
 
 .section-text p {
   font-size: 14px;
-  line-height: 1.7;
   color: #444;
   margin-bottom: 8px;
 }
 
 /* =============================================
-   FOOTER
+   5. REGISTRATION PAGE (MVC VIEW)
+   ============================================= */
+.registration-card {
+  background-color: #fdf6e3; 
+  max-width: 950px;
+  margin: 0 auto;
+  padding: 40px;
+  border-radius: 15px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+
+.registration-card h2 {
+  text-align: center;
+  font-family: "Playfair Display", serif;
+  font-variant: small-caps;
+  margin-bottom: 30px;
+  font-size: 28px;
+}
+
+.reg-section {
+  background-color: #adc4f0; 
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 25px;
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  border: 2px solid #8aa4c9; 
+}
+
+.reg-label-side {
+  width: 160px;
+  font-weight: 600;
+  font-size: 15px;
+  color: #333;
+  padding-top: 10px;
+}
+
+.reg-input-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  background: rgba(255, 255, 255, 0.4);
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.full-row { grid-column: span 2; }
+
+.reg-input-grid label {
+  display: block;
+  font-size: 12px;
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+/* Fixed Input Styling with Border and Darker Background */
+.reg-input-grid input, 
+.reg-input-grid select, 
+.reg-input-grid textarea {
+  width: 100%;
+  padding: 10px;
+  border: 2px solid #111; /* Strong black border for definition */
+  border-radius: 6px;
+  background-color: #cbdcf7;
+  font-size: 14px;
+  color: #222;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+/* Focus effect */
+.reg-input-grid input:focus {
+  outline: none;
+  border-color: #5a7fb5;
+  box-shadow: 0 0 5px rgba(90, 127, 181, 0.3);
+  background-color: #d6e4f7;
+}
+
+.photo-box {
+  width: 140px;
+  text-align: center;
+}
+
+.photo-placeholder {
+  width: 110px;
+  height: 130px;
+  background: #e0e0e0;
+  margin: 0 auto 10px;
+  border: 2px solid #999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+}
+
+.submit-container {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.main-submit-btn {
+  background-color: #9db4d6;
+  color: #111;
+  padding: 12px 60px;
+  border: none;
+  border-radius: 25px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.main-submit-btn:hover {
+  background-color: #111;
+  color: #fff;
+}
+
+/* =============================================
+   6. FOOTER
    ============================================= */
 .footer {
   background-color: #9db4d6;
   padding: 22px 40px;
-  margin-top: 20px;
+  margin-top: 40px;
 }
 
 .footer-container {
@@ -176,7 +270,6 @@ body {
   gap: 16px;
 }
 
-/* Footer logo */
 .footer-logo {
   display: flex;
   align-items: center;
@@ -190,25 +283,9 @@ body {
 .footer-logo img {
   width: 36px;
   height: 36px;
-  object-fit: contain;
 }
 
-/* Footer address under logo */
-.footer-left p {
-  font-size: 13px;
-  margin-top: 6px;
-  color: #333;
-}
-
-/* Footer contact info */
-.footer-center p {
-  font-size: 13px;
-  color: #333;
-  margin-bottom: 4px;
-}
-
-/* Footer copyright */
-.footer-right p {
+.footer-left p, .footer-center p, .footer-right p {
   font-size: 13px;
   color: #333;
 }
