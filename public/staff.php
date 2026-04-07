@@ -1,19 +1,14 @@
 <?php
-/**
- * warden.php
- * Staffs page — shows hostel staff members with photo, name, contact, and bio.
- * Included via the nav link "Staffs" in the header.
- */
 include('../views/layout/header.php');
 ?>
 <main class="main-content">
 
-    <!-- Register Now button (top right) -->
+    <!-- Register Now button -->
     <div class="register-bar">
         <a href="/HostelManagementSystem/views/auth/register.php" class="register-btn">Register now !!</a>
     </div>
 
-    <!-- ========== Staff Member 1: Image LEFT, text RIGHT ========== -->
+    <!-- Staff Member 1: Details -->
     <div class="section-block">
         <img src="/HostelManagementSystem/public/images/staff1.jpg" alt="Ananya Arora">
 
@@ -31,7 +26,7 @@ include('../views/layout/header.php');
         </div>
     </div>
 
-    <!-- ========== Staff Member 2: Text LEFT, image RIGHT ========== -->
+    <!-- Staff Member 2: Details -->
     <div class="section-block reverse">
         <img src="/HostelManagementSystem/public/images/staff2.jpg" alt="Marcus Lindberg">
 
@@ -49,7 +44,7 @@ include('../views/layout/header.php');
         </div>
     </div>
 
-    <!-- ========== Staff Member 3: Image LEFT, text RIGHT ========== -->
+    <!-- Staff Member 3: Details -->
     <div class="section-block">
         <img src="/HostelManagementSystem/public/images/staff3.jpg" alt="Priya Tamrakar">
 

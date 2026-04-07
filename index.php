@@ -1,22 +1,17 @@
 <?php
-/**
- * index.php
- * Homepage (About Us page) of Pentatonic Hostel.
- * Displays three content sections with images and text.
- */
 include('views/layout/header.php');
 ?>
 
 <main class="main-content">
 
-    <!-- Register Now button (top right) -->
+    <!-- Register Now button -->
     <div class="register-bar">
-        <a href="/HOSTELMANAGEMENTSYSTEM/views/auth/register.php" class="register-btn">Register now !!</a>
+        <a href="/HostelManagementSystem/views/auth/register.php" class="register-btn">Register now !!</a>
     </div>
 
-    <!-- ========== Section 1: Your Home Away From Home ========== -->
+    <!-- Section 1: Your Home Away From Home -->
     <div class="section-block">
-        <img src="/HOSTELMANAGEMENTSYSTEM/public/images/common-area.png" alt="Common area of Pentatonic Hostel">
+        <img src="/HostelManagementSystem/public/images/common-area.png" alt="Common area of Pentatonic Hostel">
 
         <div class="section-text">
             <h2>Your Home Away From Home</h2>
@@ -35,9 +30,9 @@ include('views/layout/header.php');
         </div>
     </div>
 
-    <!-- ========== Section 2: Rest Well, Travel Better ========== -->
+    <!-- Section 2: Rest Well, Travel Better -->
     <div class="section-block reverse">
-        <img src="/HOSTELMANAGEMENTSYSTEM/public/images/dorm-room.png" alt="Clean dorm room with bunk beds">
+        <img src="/HostelManagementSystem/public/images/dorm-room.png" alt="Clean dorm room with bunk beds">
 
         <div class="section-text">
             <h2>Rest Well, Travel Better</h2>
@@ -54,9 +49,9 @@ include('views/layout/header.php');
         </div>
     </div>
 
-    <!-- ========== Section 3: Connect and Unwind ========== -->
+    <!-- Section 3: Connect and Unwind -->
     <div class="section-block">
-        <img src="/HOSTELMANAGEMENTSYSTEM/public/images/living-area.jpg" alt="Rooftop terrace at sunset">
+        <img src="/HostelManagementSystem/public/images/living-area.jpg" alt="Rooftop terrace at sunset">
 
         <div class="section-text">
             <h2>Connect and Unwind</h2>

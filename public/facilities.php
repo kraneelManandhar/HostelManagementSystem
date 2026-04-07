@@ -1,20 +1,15 @@
 <?php
-/**
- * facilities.php
- * Location: public/facilities.php
- * Facilities page — 2-column grid of hostel amenities.
- */
 include('../views/layout/header.php');
 ?>
 
 <main class="main-content">
 
-    <!-- Register Now button (top right) -->
+    <!-- Register Now button -->
     <div class="register-bar">
         <a href="/HostelManagementSystem/views/auth/register.php" class="register-btn">Register now !!</a>
     </div>
 
-    <!-- 2-column facilities grid -->
+    <!-- Facilities Grid -->
     <div class="facilities-grid">
 
         <div class="facility-card">
@@ -44,7 +39,7 @@ include('../views/layout/header.php');
 
         <div class="facility-card">
             <img src="/HostelManagementSystem/public/images/rooftop-sitting.jpg" alt="Roof Sitting Area">
-            <p>Roof Sitting Area</p>
+            <p>Rooftop Sitting Area</p>
         </div>
 
     </div>
@@ -52,3 +47,4 @@ include('../views/layout/header.php');
 </main>
 
 <?php include('../views/layout/footer.php'); ?>
+

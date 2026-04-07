@@ -1,14 +1,8 @@
-/**
- * main.js
- * Main JavaScript file for Pentatonic Hostel.
- * Add interactive features here as the project grows.
- */
+/*
+Highlights the active navigation link using JavaScript.
+PHP already does this, but this is a backup for special cases.
+*/
 
-// =============================================
-// Active nav link highlight (fallback for JS)
-// The PHP already handles this server-side,
-// but this JS version handles edge cases.
-// =============================================
 document.addEventListener("DOMContentLoaded", function () {
   // Get all nav links
   const navLinks = document.querySelectorAll(".nav-links a");

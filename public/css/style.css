@@ -1,6 +1,4 @@
-/* =============================================
-   RESET & BASE
-   ============================================= */
+/* RESET & BASE */
 * {
   margin: 0;
   padding: 0;
@@ -13,9 +11,7 @@ body {
   color: #222;
 }
 
-/* =============================================
-   NAVBAR
-   ============================================= */
+/* NAVBAR */
 .navbar {
   background-color: #9db4d6;
   padding: 12px 40px;
@@ -32,14 +28,14 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-weight: 600;
-  font-size: 16px;
+  font-weight: 800;
+  font-size: 18px;
   font-family: "Playfair Display", serif;
 }
 
 .logo img {
-  width: 42px;
-  height: 42px;
+  width: 50px;
+  height: 50px;
   object-fit: contain;
 }
 
@@ -86,14 +82,12 @@ body {
   background-color: #e0e0e0;
 }
 
-/* =============================================
-   MAIN CONTENT WRAPPER
-   ============================================= */
+/* MAIN CONTENT WRAPPER */
 .main-content {
   padding: 30px 40px;
 }
 
-/* Register Now button — top right of every page */
+/* Register Now button */
 .register-bar {
   display: flex;
   justify-content: flex-end;
@@ -116,11 +110,8 @@ body {
   background-color: #c0d6ef;
 }
 
-/* =============================================
-   SHARED SECTION BLOCKS
-   Used on About Us and Staffs pages
-   Image + text side by side inside a cream card
-   ============================================= */
+/* SHARED SECTION BLOCKS 
+(Used on About Us and Staffs pages: Image and text side by side inside a cream card) */
 .section-block {
   display: flex;
   align-items: center;
@@ -160,9 +151,7 @@ body {
   margin-bottom: 8px;
 }
 
-/* =============================================
-   STAFFS PAGE (warden.php / staffs.php)
-   ============================================= */
+/* STAFFS PAGE */
 
 /* Staff name */
 .staff-name {
@@ -172,7 +161,7 @@ body {
   color: #111;
 }
 
-/* Email / phone */
+/* Email and phone */
 .staff-contact {
   font-size: 13px;
   color: #555;
@@ -187,10 +176,7 @@ body {
   color: #444;
 }
 
-/* =============================================
-   FACILITIES PAGE (facilities.php / owner.php)
-   2-column grid — image on top, label below
-   ============================================= */
+/* FACILITIES PAGE */
 
 /* Outer cream card wrapping the whole grid */
 .facilities-grid {
@@ -233,9 +219,7 @@ body {
   text-align: center;
 }
 
-/* =============================================
-   FOOTER
-   ============================================= */
+/* FOOTER */
 .footer {
   background-color: #9db4d6;
   padding: 22px 40px;
@@ -248,7 +232,7 @@ body {
   gap: 10px;
 }
 
-/* Top row: logo + hostel name */
+/* Top row: logo and hostel name */
 .footer-top {
   display: flex;
   align-items: center;
@@ -260,18 +244,18 @@ body {
   align-items: center;
   gap: 10px;
   font-family: "Playfair Display", serif;
-  font-weight: 600;
-  font-size: 15px;
+  font-weight: 800;
+  font-size: 18px;
   font-variant: small-caps;
 }
 
 .footer-logo img {
-  width: 36px;
-  height: 36px;
+  width: 50px;
+  height: 50px;
   object-fit: contain;
 }
 
-/* Middle row: address | phone | email */
+/* Middle row: address, phone and email */
 .footer-middle {
   display: flex;
   justify-content: space-between;
