@@ -1,38 +1,37 @@
 <footer class="footer">
     <div class="footer-container">
 
-        <!-- Left -->
-        <div class="footer-left">
+        <!-- Top row: logo only -->
+        <div class="footer-top">
             <div class="footer-logo">
-                <img src="/HOSTELMANAGEMENTSYSTEM/public/images/logo.png" alt="Logo">
+                <img src="/HostelManagementSystem/public/images/logo.png" alt="Logo">
                 <span>Pentatonic Hostel</span>
             </div>
-            <p>
-                <i class="ph-fill ph-map-pin"></i>
-                123 Traveler’s Lane, City Center
-            </p>
         </div>
 
-        <!-- Center -->
-        <div class="footer-center">
-            <p>
+        <!-- Middle row: address | phone | email -->
+        <div class="footer-middle">
+            <p class="footer-left">
+                <i class="ph-fill ph-map-pin"></i>
+                123 Traveler's Lane, City Center
+            </p>
+            <p class="footer-center">
                 <i class="ph-fill ph-phone"></i>
                 +977-9812345678
             </p>
-            <p>© <?php echo date("Y"); ?> Pentatonic Hostel. All rights reserved.</p>
-        </div>
-
-        <!-- Right -->
-        <div class="footer-right">
-            <p>
+            <p class="footer-right">
                 <i class="ph-fill ph-envelope-simple"></i>
                 hello@pentatonic.com
             </p>
+        </div>
+
+        <!-- Bottom row: copyright centered -->
+        <div class="footer-bottom">
+            <p>© <?php echo date("Y"); ?> Pentatonic Hostel. All rights reserved.</p>
         </div>
 
     </div>
 </footer>
 
 <!-- JS -->
-<script src="/HOSTELMANAGEMENTSYSTEM/public/js/main.js"></script>
-
+<script src="/HostelManagementSystem/public/js/main.js"></script>

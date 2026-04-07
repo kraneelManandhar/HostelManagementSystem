@@ -10,12 +10,12 @@ include('../views/layout/header.php');
 
     <!-- Register Now button (top right) -->
     <div class="register-bar">
-        <a href="/HOSTELMANAGEMENTSYSTEM/views/auth/register.php" class="register-btn">Register now !!</a>
+        <a href="/HostelManagementSystem/views/auth/register.php" class="register-btn">Register now !!</a>
     </div>
 
     <!-- ========== Staff Member 1: Image LEFT, text RIGHT ========== -->
     <div class="section-block">
-        <img src="/HOSTELMANAGEMENTSYSTEM/public/images/staff1.jpg" alt="Ananya Arora">
+        <img src="/HostelManagementSystem/public/images/staff1.jpg" alt="Ananya Arora">
 
         <div class="section-text">
             <h3 class="staff-name">Ananya Arora</h3>
@@ -33,7 +33,7 @@ include('../views/layout/header.php');
 
     <!-- ========== Staff Member 2: Text LEFT, image RIGHT ========== -->
     <div class="section-block reverse">
-        <img src="/HOSTELMANAGEMENTSYSTEM/public/images/staff2.jpg" alt="Marcus Lindberg">
+        <img src="/HostelManagementSystem/public/images/staff2.jpg" alt="Marcus Lindberg">
 
         <div class="section-text">
             <h3 class="staff-name">Marcus Lindberg</h3>
@@ -51,7 +51,7 @@ include('../views/layout/header.php');
 
     <!-- ========== Staff Member 3: Image LEFT, text RIGHT ========== -->
     <div class="section-block">
-        <img src="/HOSTELMANAGEMENTSYSTEM/public/images/staff3.jpg" alt="Priya Tamrakar">
+        <img src="/HostelManagementSystem/public/images/staff3.jpg" alt="Priya Tamrakar">
 
         <div class="section-text">
             <h3 class="staff-name">Priya Tamrakar</h3>

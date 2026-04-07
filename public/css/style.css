@@ -9,7 +9,7 @@
 
 body {
   font-family: "Inter", sans-serif;
-  background-color: #ede3c7; /* warm cream background */
+  background-color: #ede3c7;
   color: #222;
 }
 
@@ -17,7 +17,7 @@ body {
    NAVBAR
    ============================================= */
 .navbar {
-  background-color: #9db4d6; /* soft blue */
+  background-color: #9db4d6;
   padding: 12px 40px;
 }
 
@@ -27,7 +27,7 @@ body {
   align-items: center;
 }
 
-/* Logo area */
+/* Logo */
 .logo {
   display: flex;
   align-items: center;
@@ -43,7 +43,7 @@ body {
   object-fit: contain;
 }
 
-/* Navigation links */
+/* Nav links */
 .nav-links {
   display: flex;
   gap: 10px;
@@ -65,7 +65,7 @@ body {
   background-color: #e0e0e0;
 }
 
-/* Active tab — dark pill */
+/* Active tab — filled dark pill */
 .nav-links a.active {
   background-color: #111;
   color: #fff;
@@ -87,13 +87,13 @@ body {
 }
 
 /* =============================================
-   MAIN CONTENT SECTIONS
+   MAIN CONTENT WRAPPER
    ============================================= */
 .main-content {
   padding: 30px 40px;
 }
 
-/* Register Now button (top-right of hero) */
+/* Register Now button — top right of every page */
 .register-bar {
   display: flex;
   justify-content: flex-end;
@@ -116,24 +116,26 @@ body {
   background-color: #c0d6ef;
 }
 
-/* ---- Section blocks ---- */
-/* Each section: image + text side by side */
+/* =============================================
+   SHARED SECTION BLOCKS
+   Used on About Us and Staffs pages
+   Image + text side by side inside a cream card
+   ============================================= */
 .section-block {
   display: flex;
   align-items: center;
   gap: 30px;
-  background-color: #fdf6e3; /* slightly lighter cream card */
+  background-color: #fdf6e3;
   border-radius: 12px;
   padding: 30px;
   margin-bottom: 20px;
 }
 
-/* Alternate layout: text left, image right */
+/* Reverse: text left, image right */
 .section-block.reverse {
   flex-direction: row-reverse;
 }
 
-/* Section images */
 .section-block img {
   width: 240px;
   height: 180px;
@@ -142,13 +144,12 @@ body {
   flex-shrink: 0;
 }
 
-/* Section text */
+/* About Us headings */
 .section-text h2 {
   font-family: "Playfair Display", serif;
   font-size: 24px;
   font-weight: 500;
   margin-bottom: 14px;
-  /* Small-caps style to match screenshot */
   font-variant: small-caps;
 }
 
@@ -157,6 +158,79 @@ body {
   line-height: 1.7;
   color: #444;
   margin-bottom: 8px;
+}
+
+/* =============================================
+   STAFFS PAGE (warden.php / staffs.php)
+   ============================================= */
+
+/* Staff name */
+.staff-name {
+  font-size: 17px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #111;
+}
+
+/* Email / phone */
+.staff-contact {
+  font-size: 13px;
+  color: #555;
+  margin-bottom: 2px;
+}
+
+/* Bio paragraph */
+.staff-bio {
+  margin-top: 12px;
+  font-size: 13.5px;
+  line-height: 1.7;
+  color: #444;
+}
+
+/* =============================================
+   FACILITIES PAGE (facilities.php / owner.php)
+   2-column grid — image on top, label below
+   ============================================= */
+
+/* Outer cream card wrapping the whole grid */
+.facilities-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  background-color: #fdf6e3;
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 900px;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+/* Individual facility card */
+.facility-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  overflow: hidden;
+  width: 100%;
+}
+
+/* Facility image */
+.facility-card img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 12px;
+  display: block;
+  background-color: #c9c4bc;
+}
+
+/* Label below each image */
+.facility-card p {
+  font-size: 14px;
+  color: #333;
+  text-align: center;
 }
 
 /* =============================================
@@ -170,10 +244,14 @@ body {
 
 .footer-container {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Top row: logo + hostel name */
+.footer-top {
+  display: flex;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 16px;
 }
 
 /* Footer logo */
@@ -193,22 +271,21 @@ body {
   object-fit: contain;
 }
 
-/* Footer address under logo */
-.footer-left p {
+/* Middle row: address | phone | email */
+.footer-middle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.footer-middle p {
   font-size: 13px;
-  margin-top: 6px;
   color: #333;
 }
 
-/* Footer contact info */
-.footer-center p {
-  font-size: 13px;
-  color: #333;
-  margin-bottom: 4px;
-}
-
-/* Footer copyright */
-.footer-right p {
+/* Bottom row: copyright centered */
+.footer-bottom {
+  text-align: center;
   font-size: 13px;
   color: #333;
 }
