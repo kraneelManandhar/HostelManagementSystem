@@ -1,4 +1,6 @@
-/* RESET & BASE */
+/* =============================================
+   1. RESET & BASE
+   ============================================= */
 * {
   margin: 0;
   padding: 0;
@@ -7,13 +9,16 @@
 
 body {
   font-family: "Inter", sans-serif;
-  background-color: #ede3c7;
+  background-color: #ede3c7; /* Warm cream background */
   color: #222;
+  line-height: 1.6;
 }
 
-/* NAVBAR */
+/* =============================================
+   2. NAVBAR
+   ============================================= */
 .navbar {
-  background-color: #9db4d6;
+  background-color: #9db4d6; /* Soft blue */
   padding: 12px 40px;
 }
 
@@ -23,7 +28,6 @@ body {
   align-items: center;
 }
 
-/* Logo */
 .logo {
   display: flex;
   align-items: center;
@@ -39,55 +43,39 @@ body {
   object-fit: contain;
 }
 
-/* Nav links */
 .nav-links {
   display: flex;
   gap: 10px;
 }
 
-.nav-links a {
+.nav-links a,
+.login-btn {
   text-decoration: none;
   color: #333;
   padding: 7px 18px;
   border-radius: 20px;
   background-color: #f5f5f5;
   font-size: 14px;
-  transition:
-    background-color 0.2s,
-    color 0.2s;
+  transition: 0.2s;
 }
 
-.nav-links a:hover {
+.nav-links a:hover,
+.login-btn:hover {
   background-color: #e0e0e0;
 }
 
-/* Active tab — filled dark pill */
 .nav-links a.active {
   background-color: #111;
   color: #fff;
 }
 
-/* Login button */
-.login-btn {
-  text-decoration: none;
-  padding: 7px 18px;
-  border-radius: 20px;
-  background-color: #f5f5f5;
-  color: #333;
-  font-size: 14px;
-  transition: background-color 0.2s;
-}
-
-.login-btn:hover {
-  background-color: #e0e0e0;
-}
-
-/* MAIN CONTENT WRAPPER */
+/* =============================================
+   3. MAIN CONTENT
+   ============================================= */
 .main-content {
   padding: 30px 40px;
 }
 
-/* Register Now button */
 .register-bar {
   display: flex;
   justify-content: flex-end;
@@ -101,17 +89,16 @@ body {
   padding: 8px 20px;
   border-radius: 20px;
   font-size: 14px;
-  font-weight: 500;
   border: 1px solid #b5cce8;
-  transition: background-color 0.2s;
 }
 
 .register-btn:hover {
   background-color: #c0d6ef;
 }
 
-/* SHARED SECTION BLOCKS 
-(Used on About Us and Staffs pages: Image and text side by side inside a cream card) */
+/* =============================================
+   4. LANDING PAGE SECTIONS
+   ============================================= */
 .section-block {
   display: flex;
   align-items: center;
@@ -122,7 +109,6 @@ body {
   margin-bottom: 20px;
 }
 
-/* Reverse: text left, image right */
 .section-block.reverse {
   flex-direction: row-reverse;
 }
@@ -132,53 +118,42 @@ body {
   height: 180px;
   object-fit: cover;
   border-radius: 10px;
-  flex-shrink: 0;
 }
 
-/* About Us headings */
 .section-text h2 {
   font-family: "Playfair Display", serif;
   font-size: 24px;
-  font-weight: 500;
   margin-bottom: 14px;
   font-variant: small-caps;
 }
 
 .section-text p {
   font-size: 14px;
-  line-height: 1.7;
   color: #444;
-  margin-bottom: 8px;
 }
 
-/* STAFFS PAGE */
-
-/* Staff name */
+/* =============================================
+   5. STAFF PAGE
+   ============================================= */
 .staff-name {
   font-size: 17px;
   font-weight: 600;
-  margin-bottom: 4px;
-  color: #111;
 }
 
-/* Email and phone */
 .staff-contact {
   font-size: 13px;
   color: #555;
-  margin-bottom: 2px;
 }
 
-/* Bio paragraph */
 .staff-bio {
-  margin-top: 12px;
+  margin-top: 10px;
   font-size: 13.5px;
-  line-height: 1.7;
   color: #444;
 }
 
-/* FACILITIES PAGE */
-
-/* Outer cream card wrapping the whole grid */
+/* =============================================
+   6. FACILITIES PAGE
+   ============================================= */
 .facilities-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -188,88 +163,61 @@ body {
   padding: 24px;
   max-width: 900px;
   margin: 0 auto;
-  overflow: hidden;
 }
 
-/* Individual facility card */
-.facility-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-  overflow: hidden;
-  width: 100%;
-}
-
-/* Facility image */
 .facility-card img {
   width: 100%;
   height: 200px;
   object-fit: cover;
   border-radius: 12px;
-  display: block;
-  background-color: #c9c4bc;
 }
 
-/* Label below each image */
 .facility-card p {
-  font-size: 14px;
-  color: #333;
   text-align: center;
 }
 
-/* FOOTER */
+/* =============================================
+   7. REGISTRATION PAGE
+   ============================================= */
+.registration-card {
+  background-color: #fdf6e3;
+  max-width: 950px;
+  margin: 0 auto;
+  padding: 40px;
+  border-radius: 15px;
+}
+
+.reg-section {
+  background-color: #adc4f0;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.reg-input-grid input,
+.reg-input-grid select,
+.reg-input-grid textarea {
+  width: 100%;
+  padding: 10px;
+  border: 2px solid #111;
+  background-color: #cbdcf7;
+}
+
+/* =============================================
+   8. FOOTER
+   ============================================= */
 .footer {
   background-color: #9db4d6;
   padding: 22px 40px;
-  margin-top: 20px;
-}
-
-.footer-container {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-/* Top row: logo and hostel name */
-.footer-top {
-  display: flex;
-  align-items: center;
-}
-
-/* Footer logo */
-.footer-logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-family: "Playfair Display", serif;
-  font-weight: 800;
-  font-size: 18px;
-  font-variant: small-caps;
+  margin-top: 40px;
 }
 
 .footer-logo img {
-  width: 50px;
-  height: 50px;
-  object-fit: contain;
+  width: 40px;
+  height: 40px;
 }
 
-/* Middle row: address, phone and email */
-.footer-middle {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.footer-middle p {
-  font-size: 13px;
-  color: #333;
-}
-
-/* Bottom row: copyright centered */
-.footer-bottom {
-  text-align: center;
+.footer p {
   font-size: 13px;
   color: #333;
 }
