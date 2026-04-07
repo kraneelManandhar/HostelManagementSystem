@@ -221,3 +221,39 @@ body {
   font-size: 13px;
   color: #333;
 }
+
+/* ===== FIXED FOOTER LAYOUT ===== */
+
+.footer-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Top row */
+.footer-top {
+  display: flex;
+  align-items: center;
+}
+
+/* Middle row (3 columns) */
+.footer-middle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.footer-left,
+.footer-center,
+.footer-right {
+  font-size: 13px;
+  color: #333;
+}
+
+/* Bottom row */
+.footer-bottom {
+  text-align: center;
+  font-size: 13px;
+  color: #333;
+}
