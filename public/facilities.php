@@ -1,61 +1,50 @@
 <?php
-/**
- * owner.php
- * Facilities page — shows hostel amenities in a 2-column image grid.
- * Included via the nav link "Facilities" in the header.
- */
-include('../views/layout/header.php');
+include(__DIR__ . '/../views/layout/header.php');
 ?>
 
 <main class="main-content">
 
-    <!-- Register Now button (top right) -->
+    <!-- Register Now button -->
     <div class="register-bar">
-        <a href="/HOSTELMANAGEMENTSYSTEM/views/auth/register.php" class="register-btn">Register now !!</a>
+        <a href="/HostelManagementSystem/views/auth/register.php" class="register-btn">Register now !!</a>
     </div>
 
-    <!-- ========== Facilities Grid ========== -->
-    <!-- 2-column grid, each cell has an image + label below -->
+    <!-- Facilities Grid -->
     <div class="facilities-grid">
 
-        <!-- Study Section -->
         <div class="facility-card">
-            <img src="/HOSTELMANAGEMENTSYSTEM/public/images/study-section.jpg" alt="Study Section">
+            <img src="/HostelManagementSystem/public/images/study-section.jpg" alt="Study Section">
             <p>Study section</p>
         </div>
 
-        <!-- Laundry Room -->
         <div class="facility-card">
-            <img src="/HOSTELMANAGEMENTSYSTEM/public/images/laundry.jpg" alt="Laundry Room">
+            <img src="/HostelManagementSystem/public/images/laundry.jpg" alt="Laundry Room">
             <p>Laundry Room</p>
         </div>
 
-        <!-- Game Room -->
         <div class="facility-card">
-            <img src="/HOSTELMANAGEMENTSYSTEM/public/images/game-room.jpg" alt="Game Room">
+            <img src="/HostelManagementSystem/public/images/game-room.jpg" alt="Game Room">
             <p>Game Room</p>
         </div>
 
-        <!-- Bike Rentals -->
         <div class="facility-card">
-            <img src="/HOSTELMANAGEMENTSYSTEM/public/images/bike-rentals.jpg" alt="Bike Rentals">
-            <p>Bike rentals</p>
+            <img src="/HostelManagementSystem/public/images/parking-area.jpg" alt="Parking Area">
+            <p>Parking Area</p>
         </div>
 
-        <!-- Gym -->
         <div class="facility-card">
-            <img src="/HOSTELMANAGEMENTSYSTEM/public/images/gym.jpg" alt="Gym">
+            <img src="/HostelManagementSystem/public/images/gym.jpg" alt="Gym">
             <p>Gym</p>
         </div>
 
-        <!-- Roof Sitting Area -->
         <div class="facility-card">
-            <img src="/HOSTELMANAGEMENTSYSTEM/public/images/rooftop-sitting.jpg" alt="Roof Sitting Area">
-            <p>Roof Sitting Area</p>
+            <img src="/HostelManagementSystem/public/images/rooftop-sitting.jpg" alt="Roof Sitting Area">
+            <p>Rooftop Sitting Area</p>
         </div>
 
     </div>
 
 </main>
 
-<?php include('../views/layout/footer.php'); ?>
+<?php include(__DIR__ . '/../views/layout/footer.php'); ?>
+

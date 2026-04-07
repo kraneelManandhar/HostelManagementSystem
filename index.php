@@ -8,52 +8,44 @@
 require_once 'config/db.php';
 
 // 2. Load Controllers
-// Make sure these filenames match your folder structure exactly
 require_once 'controllers/StudentController.php';
 
 // 3. Initialize Controllers
-// We pass the $pdo connection from db.php into the controllers
 $studentController = new StudentController($pdo);
 
-// 4. Capture the 'action' from the URL (defaults to 'home' if empty)
+// 4. Capture the 'action' from the URL (default = home)
 $action = $_GET['action'] ?? 'home';
 
 // 5. Routing Logic
 switch ($action) {
-    
-    // Case: Viewing the Landing Page (the code you shared earlier)
+
+    // Homepage (Landing Page)
     case 'home':
         include 'views/index.php';
         break;
 
-    // Case: Viewing the Registration Form
+    // Show Register Form
     case 'register':
         include 'views/auth/register.php';
         break;
 
-    // Case: Submitting the Registration Form (POST request)
+    // Handle Register Form Submission
     case 'register_submit':
         $studentController->register();
         break;
 
-    // Case: Staff Page
+    // Staff Page
     case 'staff':
-        include 'views/staff.php';
+        include 'public/staff.php';
         break;
 
-    // Case: Facilities Page
+    // Facilities Page
     case 'facilities':
         include 'views/facilities.php';
         break;
 
-    case 'register_submit':
-    // The $studentController was initialized at the top of index.php
-    $studentController->register(); 
-    break;
-
-    // Default: 404 Not Found or redirect to home
+    // Default: 404
     default:
         echo "404 - Page Not Found";
-        // Or: include 'views/index.php';
         break;
 }

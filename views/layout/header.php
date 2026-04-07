@@ -1,5 +1,4 @@
 <?php
-// Start session if needed
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -16,7 +15,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
     <title>Pentatonic Hostel</title>
 
     <!-- CSS -->
-    <link rel="stylesheet" href="/HOSTELMANAGEMENTSYSTEM/public/css/style.css">
+    <link rel="stylesheet" href="/HostelManagementSystem/public/css/style.css">
 
     <!-- Icons -->
     <script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web"></script>
@@ -32,25 +31,25 @@ $currentPage = basename($_SERVER['PHP_SELF']);
 
         <!-- Logo -->
         <div class="logo">
-            <img src="/HOSTELMANAGEMENTSYSTEM/public/images/logo.png" alt="Logo">
+            <img src="/HostelManagementSystem/public/images/logo.png" alt="Logo">
             <span>Pentatonic hostel</span>
         </div>
 
         <!-- Navigation -->
         <nav class="nav-links">
-            <a href="/HOSTELMANAGEMENTSYSTEM/index.php"
+            <a href="/HostelManagementSystem/index.php"
                class="<?= ($currentPage == 'index.php') ? 'active' : '' ?>">About us</a>
 
-            <a href="/HOSTELMANAGEMENTSYSTEM/public/staff.php"
+            <a href="/HostelManagementSystem/public/staff.php"
                class="<?= ($currentPage == 'staff.php') ? 'active' : '' ?>">Staffs</a>
 
-            <a href="/HOSTELMANAGEMENTSYSTEM/public/facilities.php"
+            <a href="/HostelManagementSystem/public/facilities.php"
                class="<?= ($currentPage == 'facilities.php') ? 'active' : '' ?>">Facilities</a>
         </nav>
 
         <!-- Login Button -->
         <div class="nav-actions">
-            <a href="/HOSTELMANAGEMENTSYSTEM/views/auth/login.php" class="login-btn">Login</a>
+            <a href="/HostelManagementSystem/views/auth/login.php" class="login-btn">Login</a>
         </div>
 
     </div>

@@ -1,21 +1,16 @@
 <?php
-/**
- * warden.php
- * Staffs page — shows hostel staff members with photo, name, contact, and bio.
- * Included via the nav link "Staffs" in the header.
- */
-include('../views/layout/header.php');
+include(__DIR__ . '/../views/layout/header.php');
 ?>
 <main class="main-content">
 
-    <!-- Register Now button (top right) -->
+    <!-- Register Now button -->
     <div class="register-bar">
-        <a href="/HOSTELMANAGEMENTSYSTEM/views/auth/register.php" class="register-btn">Register now !!</a>
+        <a href="/HostelManagementSystem/views/auth/register.php" class="register-btn">Register now !!</a>
     </div>
 
-    <!-- ========== Staff Member 1: Image LEFT, text RIGHT ========== -->
+    <!-- Staff Member 1: Details -->
     <div class="section-block">
-        <img src="/HOSTELMANAGEMENTSYSTEM/public/images/staff1.jpg" alt="Ananya Arora">
+        <img src="/HostelManagementSystem/public/images/staff1.jpg" alt="Ananya Arora">
 
         <div class="section-text">
             <h3 class="staff-name">Ananya Arora</h3>
@@ -31,9 +26,9 @@ include('../views/layout/header.php');
         </div>
     </div>
 
-    <!-- ========== Staff Member 2: Text LEFT, image RIGHT ========== -->
+    <!-- Staff Member 2: Details -->
     <div class="section-block reverse">
-        <img src="/HOSTELMANAGEMENTSYSTEM/public/images/staff2.jpg" alt="Marcus Lindberg">
+        <img src="/HostelManagementSystem/public/images/staff2.jpg" alt="Marcus Lindberg">
 
         <div class="section-text">
             <h3 class="staff-name">Marcus Lindberg</h3>
@@ -49,9 +44,9 @@ include('../views/layout/header.php');
         </div>
     </div>
 
-    <!-- ========== Staff Member 3: Image LEFT, text RIGHT ========== -->
+    <!-- Staff Member 3: Details -->
     <div class="section-block">
-        <img src="/HOSTELMANAGEMENTSYSTEM/public/images/staff3.jpg" alt="Priya Tamrakar">
+        <img src="/HostelManagementSystem/public/images/staff3.jpg" alt="Priya Tamrakar">
 
         <div class="section-text">
             <h3 class="staff-name">Priya Tamrakar</h3>
@@ -69,4 +64,4 @@ include('../views/layout/header.php');
 
 </main>
 
-<?php include('../views/layout/footer.php'); ?>
+<?php include(__DIR__ . '/../views/layout/footer.php'); ?>

@@ -32,14 +32,14 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-weight: 600;
-  font-size: 16px;
+  font-weight: 800;
+  font-size: 18px;
   font-family: "Playfair Display", serif;
 }
 
 .logo img {
-  width: 42px;
-  height: 42px;
+  width: 50px;
+  height: 50px;
   object-fit: contain;
 }
 
@@ -48,17 +48,19 @@ body {
   gap: 10px;
 }
 
-.nav-links a, .login-btn {
+.nav-links a,
+.login-btn {
   text-decoration: none;
   color: #333;
   padding: 7px 18px;
   border-radius: 20px;
   background-color: #f5f5f5;
   font-size: 14px;
-  transition: background-color 0.2s, color 0.2s;
+  transition: 0.2s;
 }
 
-.nav-links a:hover, .login-btn:hover {
+.nav-links a:hover,
+.login-btn:hover {
   background-color: #e0e0e0;
 }
 
@@ -68,7 +70,7 @@ body {
 }
 
 /* =============================================
-   3. MAIN CONTENT LAYOUT
+   3. MAIN CONTENT
    ============================================= */
 .main-content {
   padding: 30px 40px;
@@ -87,9 +89,7 @@ body {
   padding: 8px 20px;
   border-radius: 20px;
   font-size: 14px;
-  font-weight: 500;
   border: 1px solid #b5cce8;
-  transition: background-color 0.2s;
 }
 
 .register-btn:hover {
@@ -97,7 +97,7 @@ body {
 }
 
 /* =============================================
-   4. LANDING PAGE SECTION BLOCKS
+   4. LANDING PAGE SECTIONS
    ============================================= */
 .section-block {
   display: flex;
@@ -118,13 +118,11 @@ body {
   height: 180px;
   object-fit: cover;
   border-radius: 10px;
-  flex-shrink: 0;
 }
 
 .section-text h2 {
   font-family: "Playfair Display", serif;
   font-size: 24px;
-  font-weight: 500;
   margin-bottom: 14px;
   font-variant: small-caps;
 }
@@ -132,129 +130,81 @@ body {
 .section-text p {
   font-size: 14px;
   color: #444;
-  margin-bottom: 8px;
 }
 
 /* =============================================
-   5. REGISTRATION PAGE (MVC VIEW)
+   5. STAFF PAGE
+   ============================================= */
+.staff-name {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.staff-contact {
+  font-size: 13px;
+  color: #555;
+}
+
+.staff-bio {
+  margin-top: 10px;
+  font-size: 13.5px;
+  color: #444;
+}
+
+/* =============================================
+   6. FACILITIES PAGE
+   ============================================= */
+.facilities-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  background-color: #fdf6e3;
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.facility-card img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.facility-card p {
+  text-align: center;
+}
+
+/* =============================================
+   7. REGISTRATION PAGE
    ============================================= */
 .registration-card {
-  background-color: #fdf6e3; 
+  background-color: #fdf6e3;
   max-width: 950px;
   margin: 0 auto;
   padding: 40px;
   border-radius: 15px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-}
-
-.registration-card h2 {
-  text-align: center;
-  font-family: "Playfair Display", serif;
-  font-variant: small-caps;
-  margin-bottom: 30px;
-  font-size: 28px;
 }
 
 .reg-section {
-  background-color: #adc4f0; 
+  background-color: #adc4f0;
   border-radius: 12px;
   padding: 20px;
-  margin-bottom: 25px;
-  display: flex;
-  gap: 20px;
-  align-items: flex-start;
-  border: 2px solid #8aa4c9; 
+  margin-bottom: 20px;
 }
 
-.reg-label-side {
-  width: 160px;
-  font-weight: 600;
-  font-size: 15px;
-  color: #333;
-  padding-top: 10px;
-}
-
-.reg-input-grid {
-  flex: 1;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 15px;
-  background: rgba(255, 255, 255, 0.4);
-  padding: 20px;
-  border-radius: 10px;
-}
-
-.full-row { grid-column: span 2; }
-
-.reg-input-grid label {
-  display: block;
-  font-size: 12px;
-  margin-bottom: 5px;
-  font-weight: 500;
-}
-
-/* Fixed Input Styling with Border and Darker Background */
-.reg-input-grid input, 
-.reg-input-grid select, 
+.reg-input-grid input,
+.reg-input-grid select,
 .reg-input-grid textarea {
   width: 100%;
   padding: 10px;
-  border: 2px solid #111; /* Strong black border for definition */
-  border-radius: 6px;
+  border: 2px solid #111;
   background-color: #cbdcf7;
-  font-size: 14px;
-  color: #222;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-/* Focus effect */
-.reg-input-grid input:focus {
-  outline: none;
-  border-color: #5a7fb5;
-  box-shadow: 0 0 5px rgba(90, 127, 181, 0.3);
-  background-color: #d6e4f7;
-}
-
-.photo-box {
-  width: 140px;
-  text-align: center;
-}
-
-.photo-placeholder {
-  width: 110px;
-  height: 130px;
-  background: #e0e0e0;
-  margin: 0 auto 10px;
-  border: 2px solid #999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 40px;
-}
-
-.submit-container {
-  text-align: center;
-  margin-top: 10px;
-}
-
-.main-submit-btn {
-  background-color: #9db4d6;
-  color: #111;
-  padding: 12px 60px;
-  border: none;
-  border-radius: 25px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.main-submit-btn:hover {
-  background-color: #111;
-  color: #fff;
 }
 
 /* =============================================
-   6. FOOTER
+   8. FOOTER
    ============================================= */
 .footer {
   background-color: #9db4d6;
@@ -262,30 +212,48 @@ body {
   margin-top: 40px;
 }
 
+.footer-logo img {
+  width: 40px;
+  height: 40px;
+}
+
+.footer p {
+  font-size: 13px;
+  color: #333;
+}
+
+/* ===== FIXED FOOTER LAYOUT ===== */
+
 .footer-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Top row */
+.footer-top {
+  display: flex;
+  align-items: center;
+}
+
+/* Middle row (3 columns) */
+.footer-middle {
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 16px;
 }
 
-.footer-logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-family: "Playfair Display", serif;
-  font-weight: 600;
-  font-size: 15px;
-  font-variant: small-caps;
+.footer-left,
+.footer-center,
+.footer-right {
+  font-size: 13px;
+  color: #333;
 }
 
-.footer-logo img {
-  width: 36px;
-  height: 36px;
-}
-
-.footer-left p, .footer-center p, .footer-right p {
+/* Bottom row */
+.footer-bottom {
+  text-align: center;
   font-size: 13px;
   color: #333;
 }
