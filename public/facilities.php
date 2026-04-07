@@ -1,5 +1,5 @@
 <?php
-include('../views/layout/header.php');
+include(__DIR__ . '/../views/layout/header.php');
 ?>
 
 <main class="main-content">
@@ -46,5 +46,5 @@ include('../views/layout/header.php');
 
 </main>
 
-<?php include('../views/layout/footer.php'); ?>
+<?php include(__DIR__ . '/../views/layout/footer.php'); ?>
 

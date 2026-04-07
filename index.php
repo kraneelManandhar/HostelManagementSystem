@@ -36,7 +36,7 @@ switch ($action) {
 
     // Staff Page
     case 'staff':
-        include 'views/staff.php';
+        include 'public/staff.php';
         break;
 
     // Facilities Page
