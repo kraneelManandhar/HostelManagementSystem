@@ -1,40 +1,35 @@
 <?php
-require_once __DIR__ . '/../models/Studnet.php';
+require_once '../models/Student.php';
 
 class StudentController {
-    private $studentModel;
+    private $model;
 
-    public function __construct($db) {
-        $this->studentModel = new Student($db);
+    public function __construct(){
+        $this->model = new Student();
     }
 
-    public function register() {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Handle image upload
-            $photoName = null;
-            if (!empty($_FILES['passport_photo']['name'])) {
-                $photoName = time() . "_" . $_FILES['passport_photo']['name'];
-                move_uploaded_file($_FILES['passport_photo']['tmp_name'], __DIR__ . "/../public/images/" . $photoName);
-            }
+    public function index(){
+        return $this->model->getAll();
+    }
 
-            // Map POST data to Model array
-            $data = [
-                ':full_name' => $_POST['full_name'],
-                ':dob'       => $_POST['date_of_birth'],
-                ':contact'   => $_POST['contact_number'],
-                ':email'     => $_POST['email_address'],
-                ':photo'     => $photoName,
-                ':college'   => $_POST['college_name'],
-                ':address'   => $_POST['permanent_address'],
-                ':enrolled'  => $_POST['enrolled_date'],
-                ':g_name'    => $_POST['guardian_full_name'],
-                ':rel'       => $_POST['relationship'],
-                ':g_contact' => $_POST['guardian_contact_number']
-            ];
+    public function add(){
+        $this->model->add($_POST['name'],$_POST['email'],$_POST['contact']);
+        header("Location:index.php");
+    }
 
-            if ($this->studentModel->create($data)) {
-                header("Location: index.php?msg=RegistrationSuccessful");
-            }
-        }
+    public function delete(){
+        $this->model->delete($_GET['id']);
+        header("Location:index.php");
+    }
+
+    public function toggle($type){
+        $this->model->toggle($type,$_GET['id']);
+        header("Location:index.php?page=".$type);
+    }
+
+    public function timing(){
+        $this->model->updateTime($_POST['id'],$_POST['in'],$_POST['out']);
+        header("Location:index.php?page=timing");
     }
 }
+?>
