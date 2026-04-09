@@ -1,214 +1,266 @@
-/* =============================================
-   RESET & BASE
-   ============================================= */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+/* =========================
+   DESIGN SYSTEM 
+========================= */
+:root {
+    --primary: #1E3A5F;
+    --secondary: #2C4A6E;
+    --accent: #3B6EA8;
+    --bg: #F5F7FA;
+    --card: #FFFFFF;
+    --section: #E6E9EF;
+    --text: #222222;
+    --text-muted: #6B7280;
+
+    --radius-lg: 14px;
+    --radius-md: 10px;
+    --radius-sm: 6px;
+
+    --shadow: 0 6px 20px rgba(0,0,0,0.08);
 }
 
+/* =========================
+   BASE
+========================= */
 body {
-  font-family: "Inter", sans-serif;
-  background-color: #ede3c7; /* warm cream background */
-  color: #222;
+    margin: 0;
+    font-family: "Inter", "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--text);
 }
 
-/* =============================================
-   NAVBAR
-   ============================================= */
-.navbar {
-  background-color: #9db4d6; /* soft blue */
-  padding: 12px 40px;
+/* CENTER LAYOUT */
+.wrapper {
+    display: flex;
+    justify-content: center;
+    padding: 30px;
 }
 
-.nav-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.main {
+    display: flex;
+    width: 1200px;
+    background: var(--card);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    overflow: hidden;
 }
 
-/* Logo area */
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-weight: 600;
-  font-size: 16px;
-  font-family: "Playfair Display", serif;
+/* =========================
+   SIDEBAR
+========================= */
+.sidebar {
+    width: 240px;
+    background: var(--primary);
+    color: white;
+    padding: 20px;
 }
 
-.logo img {
-  width: 42px;
-  height: 42px;
-  object-fit: contain;
+.sidebar h2 {
+    font-size: 16px;
+    margin-bottom: 25px;
 }
 
-/* Navigation links */
-.nav-links {
-  display: flex;
-  gap: 10px;
+/* NAV BUTTONS */
+.sidebar a {
+    display: block;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 8px;
+    text-decoration: none;
+    color: white;
+    font-size: 14px;
+    background: transparent;
+    transition: 0.25s;
 }
 
-.nav-links a {
-  text-decoration: none;
-  color: #333;
-  padding: 7px 18px;
-  border-radius: 20px;
-  background-color: #f5f5f5;
-  font-size: 14px;
-  transition:
-    background-color 0.2s,
-    color 0.2s;
+.sidebar a:hover {
+    background: var(--secondary);
 }
 
-.nav-links a:hover {
-  background-color: #e0e0e0;
+.sidebar a.active {
+    background: var(--accent);
 }
 
-/* Active tab — dark pill */
-.nav-links a.active {
-  background-color: #111;
-  color: #fff;
+/* =========================
+   CONTENT
+========================= */
+.content {
+    flex: 1;
+    padding: 25px;
 }
 
-/* Login button */
-.login-btn {
-  text-decoration: none;
-  padding: 7px 18px;
-  border-radius: 20px;
-  background-color: #f5f5f5;
-  color: #333;
-  font-size: 14px;
-  transition: background-color 0.2s;
+/* TOP BAR */
+.topbar {
+    background: var(--secondary);
+    color: white;
+    padding: 12px;
+    border-radius: var(--radius-md);
+    text-align: center;
+    font-weight: 600;
+    letter-spacing: 1px;
+    margin-bottom: 25px;
 }
 
-.login-btn:hover {
-  background-color: #e0e0e0;
+/* =========================
+   DASHBOARD CARDS
+========================= */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
 }
 
-/* =============================================
-   MAIN CONTENT SECTIONS
-   ============================================= */
-.main-content {
-  padding: 30px 40px;
+.card {
+    background: var(--section);
+    border-radius: var(--radius-lg);
+    height: 130px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+    font-weight: 500;
+    position: relative;
+    transition: 0.3s;
+    cursor: pointer;
 }
 
-/* Register Now button (top-right of hero) */
-.register-bar {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 20px;
+.card:hover {
+    transform: translateY(-5px);
+    background: var(--accent);
+    color: white;
 }
 
-.register-btn {
-  text-decoration: none;
-  background-color: #d6e4f7;
-  color: #222;
-  padding: 8px 20px;
-  border-radius: 20px;
-  font-size: 14px;
-  font-weight: 500;
-  border: 1px solid #b5cce8;
-  transition: background-color 0.2s;
+/* BADGE */
+.badge {
+    position: absolute;
+    bottom: 12px;
+    right: 18px;
+    background: var(--primary);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
 }
 
-.register-btn:hover {
-  background-color: #c0d6ef;
+/* =========================
+   FORM
+========================= */
+.form {
+    margin-top: 25px;
 }
 
-/* ---- Section blocks ---- */
-/* Each section: image + text side by side */
-.section-block {
-  display: flex;
-  align-items: center;
-  gap: 30px;
-  background-color: #fdf6e3; /* slightly lighter cream card */
-  border-radius: 12px;
-  padding: 30px;
-  margin-bottom: 20px;
+.form input {
+    padding: 10px;
+    margin: 5px;
+    border-radius: var(--radius-sm);
+    border: 1px solid #ccc;
 }
 
-/* Alternate layout: text left, image right */
-.section-block.reverse {
-  flex-direction: row-reverse;
+button {
+    padding: 10px 15px;
+    border: none;
+    background: var(--primary);
+    color: white;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
 }
 
-/* Section images */
-.section-block img {
-  width: 240px;
-  height: 180px;
-  object-fit: cover;
-  border-radius: 10px;
-  flex-shrink: 0;
+button:hover {
+    background: var(--accent);
 }
 
-/* Section text */
-.section-text h2 {
-  font-family: "Playfair Display", serif;
-  font-size: 24px;
-  font-weight: 500;
-  margin-bottom: 14px;
-  /* Small-caps style to match screenshot */
-  font-variant: small-caps;
+/* =========================
+   TABLE
+========================= */
+.table {
+    background: var(--section);
+    padding: 20px;
+    border-radius: var(--radius-lg);
+    margin-top: 20px;
 }
 
-.section-text p {
-  font-size: 14px;
-  line-height: 1.7;
-  color: #444;
-  margin-bottom: 8px;
+/* HEADER */
+.row.header {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    margin-bottom: 10px;
 }
 
-/* =============================================
-   FOOTER
-   ============================================= */
-.footer {
-  background-color: #9db4d6;
-  padding: 22px 40px;
-  margin-top: 20px;
+.row.header span {
+    background: var(--secondary);
+    color: white;
+    padding: 8px;
+    border-radius: var(--radius-sm);
+    text-align: center;
+    font-size: 13px;
 }
 
-.footer-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 16px;
+/* ROW */
+.row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 10px;
+    margin: 8px 0;
+    align-items: center;
 }
 
-/* Footer logo */
-.footer-logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-family: "Playfair Display", serif;
-  font-weight: 600;
-  font-size: 15px;
-  font-variant: small-caps;
+/* CELL */
+.row span {
+    background: var(--card);
+    padding: 10px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+}
+.row span:nth-child(2) {
+    display: flex;
+    align-items: center;
+}
+/* =========================
+   STATUS
+========================= */
+/* STATUS BAR */
+.status-bar {
+    width: 100%;
+    height: 18px;
+    border-radius: 6px;
+    background: #ddd;
+    overflow: hidden;
 }
 
-.footer-logo img {
-  width: 36px;
-  height: 36px;
-  object-fit: contain;
+/* INNER COLOR */
+.status-fill {
+    height: 100%;
+    border-radius: 6px;
 }
 
-/* Footer address under logo */
-.footer-left p {
-  font-size: 13px;
-  margin-top: 6px;
-  color: #333;
+/* GREEN = YES */
+.status-yes {
+    background: #4CAF50;
+    width: 100%;
 }
 
-/* Footer contact info */
-.footer-center p {
-  font-size: 13px;
-  color: #333;
-  margin-bottom: 4px;
+/* RED = NO */
+.status-no {
+    background: #E74C3C;
+    width: 100%;
 }
 
-/* Footer copyright */
-.footer-right p {
-  font-size: 13px;
-  color: #333;
+/* =========================
+   INPUTS (TIMING)
+========================= */
+input[type="time"] {
+    padding: 6px;
+    border-radius: var(--radius-sm);
+    border: 1px solid #ccc;
+}
+
+/* =========================
+   LINKS
+========================= */
+a {
+    color: var(--primary);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
 }

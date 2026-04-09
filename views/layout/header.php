@@ -1,57 +1,22 @@
-<?php
-// Start session if needed
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-// Get current page for active nav highlight
-$currentPage = basename($_SERVER['PHP_SELF']);
-?>
-
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pentatonic Hostel</title>
-
-    <!-- CSS -->
-    <link rel="stylesheet" href="/HOSTELMANAGEMENTSYSTEM/public/css/style.css">
-
-    <!-- Icons -->
-    <script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web"></script>
-
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <title>Hostel Management</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
-
 <body>
 
-<header class="navbar">
-    <div class="nav-container">
+<div class="wrapper">
 
-        <!-- Logo -->
-        <div class="logo">
-            <img src="/HOSTELMANAGEMENTSYSTEM/public/images/logo.png" alt="Logo">
-            <span>Pentatonic hostel</span>
-        </div>
+<div class="sidebar">
+    <h2>Pentatonic hostel</h2>
 
-        <!-- Navigation -->
-        <nav class="nav-links">
-            <a href="/HOSTELMANAGEMENTSYSTEM/index.php"
-               class="<?= ($currentPage == 'index.php') ? 'active' : '' ?>">About us</a>
+    <a href="index.php">Dashboard</a>
+    <a href="index.php?page=food">Food</a>
+    <a href="index.php?page=laundry">Laundry</a>
+    <a href="index.php?page=bathroom">Bathroom Cleaning</a>
+    <a href="index.php?page=timing">Timing</a>
+</div>
 
-            <a href="/HOSTELMANAGEMENTSYSTEM/public/staff.php"
-               class="<?= ($currentPage == 'staff.php') ? 'active' : '' ?>">Staffs</a>
-
-            <a href="/HOSTELMANAGEMENTSYSTEM/public/facilities.php"
-               class="<?= ($currentPage == 'facilities.php') ? 'active' : '' ?>">Facilities</a>
-        </nav>
-
-        <!-- Login Button -->
-        <div class="nav-actions">
-            <a href="/HOSTELMANAGEMENTSYSTEM/views/auth/login.php" class="login-btn">Login</a>
-        </div>
-
-    </div>
-</header>
+<div class="content">
+<div class="topbar">WARDEN PANEL</div>
