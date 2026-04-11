@@ -1,5 +1,5 @@
 <?php
-include(__DIR__ . '/../views/layout/header.php');
+include(__DIR__ . '/../layout/header.php'); 
 ?>
 <main class="main-content">
 
@@ -17,11 +17,9 @@ include(__DIR__ . '/../views/layout/header.php');
             <p class="staff-contact">ananya@pentatonic.com</p>
             <p class="staff-contact">9847612502</p>
             <p class="staff-bio">
-                Our team is the heart of Pentatonic Hostel. Each member brings a unique energy,
-                local expertise, and genuine passion for making every guest feel at home. Whether
-                it's recommending hidden gems around the city or ensuring your stay is
-                comfortable and memorable, our staff goes above and beyond with warmth and
-                dedication.
+                Ananya is responsible for guest relations and front desk management. 
+                She ensures smooth check-ins and check-outs while handling guest queries with patience and professionalism. 
+                Her friendly attitude makes every visitor feel welcomed from the moment they arrive.
             </p>
         </div>
     </div>
@@ -35,11 +33,9 @@ include(__DIR__ . '/../views/layout/header.php');
             <p class="staff-contact">marcus@pentatonic.com</p>
             <p class="staff-contact">9876543210</p>
             <p class="staff-bio">
-                Our team is the heart of Pentatonic Hostel. Each member brings a unique
-                energy, local expertise, and genuine passion for making every guest feel at
-                home. Whether it's recommending hidden gems around the city or ensuring
-                your stay is comfortable and memorable, our staff goes above and beyond with
-                warmth and dedication.
+                Marcus manages hostel operations and maintenance coordination. 
+                With strong organizational skills, he ensures all facilities are running smoothly and efficiently.
+                He is known for quickly resolving issues and maintaining a clean, safe environment for all individuals.
             </p>
         </div>
     </div>
@@ -53,15 +49,13 @@ include(__DIR__ . '/../views/layout/header.php');
             <p class="staff-contact">priya@pentatonic.com</p>
             <p class="staff-contact">9876544902</p>
             <p class="staff-bio">
-                Our team is the heart of Pentatonic Hostel. Each member brings a unique
-                energy, local expertise, and genuine passion for making every guest feel at
-                home. Whether it's recommending hidden gems around the city or ensuring
-                your stay is comfortable and memorable, our staff goes above and beyond with
-                warmth and dedication.
+                Priya is part of the housekeeping team responsible for maintaining cleanliness 
+                and hygiene across the hostel. She ensures that rooms, bathrooms, and common 
+                areas are cleaned regularly and kept in good condition for a comfortable
+                stay for all residents.
             </p>
         </div>
     </div>
-
 </main>
 
-<?php include(__DIR__ . '/../views/layout/footer.php'); ?>
+<?php include(__DIR__ . '/../layout/footer.php'); ?>
