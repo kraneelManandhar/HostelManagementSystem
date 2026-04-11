@@ -1,24 +1,62 @@
-/* =============================================
-   1. RESET & BASE
-   ============================================= */
+/* CSS VARIABLES */
+:root {
+  /* Core Colors */
+  --white: #ffffff;
+  --black: #000000;
+  --primary-dark: #022448;
+  --light-blue: #aac4f54a;
+  --hover-blue: #c8d9ed;
+  --accent-yellow: #e8b84b;
+  --accent-yellow-dark: #d4a438;
+
+  /* Navbar */
+  --nav-bg: var(--primary-dark);
+  --nav-link-bg: var(--white);
+  --nav-link-text: var(--black);
+  --nav-link-hover: var(--hover-blue);
+  --nav-active-bg: #111;
+  --nav-active-text: var(--white);
+
+  /* Buttons */
+  --login-bg: var(--white);
+  --login-text: var(--black);
+  --login-hover: var(--hover-blue);
+
+  --register-bg: var(--accent-yellow);
+  --register-text: var(--black);
+  --register-border: var(--accent-yellow-dark);
+  --register-hover: var(--accent-yellow-dark);
+
+  /* Sections */
+  --section-bg: var(--light-blue);
+  --text-dark: var(--black);
+
+  /* Footer */
+  --footer-bg: var(--primary-dark);
+  --footer-text: var(--white);
+
+  /* Logo */
+  --logo-size: 70px;
+  --logo-filter: invert(1);
+}
+
+/* RESET */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+/* BODY */
 body {
   font-family: "Inter", sans-serif;
-  background-color: #ede3c7; /* Warm cream background */
-  color: #222;
-  line-height: 1.6;
+  background-color: var(--white);
+  color: var(--black);
 }
 
-/* =============================================
-   2. NAVBAR
-   ============================================= */
+/* NAVBAR */
 .navbar {
-  background-color: #9db4d6; /* Soft blue */
+  background-color: var(--nav-bg);
   padding: 12px 40px;
 }
 
@@ -28,54 +66,83 @@ body {
   align-items: center;
 }
 
+/* LOGO */
 .logo {
+  font-family: "Playfair Display", serif;
+  font-weight: 800;
+  font-size: 18px;
+}
+
+/* FIX: clickable logo */
+.logo a {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-weight: 800;
-  font-size: 18px;
+  text-decoration: none;
+  color: var(--white);
   font-family: "Playfair Display", serif;
+  font-weight: 800;
+  font-size: 20px;
+  font-variant: small-caps;
+}
+
+.logo a:visited {
+  color: var(--white);
 }
 
 .logo img {
-  width: 50px;
-  height: 50px;
+  width: var(--logo-size);
+  height: var(--logo-size);
   object-fit: contain;
+  filter: var(--logo-filter);
 }
 
+/* NAV LINKS */
 .nav-links {
   display: flex;
   gap: 10px;
 }
 
-.nav-links a,
-.login-btn {
+.nav-links a {
   text-decoration: none;
-  color: #333;
+  color: var(--nav-link-text);
   padding: 7px 18px;
   border-radius: 20px;
-  background-color: #f5f5f5;
+  background-color: var(--nav-link-bg);
   font-size: 14px;
   transition: 0.2s;
 }
 
-.nav-links a:hover,
-.login-btn:hover {
-  background-color: #e0e0e0;
+.nav-links a:hover {
+  background-color: var(--nav-link-hover);
 }
 
 .nav-links a.active {
-  background-color: #111;
-  color: #fff;
+  background-color: var(--nav-active-bg);
+  color: var(--nav-active-text);
 }
 
-/* =============================================
-   3. MAIN CONTENT
-   ============================================= */
+/* LOGIN BUTTON */
+.login-btn {
+  text-decoration: none;
+  padding: 7px 18px;
+  border-radius: 20px;
+  background-color: var(--login-bg);
+  color: var(--login-text);
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+.login-btn:hover {
+  background-color: var(--login-hover);
+}
+
+/* MAIN CONTENT */
 .main-content {
   padding: 30px 40px;
 }
 
+/* REGISTER BUTTON */
 .register-bar {
   display: flex;
   justify-content: flex-end;
@@ -84,26 +151,25 @@ body {
 
 .register-btn {
   text-decoration: none;
-  background-color: #d6e4f7;
-  color: #222;
+  background-color: var(--register-bg);
+  color: var(--register-text);
   padding: 8px 20px;
   border-radius: 20px;
   font-size: 14px;
-  border: 1px solid #b5cce8;
+  border: 1px solid var(--register-border);
+  transition: 0.2s;
 }
 
 .register-btn:hover {
-  background-color: #c0d6ef;
+  background-color: var(--register-hover);
 }
 
-/* =============================================
-   4. LANDING PAGE SECTIONS
-   ============================================= */
+/* SECTION BLOCK */
 .section-block {
   display: flex;
   align-items: center;
   gap: 30px;
-  background-color: #fdf6e3;
+  background-color: var(--section-bg);
   border-radius: 12px;
   padding: 30px;
   margin-bottom: 20px;
@@ -117,52 +183,61 @@ body {
   width: 240px;
   height: 180px;
   object-fit: cover;
+  flex-shrink: 0;
   border-radius: 10px;
 }
 
+/* TEXT */
 .section-text h2 {
   font-family: "Playfair Display", serif;
   font-size: 24px;
   margin-bottom: 14px;
   font-variant: small-caps;
+  color: var(--text-dark);
 }
 
 .section-text p {
   font-size: 14px;
-  color: #444;
+  line-height: 1.7;
+  color: var(--text-dark);
 }
 
-/* =============================================
-   5. STAFF PAGE
-   ============================================= */
+/* STAFF */
 .staff-name {
   font-size: 17px;
   font-weight: 600;
+  color: var(--text-dark);
 }
 
 .staff-contact {
   font-size: 13px;
-  color: #555;
+  color: var(--text-dark);
 }
 
 .staff-bio {
-  margin-top: 10px;
+  margin-top: 12px;
   font-size: 13.5px;
-  color: #444;
+  line-height: 1.7;
+  color: var(--text-dark);
 }
 
-/* =============================================
-   6. FACILITIES PAGE
-   ============================================= */
+/* FACILITIES */
 .facilities-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
-  background-color: #fdf6e3;
+  background-color: var(--section-bg);
   border-radius: 12px;
   padding: 24px;
   max-width: 900px;
   margin: 0 auto;
+}
+
+.facility-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
 }
 
 .facility-card img {
@@ -173,87 +248,52 @@ body {
 }
 
 .facility-card p {
-  text-align: center;
+  font-size: 14px;
+  color: var(--text-dark);
 }
 
-/* =============================================
-   7. REGISTRATION PAGE
-   ============================================= */
-.registration-card {
-  background-color: #fdf6e3;
-  max-width: 950px;
-  margin: 0 auto;
-  padding: 40px;
-  border-radius: 15px;
-}
-
-.reg-section {
-  background-color: #adc4f0;
-  border-radius: 12px;
-  padding: 20px;
-  margin-bottom: 20px;
-}
-
-.reg-input-grid input,
-.reg-input-grid select,
-.reg-input-grid textarea {
-  width: 100%;
-  padding: 10px;
-  border: 2px solid #111;
-  background-color: #cbdcf7;
-}
-
-/* =============================================
-   8. FOOTER
-   ============================================= */
+/* FOOTER */
 .footer {
-  background-color: #9db4d6;
+  background-color: var(--footer-bg);
   padding: 22px 40px;
-  margin-top: 40px;
+  margin-top: 20px;
 }
-
-.footer-logo img {
-  width: 40px;
-  height: 40px;
-}
-
-.footer p {
-  font-size: 13px;
-  color: #333;
-}
-
-/* ===== FIXED FOOTER LAYOUT ===== */
 
 .footer-container {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
-/* Top row */
-.footer-top {
+.footer-logo {
   display: flex;
   align-items: center;
+  gap: 10px;
+  font-family: "Playfair Display", serif;
+  font-weight: 800;
+  font-size: 18px;
+  font-variant: small-caps;
+  color: var(--footer-text);
 }
 
-/* Middle row (3 columns) */
+.footer-logo img {
+  width: var(--logo-size);
+  height: var(--logo-size);
+  object-fit: contain;
+  filter: var(--logo-filter);
+}
+
 .footer-middle {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
 }
 
-.footer-left,
-.footer-center,
-.footer-right {
+.footer-middle p,
+.footer-bottom {
   font-size: 13px;
-  color: #333;
+  color: var(--footer-text);
 }
 
-/* Bottom row */
 .footer-bottom {
   text-align: center;
-  font-size: 13px;
-  color: #333;
 }

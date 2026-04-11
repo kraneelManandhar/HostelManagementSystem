@@ -3,8 +3,8 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Get current page for active nav highlight
-$currentPage = basename($_SERVER['PHP_SELF']);
+// Fix active page
+$currentPage = $_GET['page'] ?? 'about';
 ?>
 
 <!DOCTYPE html>
@@ -14,14 +14,8 @@ $currentPage = basename($_SERVER['PHP_SELF']);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pentatonic Hostel</title>
 
-    <!-- CSS -->
     <link rel="stylesheet" href="/HostelManagementSystem/public/css/style.css">
-
-    <!-- Icons -->
     <script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web"></script>
-
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -31,25 +25,35 @@ $currentPage = basename($_SERVER['PHP_SELF']);
 
         <!-- Logo -->
         <div class="logo">
-            <img src="/HostelManagementSystem/public/images/logo.png" alt="Logo">
-            <span>Pentatonic hostel</span>
+            <a href="/HostelManagementSystem/index.php">
+                <img src="/HostelManagementSystem/public/images/logo.png" alt="Logo">
+                <span>Pentatonic Hostel</span>
+            </a>
         </div>
 
         <!-- Navigation -->
         <nav class="nav-links">
-            <a href="/HostelManagementSystem/index.php"
-               class="<?= ($currentPage == 'index.php') ? 'active' : '' ?>">About us</a>
+            <a href="/HostelManagementSystem/index.php?page=about"
+               class="<?= ($currentPage == 'about') ? 'active' : '' ?>">
+               About Us
+            </a>
 
-            <a href="/HostelManagementSystem/public/staff.php"
-               class="<?= ($currentPage == 'staff.php') ? 'active' : '' ?>">Staffs</a>
+            <a href="/HostelManagementSystem/index.php?page=staff"
+               class="<?= ($currentPage == 'staff') ? 'active' : '' ?>">
+               Staffs
+            </a>
 
-            <a href="/HostelManagementSystem/public/facilities.php"
-               class="<?= ($currentPage == 'facilities.php') ? 'active' : '' ?>">Facilities</a>
+            <a href="/HostelManagementSystem/index.php?page=facilities"
+               class="<?= ($currentPage == 'facilities') ? 'active' : '' ?>">
+               Facilities
+            </a>
         </nav>
 
-        <!-- Login Button -->
+        <!-- Login -->
         <div class="nav-actions">
-            <a href="/HostelManagementSystem/views/auth/login.php" class="login-btn">Login</a>
+            <a href="/HostelManagementSystem/views/auth/login.php" class="login-btn">
+                Login
+            </a>
         </div>
 
     </div>

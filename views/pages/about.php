@@ -1,12 +1,12 @@
 <?php
-include(__DIR__ . '/layout/header.php');
+include(__DIR__ . '/../layout/header.php');
 ?>
 
 <main class="main-content">
 
-    <!-- Register Now button (top right) -->
+    <!-- Register Now button -->
     <div class="register-bar">
-        <a href="/HostelManagementSystem/index.php?action=register" class="register-btn">Register now !!</a>
+        <a href="/HostelManagementSystem/views/auth/register.php" class="register-btn">Register now !!</a>
     </div>
 
     <!-- Section 1: Your Home Away From Home -->
@@ -24,7 +24,7 @@ include(__DIR__ . '/layout/header.php');
             </p>
             <p>
                 We believe travel should be accessible to everyone. That's why we've created
-                spaces designed for connection — from our vibrant common areas to our cozy
+                spaces designed for connection, from our vibrant common areas to our cozy
                 dorms and private rooms.
             </p>
         </div>
@@ -39,7 +39,7 @@ include(__DIR__ . '/layout/header.php');
             <p>
                 Our rooms are designed with your comfort in mind. From spacious
                 dorms with personal lockers and reading lights to private rooms for
-                those seeking extra privacy — every space is kept immaculately clean
+                those seeking extra privacy, every space is kept immaculately clean
                 and thoughtfully furnished.
             </p>
             <p>
@@ -70,4 +70,5 @@ include(__DIR__ . '/layout/header.php');
 
 </main>
 
-<?php include(__DIR__ . '/layout/footer.php'); ?>
+<?php include(__DIR__ . '/../layout/footer.php'); ?>
+

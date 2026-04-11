@@ -31,4 +31,3 @@
 </footer>
 
 <script src="/HostelManagementSystem/public/js/main.js"></script>
-
