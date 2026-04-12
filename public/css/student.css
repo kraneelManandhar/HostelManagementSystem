@@ -1,0 +1,727 @@
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@300;400;500;600&display=swap");
+
+/* CSS VARIABLES */
+:root {
+  --navy: #022448;
+  --bg: #dce8f5;
+  --white: #ffffff;
+  --dark: #222;
+  --amber: #e8b84b;
+  --amber-dark: #d4a438;
+  --danger: #c0474a;
+  --light-blue: #aac4e0;
+  --muted: #888;
+  --subtle: #555;
+  --hover-gray: #e0e0e0;
+  --card-bg: #e2ecf8;
+  --panel-right: #cddaed;
+  --black-pill: #111;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Inter", sans-serif;
+  background-color: var(--bg);
+  color: var(--dark);
+  min-height: 100vh;
+}
+
+/* PAGE WRAPPER */
+.sd-page-wrap {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* BODY ROW: Main content carries its own padding. */
+.sd-body-row {
+  display: flex;
+  flex: 1;
+  padding: 0;
+  gap: 0;
+}
+
+/* SIDEBAR */
+.sd-sidebar {
+  width: 230px;
+  min-width: 230px;
+  background-color: var(--navy);
+  border-radius: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 24px 16px 20px;
+  align-self: stretch;
+}
+
+/* Logo block: top of sidebar */
+.sd-sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin-bottom: 28px;
+  padding: 0 4px;
+}
+
+.sd-sidebar-logo img {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+  flex-shrink: 0;
+}
+
+.sd-sidebar-logo span {
+  font-family: "Playfair Display", serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--white);
+  line-height: 1.25;
+}
+
+/* Profile (photo + name + role) */
+.sd-sidebar-profile {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 24px;
+  width: 100%;
+}
+
+.sd-avatar {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background-color: #b0b8c4;
+  border: 3px solid var(--white);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  flex-shrink: 0;
+}
+
+.sd-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.sd-avatar-fallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  color: #e0e6ee;
+}
+
+.sd-student-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--white);
+  text-align: left;
+  margin-bottom: 4px;
+}
+
+.sd-student-role {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--light-blue);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* Nav buttons: stacked top to bottom */
+.sd-sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.sd-nav-btn {
+  width: 100%;
+  padding: 11px 16px;
+  border-radius: 24px;
+  border: none;
+  background-color: var(--white);
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--dark);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+}
+
+.sd-nav-btn i {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.sd-nav-btn:hover {
+  background-color: var(--hover-gray);
+}
+
+.sd-nav-btn.active {
+  background-color: var(--black-pill);
+  color: var(--white);
+}
+
+/* Pushes sign-out to the very bottom */
+.sd-sidebar-spacer {
+  flex: 1;
+}
+
+.sd-signout-btn {
+  width: 100%;
+  padding: 11px 16px;
+  border-radius: 24px;
+  border: none;
+  background-color: var(--white);
+  color: var(--dark);
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  transition: background-color 0.2s;
+}
+
+.sd-signout-btn i {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.sd-signout-btn:hover {
+  background-color: var(--hover-gray);
+}
+
+/* MAIN CONTENT AREA */
+.sd-main {
+  flex: 1;
+  min-width: 0;
+  padding: 20px 20px 24px 20px;
+}
+
+/* Welcome banner */
+.sd-welcome-card {
+  background-color: var(--navy);
+  border-radius: 12px;
+  padding: 22px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.sd-welcome-card h1 {
+  font-family: "Playfair Display", serif;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: var(--white);
+}
+
+.sd-welcome-card p {
+  font-size: 13px;
+  color: var(--light-blue);
+  margin-top: 4px;
+}
+
+.sd-joined-badge {
+  background-color: var(--amber);
+  color: var(--dark);
+  border-radius: 20px;
+  padding: 10px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Page switching */
+.sd-page {
+  display: none;
+}
+.sd-page.active {
+  display: block;
+}
+
+/* White panel wrapper (Dashboard + Complaints) */
+.sd-blue-panel {
+  background-color: var(--white);
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* DASHBOARD: info cards */
+.sd-info-card {
+  background-color: var(--card-bg);
+  border-radius: 12px;
+  padding: 18px 22px;
+}
+
+.sd-info-card h3 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--dark);
+  margin-bottom: 16px;
+}
+
+.sd-info-grid {
+  display: grid;
+  gap: 10px 16px;
+}
+
+.sd-cols-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+.sd-cols-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.sd-info-field label {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.sd-info-field span {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--dark);
+}
+
+/* ROOM DETAILS: DOUBLE SITTER: Two separate boxes side by side */
+.sd-room-outer {
+  display: flex;
+  gap: 14px;
+  align-items: stretch;
+}
+
+.sd-room-left-wrap {
+  flex: 1;
+  min-width: 0;
+}
+
+.sd-room-left-card {
+  display: flex;
+  gap: 48px;
+  align-items: flex-start;
+}
+
+.sd-room-right-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background-color: var(--panel-right);
+  border-radius: 12px;
+  padding: 18px 22px;
+  min-width: 180px;
+  flex-shrink: 0;
+  justify-content: center;
+}
+
+/* Status badges */
+.sd-badge {
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 700;
+  background: none;
+  padding: 0;
+  border-radius: 0;
+}
+
+.badge-overdue,
+.badge-pending {
+  color: var(--danger) !important;
+}
+.badge-paid {
+  color: #4caf50;
+}
+
+/*  COMPLAINTS PAGE */
+
+/* Hero gradient banner: column layout */
+.sd-complaint-hero {
+  background: linear-gradient(135deg, #2a4a6b 0%, #3d6080 50%, #4a7090 100%);
+  border-radius: 12px;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 18px;
+}
+
+.sd-complaint-hero-text h2 {
+  font-family: "Inter", sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+
+.sd-complaint-hero-text p {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.82);
+  line-height: 1.6;
+}
+
+.sd-write-btn {
+  background-color: var(--amber);
+  border: none;
+  border-radius: 20px;
+  padding: 10px 22px;
+  font-family: "Inter", sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--dark);
+  cursor: pointer;
+  white-space: nowrap;
+  letter-spacing: 0.03em;
+  transition: background-color 0.2s;
+}
+
+.sd-write-btn:hover {
+  background-color: var(--amber-dark);
+}
+
+/* Previous complaints list box */
+.sd-complaint-list-box {
+  background-color: var(--card-bg);
+  border-radius: 12px;
+  padding: 14px 16px;
+  min-height: 180px;
+}
+
+.sd-complaint-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.sd-section-pill {
+  display: inline-block;
+  background-color: var(--white);
+  border: 1px solid var(--bg);
+  border-radius: 15px;
+  padding: 5px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--dark);
+}
+
+.sd-trash-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+  color: var(--danger);
+  transition: color 0.2s;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.sd-trash-btn:hover {
+  color: #a03035;
+}
+
+/* Column header pills */
+.sd-complaint-col-headers {
+  display: grid;
+  grid-template-columns: 28px 1fr 2fr 90px 80px;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding: 0 8px;
+}
+
+.sd-complaint-col-headers span {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  background-color: var(--white);
+  border-radius: 12px;
+  padding: 4px 10px;
+  text-align: center;
+}
+
+.sd-complaint-col-headers span:first-child {
+  background: none;
+  padding: 0;
+}
+
+/* Complaint data rows */
+.sd-complaint-item {
+  display: grid;
+  grid-template-columns: 28px 1fr 2fr 90px 80px;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 8px;
+  background-color: var(--white);
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.sd-complaint-item input[type="radio"] {
+  accent-color: var(--navy);
+  flex-shrink: 0;
+}
+
+.sd-c-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--dark);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sd-c-desc {
+  font-size: 11px;
+  color: var(--subtle);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sd-c-room {
+  font-size: 11px;
+  color: var(--dark);
+  background-color: var(--white);
+  border-radius: 12px;
+  padding: 3px 10px;
+  text-align: center;
+}
+
+/*  NOTICE PAGE */
+#page-notice .sd-blue-panel {
+  background-color: transparent;
+  padding: 0;
+  gap: 12px;
+}
+
+.sd-notice-header {
+  background-color: var(--white);
+  border-radius: 12px;
+  padding: 16px 20px;
+}
+
+.sd-notice-header h3 {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--dark);
+  margin-bottom: 6px;
+}
+
+.sd-notice-header p {
+  font-size: 12px;
+  color: var(--subtle);
+  line-height: 1.55;
+}
+
+/* Each notice has its own white box */
+.sd-notice-card {
+  background-color: var(--white);
+  border-radius: 12px;
+  padding: 18px 20px;
+}
+
+/* Meta (date + author) above title */
+.sd-notice-meta {
+  display: flex;
+  gap: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  letter-spacing: 0.03em;
+  margin-bottom: 10px;
+}
+
+.sd-notice-meta span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.sd-notice-card h4 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--dark);
+  margin-bottom: 10px;
+}
+
+/* Description in nested light-blue box */
+.sd-notice-body {
+  background-color: var(--card-bg);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 12px;
+  color: var(--subtle);
+  line-height: 1.6;
+}
+
+.sd-notice-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--muted);
+  padding: 8px 0 2px;
+}
+
+.sd-notice-footer i {
+  font-size: 18px;
+}
+
+/*  COMPLAINT MODAL */
+.sd-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+}
+
+.sd-modal-overlay.open {
+  display: flex;
+}
+
+.sd-modal-box {
+  background-color: #6e8fae;
+  border-radius: 16px;
+  padding: 26px 30px;
+  width: 480px;
+  max-width: 90vw;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.25);
+}
+
+.sd-modal-box h2 {
+  text-align: center;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: "Inter", sans-serif;
+  background-color: var(--white);
+  border-radius: 20px;
+  padding: 12px;
+  margin-bottom: 20px;
+  color: var(--dark);
+}
+
+.sd-form-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.sd-form-group {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.sd-form-group label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--white);
+  margin-bottom: 5px;
+}
+
+.sd-form-group input,
+.sd-form-group textarea {
+  padding: 9px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  background-color: var(--white);
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  color: var(--dark);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.sd-form-group input:focus,
+.sd-form-group textarea:focus {
+  border-color: var(--navy);
+}
+
+.sd-form-group textarea {
+  resize: vertical;
+  min-height: 90px;
+}
+
+.sd-form-small {
+  max-width: 110px;
+}
+
+.sd-form-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 18px;
+}
+
+.sd-btn-back {
+  background-color: transparent;
+  border: none;
+  padding: 8px 22px;
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--white);
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.sd-btn-back:hover {
+  opacity: 0.7;
+}
+
+.sd-btn-submit {
+  background-color: var(--amber);
+  border: 1px solid var(--amber-dark);
+  border-radius: 20px;
+  padding: 9px 30px;
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--dark);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.sd-btn-submit:hover {
+  background-color: var(--amber-dark);
+}
