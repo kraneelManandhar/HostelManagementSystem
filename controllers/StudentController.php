@@ -1,40 +1,46 @@
 <?php
-require_once __DIR__ . '/../models/Studnet.php';
+
+require_once __DIR__ . '/../models/Student.php';
+require_once __DIR__ . '/../models/Room.php';
+require_once __DIR__ . '/../models/Fee.php';
+require_once __DIR__ . '/../models/Complaint.php';
+require_once __DIR__ . '/../models/Notice.php';
 
 class StudentController {
-    private $studentModel;
 
-    public function __construct($db) {
-        $this->studentModel = new Student($db);
+    private PDO $pdo;
+
+    public function __construct($pdo) {
+        $this->pdo = $pdo;
     }
 
-    public function register() {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Handle image upload
-            $photoName = null;
-            if (!empty($_FILES['passport_photo']['name'])) {
-                $photoName = time() . "_" . $_FILES['passport_photo']['name'];
-                move_uploaded_file($_FILES['passport_photo']['tmp_name'], __DIR__ . "/../public/images/" . $photoName);
-            }
+    public function dashboard() {
 
-            // Map POST data to Model array
-            $data = [
-                ':full_name' => $_POST['full_name'],
-                ':dob'       => $_POST['date_of_birth'],
-                ':contact'   => $_POST['contact_number'],
-                ':email'     => $_POST['email_address'],
-                ':photo'     => $photoName,
-                ':college'   => $_POST['college_name'],
-                ':address'   => $_POST['permanent_address'],
-                ':enrolled'  => $_POST['enrolled_date'],
-                ':g_name'    => $_POST['guardian_full_name'],
-                ':rel'       => $_POST['relationship'],
-                ':g_contact' => $_POST['guardian_contact_number']
-            ];
+        if (!isset($_SESSION['student_id'])) {
+            header("Location: /HostelManagementSystem/views/auth/login.php");
+            exit();
+        }
 
-            if ($this->studentModel->create($data)) {
-                header("Location: index.php?msg=RegistrationSuccessful");
-            }
+        try {
+
+            $id = $_SESSION['student_id'];
+
+            $studentModel = new Student($this->pdo);
+            $roomModel = new Room($this->pdo);
+            $feeModel = new Fee($this->pdo);
+            $complaintModel = new Complaint($this->pdo);
+            $noticeModel = new Notice($this->pdo);
+
+            $student = $studentModel->find($id);
+            $room = $roomModel->findByStudent($id);   
+            $fees = $feeModel->findByStudent($id);
+            $complaints = $complaintModel->allByStudent($id);
+            $notices = $noticeModel->all();
+
+            require __DIR__ . '/../views/dashboard/student_dashboard.php';
+
+        } catch (PDOException $e) {
+            die("Dashboard Error: " . $e->getMessage());
         }
     }
 }
