@@ -2,7 +2,6 @@
 
 class PageController {
 
-    // Landing page
     public function home() {
         require __DIR__ . '/../views/pages/about.php';
     }
@@ -18,4 +17,5 @@ class PageController {
     public function facilities() {
         require __DIR__ . '/../views/pages/facilities.php';
     }
+
 }

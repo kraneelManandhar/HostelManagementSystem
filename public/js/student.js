@@ -1,105 +1,132 @@
-// Handles: page navigation, complaint form modal,
-// dynamic complaint adding, complaint deletion
-
 document.addEventListener("DOMContentLoaded", function () {
   // 1. SIDEBAR NAVIGATION
   const navButtons = document.querySelectorAll(".sd-nav-btn[data-page]");
   const pages = document.querySelectorAll(".sd-page");
 
-  navButtons.forEach(function (button) {
+  navButtons.forEach((button) => {
     button.addEventListener("click", function () {
-      navButtons.forEach(function (btn) {
-        btn.classList.remove("active");
-      });
-      pages.forEach(function (page) {
-        page.classList.remove("active");
-      });
+      navButtons.forEach((btn) => btn.classList.remove("active"));
+      pages.forEach((page) => page.classList.remove("active"));
 
       button.classList.add("active");
 
-      const targetId = "page-" + button.dataset.page;
-      const targetPage = document.getElementById(targetId);
-      if (targetPage) {
-        targetPage.classList.add("active");
-      }
+      const targetPage = document.getElementById("page-" + button.dataset.page);
+      if (targetPage) targetPage.classList.add("active");
     });
   });
 
-  // 2. COMPLAINT FORM MODAL
+  // 2. MODAL CONTROLS
   const modal = document.getElementById("complaintModal");
   const openBtn = document.getElementById("openComplaintForm");
   const closeBtn = document.getElementById("closeComplaintForm");
-  const submitBtn = document.getElementById("submitComplaint");
 
   if (openBtn) {
-    openBtn.addEventListener("click", function () {
-      modal.classList.add("open");
-    });
+    openBtn.addEventListener("click", () => modal.classList.add("open"));
   }
 
   if (closeBtn) {
-    closeBtn.addEventListener("click", function () {
-      closeModal();
-    });
+    closeBtn.addEventListener("click", closeModal);
   }
 
   if (modal) {
-    modal.addEventListener("click", function (e) {
-      if (e.target === modal) {
-        closeModal();
-      }
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) closeModal();
     });
   }
 
   function closeModal() {
     modal.classList.remove("open");
-    var issueInput = document.getElementById("inputIssue");
-    var descInput = document.getElementById("inputDesc");
-    if (issueInput) issueInput.value = "";
-    if (descInput) descInput.value = "";
   }
 
-  // 3. SUBMIT COMPLAINT: appends a new row to the grid list
-  if (submitBtn) {
-    submitBtn.addEventListener("click", function () {
-      var issue = document.getElementById("inputIssue").value.trim();
-      var desc = document.getElementById("inputDesc").value.trim();
-      var room = document.getElementById("inputRoom").value.trim();
+  // 3. SUBMIT COMPLAINT
+  const submitBtn = document.getElementById("submitComplaint");
 
-      if (issue === "") {
+  if (submitBtn) {
+    submitBtn.addEventListener("click", async function () {
+      const form = document.querySelector("form");
+      const formData = new FormData(form);
+
+      const issue = formData.get("title")?.trim();
+      const description = formData.get("description")?.trim();
+      const room = formData.get("room_number")?.trim();
+
+      // validation
+      if (!issue) {
         alert("Please fill in the Issue field.");
         return;
       }
 
-      var list = document.getElementById("sd-complaints-list");
-      if (list) {
-        var item = document.createElement("div");
-        item.className = "sd-complaint-item";
-        item.innerHTML =
-          '<input type="radio" name="selected-complaint">' +
-          '<span class="sd-c-title">' +
-          escHtml(issue) +
-          "</span>" +
-          '<span class="sd-c-desc">' +
-          escHtml(desc || "—") +
-          "</span>" +
-          '<span class="sd-c-room">' +
-          escHtml(room) +
-          "</span>" +
-          '<span class="sd-badge badge-pending">Pending</span>';
-        list.appendChild(item);
-      }
+      try {
+        const response = await fetch(
+          "/HostelManagementSystem/index.php?page=complaint_add",
+          {
+            method: "POST",
+            body: formData,
+          },
+        );
 
-      closeModal();
+        const result = await response.json();
+
+        if (!result.success) {
+          alert(result.message || "Failed to submit complaint");
+          return;
+        }
+
+        // 1. Add to UI
+        addComplaintToUI(result.data);
+
+        // 2. Close modal
+        modal.classList.remove("open");
+
+        // 3. Reset form
+        form.reset();
+
+        // STAY ON COMPLAINT PAGE
+        document
+          .querySelectorAll(".sd-nav-btn")
+          .forEach((btn) => btn.classList.remove("active"));
+
+        document
+          .querySelectorAll(".sd-page")
+          .forEach((page) => page.classList.remove("active"));
+
+        document
+          .querySelector('.sd-nav-btn[data-page="complaints"]')
+          ?.classList.add("active");
+
+        document.getElementById("page-complaints")?.classList.add("active");
+      } catch (error) {
+        console.error("Error:", error);
+        alert("Server error while submitting complaint.");
+      }
     });
   }
 
-  // 4. DELETE SELECTED COMPLAINT
-  var trashBtn = document.getElementById("deleteComplaint");
+  // 4. ADD COMPLAINT TO UI
+  function addComplaintToUI(data) {
+    const list = document.getElementById("sd-complaints-list");
+    if (!list) return;
+
+    const item = document.createElement("div");
+    item.className = "sd-complaint-item";
+
+    item.innerHTML = `
+      <input type="radio" name="selected-complaint" value="${data.id}">
+      <span class="sd-c-title">${escHtml(data.issue)}</span>
+      <span class="sd-c-desc">${escHtml(data.description || "—")}</span>
+      <span class="sd-c-room">${escHtml(data.room || "—")}</span>
+      <span class="sd-badge">Pending</span>
+    `;
+
+    list.appendChild(item);
+  }
+
+  // 5. DELETE COMPLAINT
+  const trashBtn = document.getElementById("deleteComplaint");
 
   if (trashBtn) {
-    trashBtn.addEventListener("click", function () {
-      var selected = document.querySelector(
+    trashBtn.addEventListener("click", async function () {
+      const selected = document.querySelector(
         ".sd-complaint-item input[type='radio']:checked",
       );
 
@@ -108,47 +135,60 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
       }
 
-      selected.closest(".sd-complaint-item").remove();
+      const complaintId = selected.value;
+
+      try {
+        const res = await fetch(
+          "/HostelManagementSystem/index.php?page=complaint_delete",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              id: complaintId,
+            }),
+          },
+        );
+
+        const result = await res.json();
+
+        if (!result.success) {
+          alert(result.message || "Delete failed");
+          return;
+        }
+
+        selected.closest(".sd-complaint-item").remove();
+      } catch (err) {
+        console.error(err);
+        alert("Server error while deleting complaint.");
+      }
     });
   }
 
-  // 5. HELPER: escape HTML to prevent XSS
+  // 6. HTML ESCAPE
   function escHtml(str) {
-    return str
+    if (!str) return "";
+    return String(str)
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;");
   }
 
-  // 6. LOGO CLICK: GO TO DASHBOARD
+  // 7. LOGO NAVIGATION
   const logo = document.getElementById("goDashboard");
 
   if (logo) {
-    logo.addEventListener("click", function () {
-      // Remove active from all nav buttons
-      navButtons.forEach(function (btn) {
-        btn.classList.remove("active");
-      });
+    logo.addEventListener("click", () => {
+      navButtons.forEach((btn) => btn.classList.remove("active"));
+      pages.forEach((page) => page.classList.remove("active"));
 
-      // Remove active from all pages
-      pages.forEach(function (page) {
-        page.classList.remove("active");
-      });
+      document
+        .querySelector('.sd-nav-btn[data-page="dashboard"]')
+        ?.classList.add("active");
 
-      // Activate dashboard button
-      const dashboardBtn = document.querySelector(
-        '.sd-nav-btn[data-page="dashboard"]',
-      );
-      if (dashboardBtn) {
-        dashboardBtn.classList.add("active");
-      }
-
-      // Show dashboard page
-      const dashboardPage = document.getElementById("page-dashboard");
-      if (dashboardPage) {
-        dashboardPage.classList.add("active");
-      }
+      document.getElementById("page-dashboard")?.classList.add("active");
     });
   }
 });
