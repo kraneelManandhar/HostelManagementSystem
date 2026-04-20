@@ -1,42 +1,51 @@
 <?php
+/**
+ * index.php
+ * The Front Controller (Router) for Pentatonic Hostel Management System.
+ */
 
-session_start();
-require_once __DIR__ . '/config/db.php';
+// 1. Load Database Configuration
+require_once 'config/db.php';
 
-require_once __DIR__ . '/controllers/PageController.php';
-require_once __DIR__ . '/controllers/StudentController.php';
-require_once __DIR__ . '/controllers/ComplaintController.php';
+// 2. Load Controllers
+require_once 'controllers/StudentController.php';
 
-$page = $_GET['page'] ?? 'home';
-
-$pageController = new PageController();
+// 3. Initialize Controllers
 $studentController = new StudentController($pdo);
-$complaintController = new ComplaintController($pdo);
 
-switch ($page) {
+// 4. Capture the 'action' from the URL (default = home)
+$action = $_GET['action'] ?? 'home';
 
-    // PUBLIC PAGES
+// 5. Routing Logic
+switch ($action) {
+
+    // Homepage (Landing Page)
     case 'home':
-    case 'about':
+        include 'views/index.php';
+        break;
+
+    // Show Register Form
+    case 'register':
+        include 'views/auth/register.php';
+        break;
+
+    // Handle Register Form Submission
+    case 'register_submit':
+        $studentController->register();
+        break;
+
+    // Staff Page
     case 'staff':
+        include 'public/staff.php';
+        break;
+
+    // Facilities Page
     case 'facilities':
-        $pageController->$page();
+        include 'views/facilities.php';
         break;
 
-    // STUDENT
-    case 'student_dashboard':
-        $studentController->dashboard();
-        break;
-
-    // COMPLAINTS
-    case 'complaint_add':
-        $complaintController->store();
-        break;
-
-    case 'complaint_delete':
-        $complaintController->delete();
-        break;
-
+    // Default: 404
     default:
-        echo "404 Page Not Found";
+        echo "404 - Page Not Found";
+        break;
 }

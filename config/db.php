@@ -1,19 +1,22 @@
 <?php
-
-$host = "localhost";
-$database = "hostel_db";
-$username = "root";
-$password = "";
-
-try {
-    $pdo = new PDO(
-        "mysql:host=$host;dbname=$database;charset=utf8",
-        $username,
-        $password
-    );
-
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-} catch (PDOException $e) {
-    die("Database connection failed: " . $e->getMessage());
+class DB {
+    public static function connect() {
+        try {
+            return new PDO("mysql:host=localhost;dbname=hostel", "root", "");
+        } catch (PDOException $e) {
+            die("Error: " . $e->getMessage());
+        }
+    }
 }
+?>
+<?php
+class DB {
+    public static function connect() {
+        try {
+            return new PDO("mysql:host=localhost;dbname=hostel", "root", "");
+        } catch (PDOException $e) {
+            die("Error: " . $e->getMessage());
+        }
+    }
+}
+?>
