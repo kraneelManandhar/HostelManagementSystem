@@ -1,46 +1,72 @@
+<<<<<<< HEAD
 <?php
-
-require_once __DIR__ . '/../models/Student.php';
-require_once __DIR__ . '/../models/Room.php';
-require_once __DIR__ . '/../models/Fee.php';
-require_once __DIR__ . '/../models/Complaint.php';
-require_once __DIR__ . '/../models/Notice.php';
+require_once '../models/Student.php';
 
 class StudentController {
+    private $model;
 
-    private PDO $pdo;
-
-    public function __construct($pdo) {
-        $this->pdo = $pdo;
+    public function __construct(){
+        $this->model = new Student();
     }
 
-    public function dashboard() {
+    public function index(){
+        return $this->model->getAll();
+    }
 
-        if (!isset($_SESSION['student_id'])) {
-            header("Location: /HostelManagementSystem/views/auth/login.php");
-            exit();
-        }
+    public function add(){
+        $this->model->add($_POST['name'],$_POST['email'],$_POST['contact']);
+        header("Location:index.php");
+    }
 
-        try {
+    public function delete(){
+        $this->model->delete($_GET['id']);
+        header("Location:index.php");
+    }
 
-            $id = $_SESSION['student_id'];
+    public function toggle($type){
+        $this->model->toggle($type,$_GET['id']);
+        header("Location:index.php?page=".$type);
+    }
 
-            $studentModel = new Student($this->pdo);
-            $roomModel = new Room($this->pdo);
-            $feeModel = new Fee($this->pdo);
-            $complaintModel = new Complaint($this->pdo);
-            $noticeModel = new Notice($this->pdo);
-
-            $student = $studentModel->find($id);
-            $room = $roomModel->findByStudent($id);   
-            $fees = $feeModel->findByStudent($id);
-            $complaints = $complaintModel->allByStudent($id);
-            $notices = $noticeModel->all();
-
-            require __DIR__ . '/../views/dashboard/student_dashboard.php';
-
-        } catch (PDOException $e) {
-            die("Dashboard Error: " . $e->getMessage());
-        }
+    public function timing(){
+        $this->model->updateTime($_POST['id'],$_POST['in'],$_POST['out']);
+        header("Location:index.php?page=timing");
     }
 }
+=======
+<?php
+require_once '../models/Student.php';
+
+class StudentController {
+    private $model;
+
+    public function __construct(){
+        $this->model = new Student();
+    }
+
+    public function index(){
+        return $this->model->getAll();
+    }
+
+    public function add(){
+        $this->model->add($_POST['name'],$_POST['email'],$_POST['contact']);
+        header("Location:index.php");
+    }
+
+    public function delete(){
+        $this->model->delete($_GET['id']);
+        header("Location:index.php");
+    }
+
+    public function toggle($type){
+        $this->model->toggle($type,$_GET['id']);
+        header("Location:index.php?page=".$type);
+    }
+
+    public function timing(){
+        $this->model->updateTime($_POST['id'],$_POST['in'],$_POST['out']);
+        header("Location:index.php?page=timing");
+    }
+}
+>>>>>>> a1168b8b45eef63cc27118b6696886423dcefc31
+?>
