@@ -1,46 +1,66 @@
-<<<<<<< HEAD
+<?php
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+if (!defined('BASE_URL')) {
+    define('BASE_URL', '/HOSTELMANAGEMENTSYSTEM/');
+}
+// Fix active page
+$currentPage = $_GET['page'] ?? 'about';
+?>
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Hostel Management</title>
-    <link rel="stylesheet" href="css/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pentatonic Hostel</title>
+
+    <link rel="stylesheet" href="/HOSTELMANAGEMENTSYSTEM/public/css/style.css">
+
+
+    <script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web"></script>
 </head>
+
 <body>
 
-<div class="wrapper">
+<header class="navbar">
+    <div class="nav-container">
 
-<div class="sidebar">
-    <h2>Pentatonic hostel</h2>
+        <!-- Logo -->
+        <div class="logo">
+            <a href="/HOSTELMANAGEMENTSYSTEM/index.php">
+                <img src="/HOSTELMANAGEMENTSYSTEM/public/images/logo.png" alt="Logo">
+                <span>Pentatonic Hostel</span>
+            </a>
+        </div>
 
-    <a href="index.php">Dashboard</a>
-    <a href="index.php?page=food">Food</a>
-    <a href="index.php?page=laundry">Laundry</a>
-    <a href="index.php?page=bathroom">Bathroom Cleaning</a>
-    <a href="index.php?page=timing">Timing</a>
-</div>
+        <!-- Navigation -->
+        <nav class="nav-links">
+            <a href="/HOSTELMANAGEMENTSYSTEM/index.php?action=home"
+               class="<?= ($currentPage == 'about') ? 'active' : '' ?>">
+               About Us
+            </a>
 
-<div class="content">
-=======
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Hostel Management</title>
-    <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
+            <a href="/HOSTELMANAGEMENTSYSTEM/index.php?action=staff"
+               class="<?= ($currentPage == 'staff') ? 'active' : '' ?>">
+               Staffs
+            </a>
 
-<div class="wrapper">
+            <a href="/HOSTELMANAGEMENTSYSTEM/index.php?action=facilities"
+               class="<?= ($currentPage == 'facilities') ? 'active' : '' ?>">
+               Facilities
+            </a>
+        </nav>
 
-<div class="sidebar">
-    <h2>Pentatonic hostel</h2>
+        <!-- Login -->
+        <div class="nav-actions">
+            <a href="/HOSTELMANAGEMENTSYSTEM/views/auth/login.php" class="login-btn">
+                Login
+            </a>
+        </div>
 
-    <a href="index.php">Dashboard</a>
-    <a href="index.php?page=food">Food</a>
-    <a href="index.php?page=laundry">Laundry</a>
-    <a href="index.php?page=bathroom">Bathroom Cleaning</a>
-    <a href="index.php?page=timing">Timing</a>
-</div>
-
-<div class="content">
->>>>>>> a1168b8b45eef63cc27118b6696886423dcefc31
-<div class="topbar">WARDEN PANEL</div>
+    </div>
+</header>
