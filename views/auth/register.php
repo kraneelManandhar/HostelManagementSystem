@@ -109,7 +109,7 @@
 <div class="submit-container">
     <button type="submit" class="main-submit-btn">Continue →</button>
 </div>
-</form> <!-- Don't forget to close the form! -->
+</form>
 </main>
 
 <?php include(__DIR__ . '/../layout/footer.php'); ?>
