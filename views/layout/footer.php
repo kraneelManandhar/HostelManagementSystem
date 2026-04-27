@@ -30,4 +30,4 @@
     </div>
 </footer>
 
-<script src='/HOSTELMANAGEMENTSYSTEM/public/js/main.js'></script>
+<script src='/HostelManagementSystem/public/js/main.js'></script>
