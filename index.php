@@ -1,10 +1,8 @@
 <?php
-// Define BASE_URL first
 if (!defined('BASE_URL')) {
-    define('BASE_URL', '/HOSTELMANAGEMENTSYSTEM/');
+    define('BASE_URL', '/HostelManagementSystem/');
 }
 
-// Start session
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -12,18 +10,20 @@ if (session_status() === PHP_SESSION_NONE) {
 require_once __DIR__ . '/config/db.php';
 require_once __DIR__ . '/models/Student.php';
 require_once __DIR__ . '/models/User.php';
+require_once __DIR__ . '/models/Room.php';
+require_once __DIR__ . '/models/Fee.php';
+require_once __DIR__ . '/models/Notice.php';
+require_once __DIR__ . '/models/Complaint.php';
 require_once __DIR__ . '/controllers/StudentController.php';
 require_once __DIR__ . '/controllers/AuthController.php';
+require_once __DIR__ . '/controllers/ComplaintController.php';
 
-$studentController = new StudentController();
 $action = $_GET['action'] ?? 'home';
 
-// ========== AUTO-REDIRECT LOGGED-IN USERS ==========
-// If user is already logged in and trying to access home/login/register pages
-$publicPages = ['home', 'login', 'register', 'register_step1', 'set_password', 'register_final'];
+$publicPages = ['home', 'login', 'register', 'register_step1', 'set_password', 'register_final', 'about', 'staff', 'facilities'];
 
-if (isset($_SESSION['logged_in']) && in_array($action, $publicPages)) {
-    // Redirect to appropriate dashboard based on role
+// Redirect already-logged-in users away from public pages
+if (isset($_SESSION['logged_in']) && in_array($action, ['login', 'register', 'register_step1', 'set_password', 'register_final'])) {
     switch ($_SESSION['user_role']) {
         case 'admin':
             header('Location: ' . BASE_URL . 'index.php?action=admin_dashboard');
@@ -31,17 +31,17 @@ if (isset($_SESSION['logged_in']) && in_array($action, $publicPages)) {
         case 'warden':
             header('Location: ' . BASE_URL . 'index.php?action=warden_dashboard');
             exit;
-        case 'student':
         default:
             header('Location: ' . BASE_URL . 'index.php?action=student_dashboard');
             exit;
     }
 }
 
-// ========== ROUTER ==========
 switch ($action) {
+
     case 'home':
-        include 'views/index.php';
+    case 'about':
+        include 'views/pages/about.php';
         break;
 
     case 'register':
@@ -50,8 +50,23 @@ switch ($action) {
 
     case 'register_step1':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // ... existing code ...
+            // Store registration form data in session, move to set_password step
+            $_SESSION['reg_data'] = $_POST;
+
+            // Handle profile photo upload
+            if (!empty($_FILES['profile_photo']['name'])) {
+                $uploadDir = __DIR__ . '/public/uploads/';
+                if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
+                $ext = pathinfo($_FILES['profile_photo']['name'], PATHINFO_EXTENSION);
+                $filename = uniqid() . '_' . rand(100000000, 999999999) . '.' . $ext;
+                move_uploaded_file($_FILES['profile_photo']['tmp_name'], $uploadDir . $filename);
+                $_SESSION['reg_data']['profile_photo'] = $filename;
+            }
+
+            header('Location: ' . BASE_URL . 'index.php?action=set_password');
+            exit;
         }
+        include 'views/auth/register.php';
         break;
 
     case 'set_password':
@@ -59,7 +74,26 @@ switch ($action) {
         break;
 
     case 'register_final':
-        // ... existing code ...
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $password        = $_POST['password'] ?? '';
+            $confirmPassword = $_POST['confirm_password'] ?? '';
+
+            if (empty($password) || $password !== $confirmPassword || strlen($password) < 6) {
+                header('Location: ' . BASE_URL . 'index.php?action=set_password&error=password');
+                exit;
+            }
+
+            $data = $_SESSION['reg_data'] ?? [];
+            $data['password'] = password_hash($password, PASSWORD_DEFAULT);
+
+            $pdo = DB::connect();
+            $studentController = new StudentController($pdo);
+            $studentController->register($data);
+
+            unset($_SESSION['reg_data']);
+            header('Location: ' . BASE_URL . 'index.php?action=login&registered=success');
+            exit;
+        }
         break;
 
     case 'login':
@@ -69,12 +103,30 @@ switch ($action) {
     case 'logout':
         $auth = new AuthController();
         $auth->logout();
-        header('Location: ' . BASE_URL . 'index.php?action=home');
+        header('Location: ' . BASE_URL . 'index.php?action=login');
         exit;
 
     case 'student_dashboard':
         requireRole('student');
+        $pdo = DB::connect();
+        $studentController = new StudentController($pdo);
+        // All data fetching happens in the controller 
+        extract($studentController->getDashboardData($_SESSION['user_id']));
         include 'views/dashboard/student_dashboard.php';
+        break;
+
+    case 'complaint_add':
+        requireRole('student');
+        $pdo = DB::connect();
+        $cc = new ComplaintController($pdo);
+        $cc->store();
+        break;
+
+    case 'complaint_delete':
+        requireRole('student');
+        $pdo = DB::connect();
+        $cc = new ComplaintController($pdo);
+        $cc->delete();
         break;
 
     case 'warden_dashboard':
@@ -100,7 +152,6 @@ switch ($action) {
         break;
 }
 
-// Helper function
 function requireRole($role) {
     if (!isset($_SESSION['logged_in']) || $_SESSION['user_role'] !== $role) {
         header('Location: ' . BASE_URL . 'index.php?action=login');

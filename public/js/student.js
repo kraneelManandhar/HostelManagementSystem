@@ -39,32 +39,29 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // 3. SUBMIT COMPLAINT
+  // FIX: reference the form inside the modal by id, not document.querySelector("form")
   const submitBtn = document.getElementById("submitComplaint");
 
   if (submitBtn) {
     submitBtn.addEventListener("click", async function () {
-      const form = document.querySelector("form");
-      const formData = new FormData(form);
+      const form = document.getElementById("complaintForm");
 
-      const issue = formData.get("title")?.trim();
-      const description = formData.get("description")?.trim();
-      const room = formData.get("room_number")?.trim();
+      // Read values directly from inputs (more reliable than FormData on hidden modals)
+      const titleInput = form.querySelector('input[name="title"]');
+      const issue = titleInput?.value?.trim();
 
-      // validation
       if (!issue) {
         alert("Please fill in the Issue field.");
         return;
       }
 
+      const formData = new FormData(form);
+
       try {
         const response = await fetch(
-          "/HostelManagementSystem/index.php?page=complaint_add",
-          {
-            method: "POST",
-            body: formData,
-          },
+          "/HostelManagementSystem/index.php?action=complaint_add",
+          { method: "POST", body: formData },
         );
-
         const result = await response.json();
 
         if (!result.success) {
@@ -72,28 +69,15 @@ document.addEventListener("DOMContentLoaded", function () {
           return;
         }
 
-        // 1. Add to UI
         addComplaintToUI(result.data);
-
-        // 2. Close modal
         modal.classList.remove("open");
-
-        // 3. Reset form
         form.reset();
 
-        // STAY ON COMPLAINT PAGE
-        document
-          .querySelectorAll(".sd-nav-btn")
-          .forEach((btn) => btn.classList.remove("active"));
-
-        document
-          .querySelectorAll(".sd-page")
-          .forEach((page) => page.classList.remove("active"));
-
+        navButtons.forEach((btn) => btn.classList.remove("active"));
+        pages.forEach((page) => page.classList.remove("active"));
         document
           .querySelector('.sd-nav-btn[data-page="complaints"]')
           ?.classList.add("active");
-
         document.getElementById("page-complaints")?.classList.add("active");
       } catch (error) {
         console.error("Error:", error);
@@ -106,6 +90,10 @@ document.addEventListener("DOMContentLoaded", function () {
   function addComplaintToUI(data) {
     const list = document.getElementById("sd-complaints-list");
     if (!list) return;
+
+    // Remove "no complaints" message if present
+    const empty = list.querySelector("p");
+    if (empty) empty.remove();
 
     const item = document.createElement("div");
     item.className = "sd-complaint-item";
@@ -139,15 +127,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
       try {
         const res = await fetch(
-          "/HostelManagementSystem/index.php?page=complaint_delete",
+          "/HostelManagementSystem/index.php?action=complaint_delete",
           {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              id: complaintId,
-            }),
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id: complaintId }),
           },
         );
 
@@ -177,17 +161,15 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // 7. LOGO NAVIGATION
+  // Kept here as fallback for the JS-only click
   const logo = document.getElementById("goDashboard");
-
   if (logo) {
     logo.addEventListener("click", () => {
       navButtons.forEach((btn) => btn.classList.remove("active"));
       pages.forEach((page) => page.classList.remove("active"));
-
       document
         .querySelector('.sd-nav-btn[data-page="dashboard"]')
         ?.classList.add("active");
-
       document.getElementById("page-dashboard")?.classList.add("active");
     });
   }

@@ -5,7 +5,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 if (!defined('BASE_URL')) {
-    define('BASE_URL', '/HOSTELMANAGEMENTSYSTEM/');
+    define('BASE_URL', '/HostelManagementSystem/');
 }
 // Fix active page
 $currentPage = $_GET['page'] ?? 'about';
@@ -18,7 +18,7 @@ $currentPage = $_GET['page'] ?? 'about';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pentatonic Hostel</title>
 
-    <link rel="stylesheet" href="/HOSTELMANAGEMENTSYSTEM/public/css/style.css">
+    <link rel="stylesheet" href="/HostelManagementSystem/public/css/style.css">
 
 
     <script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web"></script>
@@ -31,25 +31,25 @@ $currentPage = $_GET['page'] ?? 'about';
 
         <!-- Logo -->
         <div class="logo">
-            <a href="/HOSTELMANAGEMENTSYSTEM/index.php">
-                <img src="/HOSTELMANAGEMENTSYSTEM/public/images/logo.png" alt="Logo">
+            <a href="/HostelManagementSystem/index.php">
+                <img src="/HostelManagementSystem/public/images/logo.png" alt="Logo">
                 <span>Pentatonic Hostel</span>
             </a>
         </div>
 
         <!-- Navigation -->
         <nav class="nav-links">
-            <a href="/HOSTELMANAGEMENTSYSTEM/index.php?action=home"
+            <a href="/HostelManagementSystem/index.php?action=home"
                class="<?= ($currentPage == 'about') ? 'active' : '' ?>">
                About Us
             </a>
 
-            <a href="/HOSTELMANAGEMENTSYSTEM/index.php?action=staff"
+            <a href="/HostelManagementSystem/index.php?action=staff"
                class="<?= ($currentPage == 'staff') ? 'active' : '' ?>">
                Staffs
             </a>
 
-            <a href="/HOSTELMANAGEMENTSYSTEM/index.php?action=facilities"
+            <a href="/HostelManagementSystem/index.php?action=facilities"
                class="<?= ($currentPage == 'facilities') ? 'active' : '' ?>">
                Facilities
             </a>
@@ -57,7 +57,7 @@ $currentPage = $_GET['page'] ?? 'about';
 
         <!-- Login -->
         <div class="nav-actions">
-            <a href="/HOSTELMANAGEMENTSYSTEM/views/auth/login.php" class="login-btn">
+            <a href="/HostelManagementSystem/views/auth/login.php" class="login-btn">
                 Login
             </a>
         </div>
