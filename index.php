@@ -20,19 +20,20 @@ require_once __DIR__ . '/controllers/ComplaintController.php';
 
 $action = $_GET['action'] ?? 'home';
 
-$publicPages = ['home', 'login', 'register', 'register_step1', 'set_password', 'register_final', 'about', 'staff', 'facilities'];
-
-// Redirect already-logged-in users away from public pages
+// Redirect logged-in users away from login/register pages
 if (isset($_SESSION['logged_in']) && in_array($action, ['login', 'register', 'register_step1', 'set_password', 'register_final'])) {
     switch ($_SESSION['user_role']) {
         case 'admin':
-            header('Location: ' . BASE_URL . 'index.php?action=admin_dashboard');
+            header('Location: ' . BASE_URL . 'index.php?action=adminDashboard');
+            exit;
+        case 'owner':
+            header('Location: ' . BASE_URL . 'index.php?action=ownerDashboard');
             exit;
         case 'warden':
-            header('Location: ' . BASE_URL . 'index.php?action=warden_dashboard');
+            header('Location: ' . BASE_URL . 'index.php?action=wardenDashboard');
             exit;
         default:
-            header('Location: ' . BASE_URL . 'index.php?action=student_dashboard');
+            header('Location: ' . BASE_URL . 'index.php?action=studentDashboard');
             exit;
     }
 }
@@ -50,10 +51,8 @@ switch ($action) {
 
     case 'register_step1':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Store registration form data in session, move to set_password step
             $_SESSION['reg_data'] = $_POST;
 
-            // Handle profile photo upload
             if (!empty($_FILES['profile_photo']['name'])) {
                 $uploadDir = __DIR__ . '/public/uploads/';
                 if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
@@ -96,31 +95,8 @@ switch ($action) {
         break;
 
     case 'login':
-    $error = "";
-    
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $email = trim($_POST['email'] ?? '');
-        $password = $_POST['password'] ?? '';
-        
-        if (empty($email) || empty($password)) {
-            $error = "Please enter both email and password";
-        } else {
-            $auth = new AuthController();
-            $result = $auth->login($email, $password);
-            
-            if ($result['success']) {
-                header('Location: ' . BASE_URL . $result['redirect']);
-                exit;
-            } else {
-                $error = $result['error'];
-            }
-        }
-    }
-    
-    // Pass error to view
-    $loginError = $error;
-    include 'views/auth/login.php';
-    break;
+        include 'views/auth/login.php';
+        break;
 
     case 'logout':
         $auth = new AuthController();
@@ -132,7 +108,6 @@ switch ($action) {
         requireRole('student');
         $pdo = DB::connect();
         $studentController = new StudentController($pdo);
-        // All data fetching happens in the controller 
         extract($studentController->getDashboardData($_SESSION['user_id']));
         include 'views/dashboard/student_dashboard.php';
         break;
@@ -153,7 +128,12 @@ switch ($action) {
 
     case 'warden_dashboard':
         requireRole('warden');
-        include 'views/dashboard/warden_dashboard.php';
+        include 'views/dashboard/wardenDashboard.php';
+        break;
+
+    case 'owner_dashboard':
+        requireRole('owner');
+        include 'views/dashboard/owner_dashboard.php';
         break;
 
     case 'admin_dashboard':
