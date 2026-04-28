@@ -6,12 +6,12 @@ include(__DIR__ . '/../layout/header.php');
 
     <!-- Register Now button -->
     <div class="register-bar">
-        <a href="/HostelManagementSystem/views/auth/register.php" class="register-btn">Register now !!</a>
+        <a href="<?= BASE_URL ?>index.php?action=register" class="register-btn">Register now !!</a>
     </div>
 
     <!-- Section 1: Your Home Away From Home -->
     <div class="section-block">
-        <img src="/HostelManagementSystem/public/images/common-area.png" alt="Common area of Pentatonic Hostel">
+        <img src="<?= BASE_URL ?>public/images/common-area.png" alt="Common area of Pentatonic Hostel">
 
         <div class="section-text">
             <h2>Your Home Away From Home</h2>
@@ -32,7 +32,7 @@ include(__DIR__ . '/../layout/header.php');
 
     <!-- Section 2: Rest Well, Travel Better -->
     <div class="section-block reverse">
-        <img src="/HostelManagementSystem/public/images/dorm-room.png" alt="Clean dorm room with bunk beds">
+        <img src="<?= BASE_URL ?>public/images/dorm-room.png" alt="Clean dorm room with bunk beds">
 
         <div class="section-text">
             <h2>Rest Well, Travel Better</h2>
@@ -51,7 +51,7 @@ include(__DIR__ . '/../layout/header.php');
 
     <!-- Section 3: Connect and Unwind -->
     <div class="section-block">
-        <img src="/HostelManagementSystem/public/images/living-area.jpg" alt="Rooftop terrace at sunset">
+        <img src="<?= BASE_URL ?>public/images/living-area.jpg" alt="Rooftop terrace at sunset">
 
         <div class="section-text">
             <h2>Connect and Unwind</h2>
@@ -71,4 +71,3 @@ include(__DIR__ . '/../layout/header.php');
 </main>
 
 <?php include(__DIR__ . '/../layout/footer.php'); ?>
-

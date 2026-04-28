@@ -1,6 +1,6 @@
 <?php
 if (!defined('BASE_URL')) {
-    define('BASE_URL', '/HostelManagementSystem/');
+    define('BASE_URL', '/HostelManagementSystem-main/');
 }
 
 if (session_status() === PHP_SESSION_NONE) {
@@ -27,6 +27,9 @@ if (isset($_SESSION['logged_in']) && in_array($action, ['login', 'register', 're
     switch ($_SESSION['user_role']) {
         case 'admin':
             header('Location: ' . BASE_URL . 'index.php?action=admin_dashboard');
+            exit;
+        case 'manager':
+            header('Location: ' . BASE_URL . 'index.php?action=manager_dashboard');
             exit;
         case 'warden':
             header('Location: ' . BASE_URL . 'index.php?action=warden_dashboard');
@@ -131,12 +134,52 @@ switch ($action) {
 
     case 'warden_dashboard':
         requireRole('warden');
-        include 'views/dashboard/warden_dashboard.php';
+        include 'views/dashboard/wardenDashboard.php';
         break;
 
     case 'admin_dashboard':
         requireRole('admin');
         include 'views/dashboard/admin_dashboard.php';
+        break;
+
+    case 'manager_dashboard':
+        requireRole('manager');
+        include 'views/dashboard/manager_dashboard.php';
+        break;
+
+    case 'manager_students':
+        requireRole('manager');
+        include 'views/dashboard/students.php';
+        break;
+
+    case 'manager_rooms_single':
+        requireRole('manager');
+        include 'views/dashboard/rooms_single.php';
+        break;
+
+    case 'manager_rooms_double':
+        requireRole('manager');
+        include 'views/dashboard/rooms_double.php';
+        break;
+
+    case 'manager_fees':
+        requireRole('manager');
+        include 'views/dashboard/fees.php';
+        break;
+
+    case 'manager_complaints':
+        requireRole('manager');
+        include 'views/dashboard/complaints.php';
+        break;
+
+    case 'manager_notices':
+        requireRole('manager');
+        include 'views/dashboard/notices.php';
+        break;
+
+    case 'manager_staff':
+        requireRole('manager');
+        include 'views/dashboard/staff.php';
         break;
 
     case 'staff':
