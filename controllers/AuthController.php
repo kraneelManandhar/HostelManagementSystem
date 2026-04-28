@@ -38,7 +38,7 @@ class AuthController {
             return [
                 'success' => true,
                 'role' => 'owner',
-                'redirect' => 'index.php?action=owner_dashboard'
+                'redirect' => 'index.php?action=ownerDashboard'
             ];
         }
 
