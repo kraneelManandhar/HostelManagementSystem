@@ -48,7 +48,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <p class="login-success">Registration successful! Please login.</p>
         <?php endif; ?>
 
-        <form method="POST" action="">
+        <!-- FIXED: Added hidden action field -->
+        <form method="POST" action="<?= BASE_URL ?>index.php?action=login">
             
             <div class="form-group">
                 <label>Email</label>

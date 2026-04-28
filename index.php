@@ -66,7 +66,6 @@ switch ($action) {
             header('Location: ' . BASE_URL . 'index.php?action=set_password');
             exit;
         }
-        include 'views/auth/register.php';
         break;
 
     case 'set_password':
@@ -97,8 +96,31 @@ switch ($action) {
         break;
 
     case 'login':
-        include 'views/auth/login.php';
-        break;
+    $error = "";
+    
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $email = trim($_POST['email'] ?? '');
+        $password = $_POST['password'] ?? '';
+        
+        if (empty($email) || empty($password)) {
+            $error = "Please enter both email and password";
+        } else {
+            $auth = new AuthController();
+            $result = $auth->login($email, $password);
+            
+            if ($result['success']) {
+                header('Location: ' . BASE_URL . $result['redirect']);
+                exit;
+            } else {
+                $error = $result['error'];
+            }
+        }
+    }
+    
+    // Pass error to view
+    $loginError = $error;
+    include 'views/auth/login.php';
+    break;
 
     case 'logout':
         $auth = new AuthController();
