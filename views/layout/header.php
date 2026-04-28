@@ -7,8 +7,8 @@ if (session_status() === PHP_SESSION_NONE) {
 if (!defined('BASE_URL')) {
     define('BASE_URL', '/HostelManagementSystem/');
 }
-// Fix active page
-$currentPage = $_GET['page'] ?? 'about';
+// Fix active page detection - use 'action' parameter (main router uses this)
+$currentAction = $_GET['action'] ?? 'home';
 ?>
 
 <!DOCTYPE html>
@@ -18,8 +18,7 @@ $currentPage = $_GET['page'] ?? 'about';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pentatonic Hostel</title>
 
-    <link rel="stylesheet" href="/HostelManagementSystem/public/css/style.css">
-
+    <link rel="stylesheet" href="<?= BASE_URL ?>public/css/style.css">
 
     <script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web"></script>
 </head>
@@ -31,33 +30,33 @@ $currentPage = $_GET['page'] ?? 'about';
 
         <!-- Logo -->
         <div class="logo">
-            <a href="/HostelManagementSystem/index.php">
-                <img src="/HostelManagementSystem/public/images/logo.png" alt="Logo">
+            <a href="<?= BASE_URL ?>index.php">
+                <img src="<?= BASE_URL ?>public/images/logo.png" alt="Logo">
                 <span>Pentatonic Hostel</span>
             </a>
         </div>
 
         <!-- Navigation -->
         <nav class="nav-links">
-            <a href="/HostelManagementSystem/index.php?action=home"
-               class="<?= ($currentPage == 'about') ? 'active' : '' ?>">
+            <a href="<?= BASE_URL ?>index.php?action=home"
+               class="<?= in_array($currentAction, ['home', 'about']) ? 'active' : '' ?>">
                About Us
             </a>
 
-            <a href="/HostelManagementSystem/index.php?action=staff"
-               class="<?= ($currentPage == 'staff') ? 'active' : '' ?>">
+            <a href="<?= BASE_URL ?>index.php?action=staff"
+               class="<?= ($currentAction == 'staff') ? 'active' : '' ?>">
                Staffs
             </a>
 
-            <a href="/HostelManagementSystem/index.php?action=facilities"
-               class="<?= ($currentPage == 'facilities') ? 'active' : '' ?>">
+            <a href="<?= BASE_URL ?>index.php?action=facilities"
+               class="<?= ($currentAction == 'facilities') ? 'active' : '' ?>">
                Facilities
             </a>
         </nav>
 
         <!-- Login -->
         <div class="nav-actions">
-            <a href="/HostelManagementSystem/views/auth/login.php" class="login-btn">
+            <a href="<?= BASE_URL ?>index.php?action=login" class="login-btn">
                 Login
             </a>
         </div>

@@ -20,16 +20,20 @@ require_once __DIR__ . '/controllers/ComplaintController.php';
 
 $action = $_GET['action'] ?? 'home';
 
-$publicPages = ['home', 'login', 'register', 'register_step1', 'set_password', 'register_final', 'about', 'staff', 'facilities'];
+// ========== ALL PUBLIC PAGES THAT LOGGED-IN USERS SHOULD NOT ACCESS ==========
+$publicPages = ['home', 'about', 'login', 'register', 'register_step1', 'set_password', 'register_final', 'staff', 'facilities'];
 
-// Redirect already-logged-in users away from public pages
-if (isset($_SESSION['logged_in']) && in_array($action, ['login', 'register', 'register_step1', 'set_password', 'register_final'])) {
+// ========== REDIRECT LOGGED-IN USERS AWAY FROM ALL PUBLIC PAGES ==========
+if (isset($_SESSION['logged_in']) && in_array($action, $publicPages)) {
     switch ($_SESSION['user_role']) {
-        case 'admin':
-            header('Location: ' . BASE_URL . 'index.php?action=admin_dashboard');
+        case 'owner':
+            header('Location: ' . BASE_URL . 'index.php?action=owner_dashboard');
             exit;
         case 'warden':
             header('Location: ' . BASE_URL . 'index.php?action=warden_dashboard');
+            exit;
+        case 'admin':
+            header('Location: ' . BASE_URL . 'index.php?action=admin_dashboard');
             exit;
         default:
             header('Location: ' . BASE_URL . 'index.php?action=student_dashboard');
@@ -50,10 +54,8 @@ switch ($action) {
 
     case 'register_step1':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Store registration form data in session, move to set_password step
             $_SESSION['reg_data'] = $_POST;
 
-            // Handle profile photo upload
             if (!empty($_FILES['profile_photo']['name'])) {
                 $uploadDir = __DIR__ . '/public/uploads/';
                 if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
@@ -66,7 +68,6 @@ switch ($action) {
             header('Location: ' . BASE_URL . 'index.php?action=set_password');
             exit;
         }
-        include 'views/auth/register.php';
         break;
 
     case 'set_password':
@@ -110,7 +111,6 @@ switch ($action) {
         requireRole('student');
         $pdo = DB::connect();
         $studentController = new StudentController($pdo);
-        // All data fetching happens in the controller 
         extract($studentController->getDashboardData($_SESSION['user_id']));
         include 'views/dashboard/student_dashboard.php';
         break;
@@ -131,12 +131,52 @@ switch ($action) {
 
     case 'warden_dashboard':
         requireRole('warden');
-        include 'views/dashboard/warden_dashboard.php';
+        include 'views/dashboard/wardenDashboard.php';
+        break;
+
+    case 'owner_dashboard':
+        requireRole('owner');
+        include 'views/dashboard/owner_dashboard.php';
         break;
 
     case 'admin_dashboard':
         requireRole('admin');
         include 'views/dashboard/admin_dashboard.php';
+        break;
+
+    case 'owner_students':
+        requireRole('owner');
+        include 'views/dashboard/students.php';
+        break;
+
+    case 'owner_rooms_single':
+        requireRole('owner');
+        include 'views/dashboard/rooms_single.php';
+        break;
+
+    case 'owner_rooms_double':
+        requireRole('owner');
+        include 'views/dashboard/rooms_double.php';
+        break;
+
+    case 'owner_fees':
+        requireRole('owner');
+        include 'views/dashboard/fees.php';
+        break;
+
+    case 'owner_complaints':
+        requireRole('owner');
+        include 'views/dashboard/complaints.php';
+        break;
+
+    case 'owner_notices':
+        requireRole('owner');
+        include 'views/dashboard/notices.php';
+        break;
+
+    case 'owner_staff':
+        requireRole('owner');
+        include 'views/dashboard/staff.php';
         break;
 
     case 'staff':
