@@ -18,8 +18,8 @@ class AuthController {
             $_SESSION['user_email'] = 'warden@pentatonic.com';
             $_SESSION['user_name'] = 'Hostel Warden';
             $_SESSION['user_role'] = 'warden';
-            $_SESSION['logged_in'] = true;
-
+            $_SESSION['logged_in'] = true; // Fixed missing line
+            
             return [
                 'success' => true,
                 'role' => 'warden',
@@ -38,20 +38,20 @@ class AuthController {
             return [
                 'success' => true,
                 'role' => 'owner',
-                'redirect' => 'index.php?action=ownerDashboard'
+                'redirect' => 'index.php?action=owner_dashboard'
             ];
         }
 
-        // Database users: admin/warden from users table
+        // Database users: admin/warden/owner from users table
         $user = $this->userModel->findByEmail($email);
-        
+
         if ($user && password_verify($password, $user['password'])) {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['user_email'] = $user['email'];
             $_SESSION['user_name'] = $user['first_name'] . ' ' . $user['last_name'];
             $_SESSION['user_role'] = $user['role'];
             $_SESSION['logged_in'] = true;
-            
+
             return [
                 'success' => true,
                 'role' => $user['role'],
@@ -61,14 +61,14 @@ class AuthController {
 
         // Database students
         $student = $this->studentModel->findByEmail($email);
-        
+
         if ($student && password_verify($password, $student['password'])) {
             $_SESSION['user_id'] = $student['id'];
             $_SESSION['user_email'] = $student['email'];
             $_SESSION['user_name'] = $student['first_name'] . ' ' . $student['last_name'];
             $_SESSION['user_role'] = 'student';
             $_SESSION['logged_in'] = true;
-            
+
             return [
                 'success' => true,
                 'role' => 'student',
@@ -83,8 +83,10 @@ class AuthController {
     }
 
     public function logout() {
+        // Clear session data
         $_SESSION = [];
 
+        // Invalidate the session cookie
         if (isset($_COOKIE[session_name()])) {
             setcookie(session_name(), '', [
                 'expires' => time() - 3600,
@@ -95,6 +97,7 @@ class AuthController {
             ]);
         }
 
+        // Destroy the session
         session_destroy();
 
         return [
@@ -103,4 +106,3 @@ class AuthController {
         ];
     }
 }
-?>

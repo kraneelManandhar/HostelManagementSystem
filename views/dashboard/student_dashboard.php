@@ -160,8 +160,8 @@ if (
                     </div>
 
                     <div class="sd-info-field">
-                        <label>Floor / Block</label>
-                        <span><?= htmlspecialchars($room['floor_block'] ?? '—') ?></span>
+                        <label>Bed slot</label>
+                        <span><?= htmlspecialchars($room['bed_slot'] ?? '—') ?></span>
                     </div>
 
                     <div class="sd-info-field">
@@ -170,6 +170,11 @@ if (
                     </div>
 
                 </div>
+                <?php if (!empty($room['roommate_names'])): ?>
+                    <p style="font-size:13px; color:#555; margin-top:12px;">
+                        Roommate: <?= htmlspecialchars($room['roommate_names']) ?>
+                    </p>
+                <?php endif; ?>
                 <?php else: ?>
                     <p style="font-size:13px; color:#888;">
                         No room assigned yet. Please contact the warden.
@@ -393,3 +398,4 @@ if (
 <script src="/HostelManagementSystem/public/js/student.js"></script>
 </body>
 </html>
+

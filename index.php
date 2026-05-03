@@ -21,16 +21,32 @@ require_once __DIR__ . '/controllers/PasswordResetController.php';
 
 $action = $_GET['action'] ?? 'home';
 
-$publicPages = ['home', 'login', 'register', 'register_step1', 'set_password', 'register_final', 'forgot_password', 'forgot_password_submit', 'reset_password', 'reset_password_submit', 'about', 'staff', 'facilities'];
+$publicPages = [
+    'home',
+    'about',
+    'login',
+    'register',
+    'register_step1',
+    'set_password',
+    'register_final',
+    'forgot_password',
+    'forgot_password_submit',
+    'reset_password',
+    'reset_password_submit',
+    'staff',
+    'facilities'
+];
 
-// Redirect already-logged-in users away from public pages.
-if (isset($_SESSION['logged_in']) && in_array($action, ['login', 'register', 'register_step1', 'set_password', 'register_final'])) {
+if (isset($_SESSION['logged_in']) && in_array($action, $publicPages, true)) {
     switch ($_SESSION['user_role']) {
-        case 'admin':
-            header('Location: ' . BASE_URL . 'index.php?action=admin_dashboard');
+        case 'owner':
+            header('Location: ' . BASE_URL . 'index.php?action=owner_dashboard');
             exit;
         case 'warden':
             header('Location: ' . BASE_URL . 'index.php?action=warden_dashboard');
+            exit;
+        case 'admin':
+            header('Location: ' . BASE_URL . 'index.php?action=admin_dashboard');
             exit;
         default:
             header('Location: ' . BASE_URL . 'index.php?action=student_dashboard');
@@ -156,12 +172,52 @@ switch ($action) {
 
     case 'warden_dashboard':
         requireRole('warden');
-        include 'views/dashboard/warden_dashboard.php';
+        include 'views/dashboard/wardenDashboard.php';
+        break;
+
+    case 'owner_dashboard':
+        requireRole('owner');
+        include 'views/dashboard/owner_dashboard.php';
         break;
 
     case 'admin_dashboard':
         requireRole('admin');
         include 'views/dashboard/admin_dashboard.php';
+        break;
+
+    case 'owner_students':
+        requireRole('owner');
+        include 'views/dashboard/students.php';
+        break;
+
+    case 'owner_rooms_single':
+        requireRole('owner');
+        include 'views/dashboard/rooms_single.php';
+        break;
+
+    case 'owner_rooms_double':
+        requireRole('owner');
+        include 'views/dashboard/rooms_double.php';
+        break;
+
+    case 'owner_fees':
+        requireRole('owner');
+        include 'views/dashboard/fees.php';
+        break;
+
+    case 'owner_complaints':
+        requireRole('owner');
+        include 'views/dashboard/complaints.php';
+        break;
+
+    case 'owner_notices':
+        requireRole('owner');
+        include 'views/dashboard/notices.php';
+        break;
+
+    case 'owner_staff':
+        requireRole('owner');
+        include 'views/dashboard/staff.php';
         break;
 
     case 'staff':

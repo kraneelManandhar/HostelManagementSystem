@@ -632,9 +632,17 @@ body {
 .password-card h2 {
     text-align: center;
     color: var(--primary-dark);
-    margin-bottom: 25px;
+    margin-bottom: 10px;
     font-size: 20px;
     font-weight: 600;
+}
+
+.password-subtitle {
+    text-align: center;
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.5;
+    margin-bottom: 25px;
 }
 
 .password-card .form-group {
@@ -699,6 +707,17 @@ body {
     background: #fee2e2;
     padding: 10px;
     border-radius: 8px;
+}
+
+.password-card .success-msg {
+    color: #16a34a;
+    font-size: 13px;
+    margin-bottom: 15px;
+    text-align: center;
+    background: #dcfce7;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #bbf7d0;
 }
 
 .signup-btn {
@@ -791,3 +810,4 @@ body {
         padding-bottom: 5px;
     }
 }
+

@@ -5,7 +5,8 @@
         <h2>Registration Form</h2>
 
         <!-- FIXED: Use BASE_URL instead of relative path -->
-        <form action="<?= BASE_URL ?>index.php?action=register_step1" method="POST" enctype="multipart/form-data">
+        <!-- views/auth/register.php -->
+<form action="<?= BASE_URL ?>index.php?action=register_step1" method="POST" enctype="multipart/form-data">
             
            <div class="reg-section">
     <div class="reg-label-side">Personal Identity:</div>

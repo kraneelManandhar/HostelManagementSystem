@@ -13,9 +13,9 @@ class Student {
     }
 
     public function getAll(){
-        $sql = "SELECT s.*, r.number as room_number, r.floor_block 
+        $sql = "SELECT s.*, r.number as room_number, r.type as room_type
                 FROM students s 
-                LEFT JOIN rooms r ON s.room_id = r.id";
+                LEFT JOIN rooms r ON s.id IN (r.student1_id, r.student2_id) OR s.room_id = r.id";
         $stmt = $this->conn->query($sql);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -43,7 +43,7 @@ class Student {
     }
 
     public function updateTime($id, $in, $out){
-        $stmt = $this->conn->prepare("UPDATE timing SET time_in = ?, time_out = ? WHERE student_id = ?");
+        $stmt = $this->conn->prepare("UPDATE timing SET check_in = ?, check_out = ? WHERE student_id = ?");
         $stmt->execute([$in, $out, $id]);
     }
 

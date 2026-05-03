@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 03, 2026 at 01:47 PM
+-- Generation Time: May 03, 2026 at 03:18 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -159,8 +159,9 @@ CREATE TABLE `password_resets` (
 --
 
 INSERT INTO `password_resets` (`id`, `email`, `token`, `expires_at`, `used`, `created_at`) VALUES
-(4, 'np03cs4a240241@heraldcollege.edu.np', 'd72489aa3394bf3925b55e63bd31a4ed9c34ec73776bc5955d8c9c919205871e', '2026-05-02 18:14:30', 0, '2026-05-02 15:14:30'),
-(5, 'shirisha@gmail.com', '1d94e98f94a1caed297acd8b5f4318eac251206bdebe5432d513ab4877bbd331', '2026-05-02 18:17:42', 0, '2026-05-02 15:17:42');
+(5, 'shirisha@gmail.com', '1d94e98f94a1caed297acd8b5f4318eac251206bdebe5432d513ab4877bbd331', '2026-05-02 18:17:42', 0, '2026-05-02 15:17:42'),
+(6, 'np03cs4a240241@heraldcollege.edu.np', 'a0b9160f4c2e7209929be1c091aa31280166bfe13a1d8aa7294a38167f959047', '2026-05-03 14:57:17', 0, '2026-05-03 11:57:17'),
+(9, 'mahhansykto@gmail.com', '4a981da132665a2602d5b2af4a1b615364ebd380d81a04af3fba7789a6edb22b', '2026-05-03 18:47:02', 1, '2026-05-03 12:02:02');
 
 -- --------------------------------------------------------
 
@@ -171,18 +172,18 @@ INSERT INTO `password_resets` (`id`, `email`, `token`, `expires_at`, `used`, `cr
 CREATE TABLE `rooms` (
   `id` int(11) NOT NULL,
   `number` varchar(20) NOT NULL,
-  `floor_block` varchar(100) DEFAULT NULL,
-  `type` enum('single','double') DEFAULT 'single',
-  `roommate` varchar(150) DEFAULT NULL
+  `type` enum('single','double') NOT NULL DEFAULT 'double',
+  `student1_id` int(11) DEFAULT NULL,
+  `student2_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `rooms`
 --
 
-INSERT INTO `rooms` (`id`, `number`, `floor_block`, `type`, `roommate`) VALUES
-(1, 'A34', '3rd Floor Block A', 'single', NULL),
-(2, 'B12', '2nd Floor Block B', 'double', 'John Doe');
+INSERT INTO `rooms` (`id`, `number`, `type`, `student1_id`, `student2_id`) VALUES
+(1, 'A1', 'single', NULL, NULL),
+(2, 'B12', 'double', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -219,7 +220,7 @@ INSERT INTO `students` (`id`, `first_name`, `middle_name`, `last_name`, `contact
 (2, 'Kraneel', '', 'Manandhar', '9841243263', '2006-09-21', 'np03cs4a240241@heraldcollege.edu.np', '$2y$10$IWEGEfbBvojFb452tTvI6OJ8ZZ/ppuSOcMqsTSLJHqn5arJXz8Ds2', 'student_69f0cbe7bbe944.48522978.jpg', 'Herald College', 'Gongabu', '2023-11-15', 'Gagdjabcjchaokcnakjc cajcbkjack', 'Parent', '900000000000', 'double', NULL, '2026-04-25 09:47:34'),
 (3, 'Mega', NULL, 'Knight', '00000000000', '2024-03-07', 'nvflzivunjxkexexis@vtmpj.net', '$2y$10$yfF4mmux7YVo5Q3Y2donxee9qRN60.ra7vFTnIWojiVqyCeQnp8p6', 'public/uploads/69ecabe5ddef8_192754067.png', 'Herald College', 'Samakhushi', '2023-03-15', 'Normal Knight', 'Sibling', '9999999999', 'single', NULL, '2026-04-25 11:56:41'),
 (5, 'Abibsha', 'Rani', 'Ghaju', '9841123456', '2006-03-19', 'abibshag@gmail.com', '$2y$10$7uJiz4TECM2jerM9bzOHreVwv8/v3/ECVQTnQrCy75dndglxsRr8e', '69efa7e89ca1a_721605999.png', 'Global College', 'Bhaktapur', '2026-04-27', 'Srijana Ghaju', 'Parent', '9841234560', 'single', 1, '2026-04-27 18:16:18'),
-(8, 'Prajwal', 'Raj', 'Bansi', '00000000000', '2014-10-15', 'mahhansykto@gmail.com', '$2y$10$Q654aGJS9SYaaZOZi40UBeaiACwtJ0hzC/XyFuB2h5hHeNokUU/5W', '69f05760b81e4_577959422.jpg', 'Herald College', 'Samakhushi', '2033-11-21', 'Ryal Bhattarai', 'Sibling', '2222222222', 'double', NULL, '2026-04-28 06:45:09'),
+(8, 'Prajwal', 'Raj', 'Bansi', '00000000000', '2014-10-15', 'mahhansykto@gmail.com', '$2y$10$gI0kXHxtmBTrPFdkauRGHuAmRjFICxtwcQjbJkMku7IOkWeEnBNpG', '69f05760b81e4_577959422.jpg', 'Herald College', 'Samakhushi', '2033-11-21', 'Ryal Bhattarai', 'Sibling', '2222222222', 'double', NULL, '2026-04-28 06:45:09'),
 (9, 'Sirjeet', NULL, 'Niger', '1234567890', '2006-02-18', 'sirjeet@gmail.com', '$2y$10$KLxxH1gyCmaeBs032EPtV.6U6F7yFIzXYEE6lkpwJbp5dMCfDGdg2', '69f05ab1131df_895725329.jpeg', 'Niger College', 'Lumbini', '2025-05-31', 'GMR GAI', 'Parent', '0987654321', 'single', NULL, '2026-04-28 06:59:12'),
 (10, 'Pratigya', 'Pun', 'Magar', '9851036289', '2006-02-14', 'pratigya@gmail.com', '$2y$10$FOw3tI.34lniQlVHqGqu4Oq5XiDmT8ES86J2S02Gn2eckrnRkFWPy', '69f05cc31c3a7_848071048.jpg', 'Herald International College', 'Pokhara', '2024-02-07', 'Ram Pun Magar', 'Parent', '7890789078', 'single', NULL, '2026-04-28 07:08:01'),
 (11, 'Shirish', NULL, 'Magar', '1111111111', '2006-03-19', 'shirisha@gmail.com', '$2y$10$weaFUDrfrnVX8aZjtswIEulbon3xZEqg7D74zxX1ZJWmMul.GKogK', '69f0a10a2cef1_843549509.jpg', 'Niger College', 'Taplejung', '2023-02-05', 'Ryal Bhattarai', 'Other', '9999999999', 'double', NULL, '2026-04-28 11:59:23'),
@@ -333,7 +334,9 @@ ALTER TABLE `password_resets`
 -- Indexes for table `rooms`
 --
 ALTER TABLE `rooms`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_student1` (`student1_id`),
+  ADD KEY `fk_student2` (`student2_id`);
 
 --
 -- Indexes for table `students`
@@ -401,7 +404,7 @@ ALTER TABLE `notices`
 -- AUTO_INCREMENT for table `password_resets`
 --
 ALTER TABLE `password_resets`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `rooms`
@@ -461,6 +464,13 @@ ALTER TABLE `food`
 --
 ALTER TABLE `laundry`
   ADD CONSTRAINT `laundry_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `rooms`
+--
+ALTER TABLE `rooms`
+  ADD CONSTRAINT `fk_student1` FOREIGN KEY (`student1_id`) REFERENCES `students` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `fk_student2` FOREIGN KEY (`student2_id`) REFERENCES `students` (`id`) ON DELETE SET NULL;
 
 --
 -- Constraints for table `students`
