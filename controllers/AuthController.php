@@ -11,15 +11,41 @@ class AuthController {
         $this->userModel = new User();
     }
 
-    /**
-     * Authenticate user - checks both students and users tables
-     */
     public function login($email, $password) {
-        // 1. Try to find in users table (admin/warden)
+        // Hardcoded warden login
+        if ($email === 'warden@pentatonic.com' && $password === 'Warden123') {
+            $_SESSION['user_id'] = 'warden_001';
+            $_SESSION['user_email'] = 'warden@pentatonic.com';
+            $_SESSION['user_name'] = 'Hostel Warden';
+            $_SESSION['user_role'] = 'warden';
+            $_SESSION['logged_in'] = true;
+
+            return [
+                'success' => true,
+                'role' => 'warden',
+                'redirect' => 'index.php?action=warden_dashboard'
+            ];
+        }
+
+        // Hardcoded owner login
+        if ($email === 'owner@pentatonic.com' && $password === 'Owner123') {
+            $_SESSION['user_id'] = 'owner_001';
+            $_SESSION['user_email'] = 'owner@pentatonic.com';
+            $_SESSION['user_name'] = 'Hostel Owner';
+            $_SESSION['user_role'] = 'owner';
+            $_SESSION['logged_in'] = true;
+
+            return [
+                'success' => true,
+                'role' => 'owner',
+                'redirect' => 'index.php?action=ownerDashboard'
+            ];
+        }
+
+        // Database users: admin/warden from users table
         $user = $this->userModel->findByEmail($email);
         
         if ($user && password_verify($password, $user['password'])) {
-            // Admin or Warden found
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['user_email'] = $user['email'];
             $_SESSION['user_name'] = $user['first_name'] . ' ' . $user['last_name'];
@@ -33,11 +59,10 @@ class AuthController {
             ];
         }
 
-        // 2. Try to find in students table
+        // Database students
         $student = $this->studentModel->findByEmail($email);
         
         if ($student && password_verify($password, $student['password'])) {
-            // Student found
             $_SESSION['user_id'] = $student['id'];
             $_SESSION['user_email'] = $student['email'];
             $_SESSION['user_name'] = $student['first_name'] . ' ' . $student['last_name'];
@@ -51,18 +76,27 @@ class AuthController {
             ];
         }
 
-        // 3. No match found
         return [
             'success' => false,
             'error' => 'Invalid email or password'
         ];
     }
 
-    /**
-     * Logout
-     */
     public function logout() {
+        $_SESSION = [];
+
+        if (isset($_COOKIE[session_name()])) {
+            setcookie(session_name(), '', [
+                'expires' => time() - 3600,
+                'path' => '/',
+                'secure' => false,
+                'httponly' => true,
+                'samesite' => 'Strict'
+            ]);
+        }
+
         session_destroy();
+
         return [
             'success' => true,
             'redirect' => 'index.php?action=home'

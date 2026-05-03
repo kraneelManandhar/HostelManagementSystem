@@ -17,12 +17,13 @@ require_once __DIR__ . '/models/Complaint.php';
 require_once __DIR__ . '/controllers/StudentController.php';
 require_once __DIR__ . '/controllers/AuthController.php';
 require_once __DIR__ . '/controllers/ComplaintController.php';
+require_once __DIR__ . '/controllers/PasswordResetController.php';
 
 $action = $_GET['action'] ?? 'home';
 
-$publicPages = ['home', 'login', 'register', 'register_step1', 'set_password', 'register_final', 'about', 'staff', 'facilities'];
+$publicPages = ['home', 'login', 'register', 'register_step1', 'set_password', 'register_final', 'forgot_password', 'forgot_password_submit', 'reset_password', 'reset_password_submit', 'about', 'staff', 'facilities'];
 
-// Redirect already-logged-in users away from public pages
+// Redirect already-logged-in users away from public pages.
 if (isset($_SESSION['logged_in']) && in_array($action, ['login', 'register', 'register_step1', 'set_password', 'register_final'])) {
     switch ($_SESSION['user_role']) {
         case 'admin':
@@ -38,7 +39,6 @@ if (isset($_SESSION['logged_in']) && in_array($action, ['login', 'register', 're
 }
 
 switch ($action) {
-
     case 'home':
     case 'about':
         include 'views/pages/about.php';
@@ -50,13 +50,14 @@ switch ($action) {
 
     case 'register_step1':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Store registration form data in session, move to set_password step
             $_SESSION['reg_data'] = $_POST;
 
-            // Handle profile photo upload
             if (!empty($_FILES['profile_photo']['name'])) {
                 $uploadDir = __DIR__ . '/public/uploads/';
-                if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
+                if (!is_dir($uploadDir)) {
+                    mkdir($uploadDir, 0755, true);
+                }
+
                 $ext = pathinfo($_FILES['profile_photo']['name'], PATHINFO_EXTENSION);
                 $filename = uniqid() . '_' . rand(100000000, 999999999) . '.' . $ext;
                 move_uploaded_file($_FILES['profile_photo']['tmp_name'], $uploadDir . $filename);
@@ -66,6 +67,7 @@ switch ($action) {
             header('Location: ' . BASE_URL . 'index.php?action=set_password');
             exit;
         }
+
         include 'views/auth/register.php';
         break;
 
@@ -75,7 +77,7 @@ switch ($action) {
 
     case 'register_final':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $password        = $_POST['password'] ?? '';
+            $password = $_POST['password'] ?? '';
             $confirmPassword = $_POST['confirm_password'] ?? '';
 
             if (empty($password) || $password !== $confirmPassword || strlen($password) < 6) {
@@ -106,11 +108,34 @@ switch ($action) {
         header('Location: ' . BASE_URL . 'index.php?action=login');
         exit;
 
+    case 'forgot_password':
+        $pdo = DB::connect();
+        $ctrl = new PasswordResetController($pdo);
+        $ctrl->showForgotForm();
+        break;
+
+    case 'forgot_password_submit':
+        $pdo = DB::connect();
+        $ctrl = new PasswordResetController($pdo);
+        $ctrl->handleForgotPassword();
+        break;
+
+    case 'reset_password':
+        $pdo = DB::connect();
+        $ctrl = new PasswordResetController($pdo);
+        $ctrl->showResetForm();
+        break;
+
+    case 'reset_password_submit':
+        $pdo = DB::connect();
+        $ctrl = new PasswordResetController($pdo);
+        $ctrl->handleResetPassword();
+        break;
+
     case 'student_dashboard':
         requireRole('student');
         $pdo = DB::connect();
         $studentController = new StudentController($pdo);
-        // All data fetching happens in the controller 
         extract($studentController->getDashboardData($_SESSION['user_id']));
         include 'views/dashboard/student_dashboard.php';
         break;
