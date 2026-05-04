@@ -23,43 +23,52 @@ if ($userMessage === '') {
 $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
 $dotenv->safeLoad();
 
-$apiKey = trim($_ENV['GEMINI_API_KEY'] ?? '');
-$model = trim($_ENV['GEMINI_MODEL'] ?? 'gemini-1.5-flash');
-$maxOutputTokens = (int) ($_ENV['GEMINI_MAX_OUTPUT_TOKENS'] ?? 300);
-$temperature = (float) ($_ENV['GEMINI_TEMPERATURE'] ?? 0.7);
+$apiKey = trim($_ENV['MISTRAL_API_KEY'] ?? '');
+$model = trim($_ENV['MISTRAL_MODEL'] ?? 'mistral-small-latest');
+$maxTokens = (int) ($_ENV['MISTRAL_MAX_OUTPUT_TOKENS'] ?? 300);
+$temperature = (float) ($_ENV['MISTRAL_TEMPERATURE'] ?? 0.7);
+$apiUrl = trim($_ENV['MISTRAL_API_URL'] ?? 'https://api.mistral.ai/v1/chat/completions');
 
 if ($apiKey === '') {
     http_response_code(500);
-    echo json_encode(["error" => "AI chat is not configured. Missing GEMINI_API_KEY in .env."]);
+    echo json_encode(["error" => "Mistral API key is not configured."]);
     exit;
 }
 
-$apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/" . rawurlencode($model) . ":generateContent?key=" . rawurlencode($apiKey);
-
 $payload = [
-    "contents" => [
+    "model" => $model,
+    "messages" => [
         [
-            "parts" => [
-                ["text" => "System Instructions: You are a helpful assistant for a hostel management system. Help students and visitors with questions about hostel facilities, rooms, fees, and staff. Keep answers concise and friendly."]
-            ]
+            "role" => "system", 
+            "content" => "You are the official AI Assistant for Pentatonic Hostel. 
+Your goal is to help students with facilities, fees, and staff contacts.
+
+STRICT FORMATTING RULES:
+1. NEVER use Markdown formatting like asterisks (**) or bullet points (-).
+2. ONLY use plain text with numbered lists (1, 2, 3).
+3. Use a single line break between different sections.
+4. Keep the tone professional and the answers concise.
+5.Keep answers short and mostly under 200 tokens.
+
+Example format:
+1. Facilities: We offer WiFi, laundry, and a study area.
+2. Staff: Contact the Warden for room allocation."
         ],
-        [
-            "parts" => [
-                ["text" => $userMessage]
-            ]
-        ]
+        ["role" => "user", "content" => $userMessage]
     ],
-    "generationConfig" => [
-        "temperature" => $temperature,
-        "maxOutputTokens" => $maxOutputTokens
-    ]
+    "temperature" => $temperature,
+    "max_tokens" => $maxTokens
 ];
 
 $ch = curl_init($apiUrl);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_POST, true);
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
-curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json"]);
+curl_setopt($ch, CURLOPT_HTTPHEADER, [
+    "Content-Type: application/json",
+    "Accept: application/json",
+    "Authorization: Bearer $apiKey"
+]);
 curl_setopt($ch, CURLOPT_TIMEOUT, 30);
 
 $response = curl_exec($ch);
@@ -69,11 +78,12 @@ if (curl_errno($ch)) {
     http_response_code(502);
     echo json_encode(["error" => curl_error($ch)]);
 } elseif ($httpCode !== 200) {
-    http_response_code(502);
-    echo json_encode(["error" => "Gemini API error ($httpCode). Check if your API key is valid."]);
+    http_response_code($httpCode);
+    echo json_encode(["error" => "Mistral API error ($httpCode)."]);
 } else {
     $body = json_decode($response, true);
-    $reply = $body['candidates'][0]['content']['parts'][0]['text'] ?? "Sorry, I couldn't get a response.";
+    // Mistral uses the same response format as OpenAI: choices[0].message.content
+    $reply = $body['choices'][0]['message']['content'] ?? "No response received.";
     echo json_encode(["reply" => trim($reply)]);
 }
 

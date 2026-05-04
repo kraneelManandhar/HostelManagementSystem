@@ -78,6 +78,9 @@
     line-height: 1.5;
     word-wrap: break-word;
 }
+.chat-message-bubble {
+    white-space: pre-line;
+}
 .chat-msg.bot {
     background: #fff;
     color: #333;
