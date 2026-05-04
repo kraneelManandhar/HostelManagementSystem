@@ -69,7 +69,7 @@ if ($managerName === '') {
     <title>Management Notices - Pentatonic Hostel</title>
     <script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="<?= $baseUrl ?>public/css/owner.css">
+    <link rel="stylesheet" href="<?= $baseUrl ?>public/css/owner.css?v=2">
 </head>
 <body>
 <div class="mn-page-wrap">
@@ -143,6 +143,10 @@ if ($managerName === '') {
 
                 <section class="mn-panel">
                     <a class="mn-open-btn" href="<?= $baseUrl ?>index.php?action=owner_notices&form=1">Post notice +</a>
+                    <div class="mn-search">
+                        <i class="ph ph-magnifying-glass"></i>
+                        <input type="text" placeholder="Search">
+                    </div>
 
                     <?php if (empty($notices)): ?>
                         <div class="mn-card">
@@ -150,7 +154,7 @@ if ($managerName === '') {
                         </div>
                     <?php else: ?>
                         <?php foreach ($notices as $notice): ?>
-                            <div class="mn-card">
+                            <div class="mn-card searchable-owner-row" data-search="<?= htmlspecialchars(strtolower(($notice['title'] ?? '') . ' ' . ($notice['description'] ?? '') . ' ' . ($notice['date'] ?? '') . ' ' . ($notice['author'] ?? ''))) ?>">
                                 <div class="mn-card-top">
                                     <div class="mn-card-title"><?= htmlspecialchars((string) ($notice['title'] ?? '')) ?></div>
                                     <form method="post" style="margin:0;">
@@ -176,6 +180,8 @@ if ($managerName === '') {
         </main>
     </div>
 </div>
+<script src="<?= $baseUrl ?>public/js/owner-search.js"></script>
 </body>
 </html>
+
 

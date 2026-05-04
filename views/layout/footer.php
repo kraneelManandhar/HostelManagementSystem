@@ -42,3 +42,4 @@ if (!defined('BASE_URL')) {
 <script src='<?= BASE_URL ?>public/js/chatbot.js'></script>
 </body>
 </html>
+

@@ -30,12 +30,12 @@ class StudentController {
 
     public function toggle($type) {
         $this->model->toggle($type, $_GET['id']);
-        header("Location: index.php?page=" . $type);
+        header("Location: index.php?action=warden_" . $type);
     }
 
     public function timing() {
         $this->model->updateTime($_POST['id'], $_POST['in'], $_POST['out']);
-        header("Location: index.php?page=timing");
+        header("Location: index.php?action=warden_timing");
     }
 
     public function register($data) {

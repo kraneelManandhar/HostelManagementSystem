@@ -140,7 +140,7 @@ $msg = $_GET['msg'] ?? '';
     <title>Staff - Pentatonic Hostel</title>
     <script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="<?= $baseUrl ?>public/css/owner.css">
+    <link rel="stylesheet" href="<?= $baseUrl ?>public/css/owner.css?v=2">
 </head>
 <body>
 <div class="sf-page-wrap">
@@ -300,3 +300,4 @@ $msg = $_GET['msg'] ?? '';
 </div>
 </body>
 </html>
+

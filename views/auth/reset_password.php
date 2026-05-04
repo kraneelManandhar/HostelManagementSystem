@@ -72,3 +72,4 @@ function togglePassword(id) {
 </script>
 
 <?php include(__DIR__ . '/../layout/footer.php'); ?>
+

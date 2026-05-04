@@ -174,7 +174,7 @@ if (!empty($selectedPhoto)) {
     <title>Management Students - Pentatonic Hostel</title>
     <script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="<?= $baseUrl ?>public/css/owner.css">
+    <link rel="stylesheet" href="<?= $baseUrl ?>public/css/owner.css?v=2">
 </head>
 <body>
 <div class="ms-page-wrap">
@@ -228,6 +228,7 @@ if (!empty($selectedPhoto)) {
                             ?>
                             <a
                                 class="ms-student-item <?= (int) $studentItem['id'] === $selectedId ? 'active' : '' ?>"
+                                data-search="<?= htmlspecialchars(strtolower($fullName . ' ' . ($studentItem['email'] ?? '') . ' ' . ($studentItem['contact_number'] ?? ''))) ?>"
                                 href="<?= $baseUrl ?>index.php?action=owner_students&student_id=<?= (int) $studentItem['id'] ?>"
                             >
                                 <?= htmlspecialchars($fullName) ?>
@@ -357,5 +358,7 @@ if (!empty($selectedPhoto)) {
         </main>
     </div>
 </div>
+<script src="<?= $baseUrl ?>public/js/owner-search.js"></script>
 </body>
 </html>
+
