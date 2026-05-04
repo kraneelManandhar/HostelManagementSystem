@@ -19,6 +19,7 @@ $currentAction = $_GET['action'] ?? 'home';
     <title>Pentatonic Hostel</title>
 
     <link rel="stylesheet" href="<?= BASE_URL ?>public/css/style.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>public/css/chatbot.css">
 
     <script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web"></script>
 </head>

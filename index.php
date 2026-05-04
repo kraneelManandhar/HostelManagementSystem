@@ -220,6 +220,10 @@ switch ($action) {
         include 'views/dashboard/staff.php';
         break;
 
+    case 'chatbot':
+        require_once __DIR__ . '/controllers/ChatbotController.php';
+        break;
+        
     case 'staff':
         include 'views/pages/staff.php';
         break;

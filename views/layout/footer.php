@@ -35,6 +35,10 @@ if (!defined('BASE_URL')) {
     </div>
 </footer>
 
+<script>
+    window.BASE_URL = <?= json_encode(BASE_URL) ?>;
+</script>
 <script src='<?= BASE_URL ?>public/js/main.js'></script>
+<script src='<?= BASE_URL ?>public/js/chatbot.js'></script>
 </body>
 </html>
