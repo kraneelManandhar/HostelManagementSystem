@@ -16,6 +16,7 @@
   --card-bg: #e2ecf8;
   --panel-right: #cddaed;
   --black-pill: #111;
+  --occupied: #e05252;
 }
 
 *,
@@ -33,6 +34,7 @@ body {
   min-height: 100vh;
 }
 
+/* STUDENT DASHBOARD */
 /* PAGE WRAPPER */
 .sd-page-wrap {
   display: flex;
@@ -40,7 +42,6 @@ body {
   min-height: 100vh;
 }
 
-/* BODY ROW: Main content carries its own padding. */
 .sd-body-row {
   display: flex;
   flex: 1;
@@ -61,7 +62,6 @@ body {
   align-self: stretch;
 }
 
-/* Logo block: top of sidebar */
 .sd-sidebar-logo {
   display: flex;
   align-items: center;
@@ -87,7 +87,6 @@ body {
   line-height: 1.25;
 }
 
-/* Profile (photo + name + role) */
 .sd-sidebar-profile {
   display: flex;
   flex-direction: column;
@@ -143,7 +142,6 @@ body {
   text-transform: uppercase;
 }
 
-/* Nav buttons: stacked top to bottom */
 .sd-sidebar-nav {
   display: flex;
   flex-direction: column;
@@ -185,7 +183,6 @@ body {
   color: var(--white);
 }
 
-/* Pushes sign-out to the very bottom */
 .sd-sidebar-spacer {
   flex: 1;
 }
@@ -267,7 +264,7 @@ body {
   display: block;
 }
 
-/* White panel wrapper (Dashboard + Complaints) */
+/* White panel wrapper */
 .sd-blue-panel {
   background-color: var(--white);
   border-radius: 16px;
@@ -317,7 +314,7 @@ body {
   color: var(--dark);
 }
 
-/* ROOM DETAILS: DOUBLE SITTER: Two separate boxes side by side */
+/* DOUBLE SITTER ROOM LAYOUT */
 .sd-room-outer {
   display: flex;
   gap: 14px;
@@ -329,22 +326,43 @@ body {
   min-width: 0;
 }
 
+/* The left card stretches full height */
+.sd-room-left-wrap .sd-info-card {
+  height: 100%;
+}
+
 .sd-room-left-card {
   display: flex;
   gap: 48px;
   align-items: flex-start;
 }
 
+/* Right floating panel */
 .sd-room-right-card {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 18px;
   background-color: var(--panel-right);
   border-radius: 12px;
-  padding: 18px 22px;
+  padding: 20px 24px;
   min-width: 180px;
   flex-shrink: 0;
   justify-content: center;
+}
+
+.sd-room-right-card .sd-info-field label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--subtle);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+
+.sd-room-right-card .sd-info-field span {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--dark);
 }
 
 /* Status badges */
@@ -365,9 +383,7 @@ body {
   color: #4caf50;
 }
 
-/*  COMPLAINTS PAGE */
-
-/* Hero gradient banner: column layout */
+/* COMPLAINTS PAGE */
 .sd-complaint-hero {
   background: linear-gradient(135deg, #2a4a6b 0%, #3d6080 50%, #4a7090 100%);
   border-radius: 12px;
@@ -412,7 +428,6 @@ body {
   background-color: var(--amber-dark);
 }
 
-/* Previous complaints list box */
 .sd-complaint-list-box {
   background-color: var(--card-bg);
   border-radius: 12px;
@@ -454,7 +469,6 @@ body {
   color: #a03035;
 }
 
-/* Column header pills */
 .sd-complaint-col-headers {
   display: grid;
   grid-template-columns: 28px 1fr 2fr 90px 80px;
@@ -478,7 +492,6 @@ body {
   padding: 0;
 }
 
-/* Complaint data rows */
 .sd-complaint-item {
   display: grid;
   grid-template-columns: 28px 1fr 2fr 90px 80px;
@@ -521,7 +534,7 @@ body {
   text-align: center;
 }
 
-/*  NOTICE PAGE */
+/* NOTICE PAGE */
 #page-notice .sd-blue-panel {
   background-color: transparent;
   padding: 0;
@@ -548,14 +561,12 @@ body {
   line-height: 1.55;
 }
 
-/* Each notice has its own white box */
 .sd-notice-card {
   background-color: var(--white);
   border-radius: 12px;
   padding: 18px 20px;
 }
 
-/* Meta (date + author) above title */
 .sd-notice-meta {
   display: flex;
   gap: 20px;
@@ -579,7 +590,6 @@ body {
   margin-bottom: 10px;
 }
 
-/* Description in nested light-blue box */
 .sd-notice-body {
   background-color: var(--card-bg);
   border-radius: 8px;
@@ -589,21 +599,7 @@ body {
   line-height: 1.6;
 }
 
-.sd-notice-footer {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  font-size: 12px;
-  color: var(--muted);
-  padding: 8px 0 2px;
-}
-
-.sd-notice-footer i {
-  font-size: 18px;
-}
-
-/*  COMPLAINT MODAL */
+/* COMPLAINT MODAL */
 .sd-modal-overlay {
   display: none;
   position: fixed;
@@ -682,10 +678,6 @@ body {
   min-height: 90px;
 }
 
-.sd-form-small {
-  max-width: 110px;
-}
-
 .sd-form-actions {
   display: flex;
   justify-content: space-between;
@@ -724,4 +716,310 @@ body {
 
 .sd-btn-submit:hover {
   background-color: var(--amber-dark);
+}
+
+/* ROOM SELECTION MODAL OVERLAY */
+.rs-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 36, 72, 0.72);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 8888;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+}
+
+/* The modal card */
+.rs-modal {
+  background: rgba(210, 228, 245, 0.72);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 24px;
+  display: flex;
+  gap: 20px;
+  width: 100%;
+  max-width: 680px;
+  min-height: 340px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+}
+
+/* LEFT: pill list */
+.rs-left {
+  width: 130px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rs-list-header {
+  background-color: var(--amber);
+  border-radius: 20px;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--dark);
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+.rs-room-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 340px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.rs-room-list::-webkit-scrollbar {
+  width: 4px;
+}
+.rs-room-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.rs-room-list::-webkit-scrollbar-thumb {
+  background: #a0b8d0;
+  border-radius: 2px;
+}
+
+.rs-room-pill {
+  background-color: var(--white);
+  border: none;
+  border-radius: 20px;
+  padding: 8px 14px;
+  font-family: "Inter", sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--dark);
+  cursor: pointer;
+  text-align: center;
+  transition:
+    background-color 0.18s,
+    color 0.18s;
+}
+
+.rs-room-pill:hover {
+  background-color: #e8eef4;
+}
+
+.rs-room-pill.active {
+  background-color: var(--black-pill);
+  color: var(--white);
+}
+
+.rs-no-rooms {
+  font-size: 12px;
+  color: var(--dark);
+  line-height: 1.6;
+  padding: 8px 4px;
+}
+
+/* RIGHT: detail panel */
+.rs-right {
+  flex: 1;
+  background-color: var(--white);
+  border-radius: 16px;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rs-title-bar {
+  background-color: var(--white);
+  border: 1.5px solid #cdd9e8;
+  border-radius: 20px;
+  padding: 10px 20px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--dark);
+  text-align: center;
+  letter-spacing: 0.04em;
+}
+
+.rs-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.rs-room-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--dark);
+  background-color: var(--white);
+  border: 1px solid #d0dcea;
+  border-radius: 12px;
+  padding: 8px 16px;
+  text-align: center;
+}
+
+.rs-room-type-label {
+  font-size: 11px;
+  color: var(--muted);
+  text-align: center;
+  background-color: #f0f4f9;
+  border-radius: 10px;
+  padding: 5px 12px;
+}
+
+/* Bed visuals */
+.rs-beds-wrap {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  align-items: flex-end;
+  background-color: #f5f8fc;
+  border-radius: 14px;
+  padding: 20px 16px 14px;
+  flex: 1;
+}
+
+.rs-bed-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  border-radius: 10px;
+  padding: 8px;
+  transition: background-color 0.18s;
+}
+
+/* Clickable (free) bed gets hover highlight */
+.rs-bed-selectable {
+  cursor: pointer;
+}
+
+.rs-bed-selectable:hover {
+  background-color: rgba(232, 184, 75, 0.15);
+}
+
+.rs-bed-svg {
+  width: 130px;
+  height: auto;
+}
+
+.rs-bed-status {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 3px 12px;
+  border-radius: 10px;
+}
+
+.rs-bed-status.occupied {
+  color: var(--occupied);
+  background-color: rgba(224, 82, 82, 0.1);
+}
+
+.rs-bed-status.empty {
+  color: #333;
+  background-color: rgba(0, 0, 0, 0.06);
+}
+
+.rs-bed-status.selected {
+  color: #a07800;
+  background-color: rgba(232, 184, 75, 0.2);
+}
+
+/* ---- Save button ---- */
+.rs-save-btn {
+  align-self: center;
+  background-color: var(--amber);
+  border: 1px solid var(--amber-dark);
+  border-radius: 20px;
+  padding: 9px 34px;
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--dark);
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-top: 6px;
+}
+
+.rs-save-btn:hover:not(:disabled) {
+  background-color: var(--amber-dark);
+}
+
+/* Empty state */
+.rs-empty-state {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--muted);
+  gap: 16px;
+}
+
+.rs-empty-state i {
+  font-size: 48px;
+  color: #b0bec8;
+}
+
+.rs-empty-state p {
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+/* STANDALONE ROOM SELECTION PAGE */
+.rs-body {
+  background: linear-gradient(
+    160deg,
+    #8aaec8 0%,
+    #5c84a8 40%,
+    #3d6080 100%
+  ) !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+}
+
+.rs-topbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 28px;
+  width: 100%;
+  max-width: 760px;
+}
+
+.rs-topbar img {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+
+.rs-topbar span {
+  font-family: "Playfair Display", serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--white);
+}
+
+.rs-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.rs-container {
+  background: rgba(210, 228, 245, 0.6);
+  backdrop-filter: blur(6px);
+  border-radius: 20px;
+  padding: 24px;
+  display: flex;
+  gap: 20px;
+  width: 100%;
+  max-width: 760px;
+  min-height: 360px;
 }
