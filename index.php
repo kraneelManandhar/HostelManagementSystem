@@ -18,6 +18,7 @@ require_once __DIR__ . '/controllers/StudentController.php';
 require_once __DIR__ . '/controllers/AuthController.php';
 require_once __DIR__ . '/controllers/ComplaintController.php';
 require_once __DIR__ . '/controllers/PasswordResetController.php';
+require_once __DIR__ . '/controllers/WardenController.php';
 
 $action = $_GET['action'] ?? 'home';
 
@@ -170,9 +171,88 @@ switch ($action) {
         $cc->delete();
         break;
 
+    /* ===== WARDEN PAGES - Standalone ===== */
     case 'warden_dashboard':
         requireRole('warden');
         include 'views/dashboard/wardenDashboard.php';
+        break;
+
+    case 'warden_students':
+        requireRole('warden');
+        include 'views/dashboard/warden_students.php';
+        break;
+
+    case 'warden_rooms':
+        requireRole('warden');
+        include 'views/dashboard/warden_rooms.php';
+        break;
+
+    case 'warden_notices':
+        requireRole('warden');
+        include 'views/dashboard/warden_notices.php';
+        break;
+
+    case 'warden_food':
+        requireRole('warden');
+        include 'views/dashboard/food.php';
+        break;
+
+    case 'warden_laundry':
+        requireRole('warden');
+        include 'views/dashboard/laundry.php';
+        break;
+
+    case 'warden_cleaning':
+        requireRole('warden');
+        include 'views/dashboard/cleaning.php';
+        break;
+
+    case 'warden_timing':
+        requireRole('warden');
+        include 'views/dashboard/timing.php';
+        break;
+
+    /* ===== WARDEN AJAX ACTIONS ===== */
+    case 'warden_save_room':
+        requireRole('warden');
+        $wardenController = new WardenController(DB::connect());
+        $wardenController->saveRoom();
+        break;
+
+    case 'warden_add_room':
+        requireRole('warden');
+        $wardenController = new WardenController(DB::connect());
+        $wardenController->addRoom();
+        break;
+
+    case 'warden_save_notice':
+        requireRole('warden');
+        $wardenController = new WardenController(DB::connect());
+        $wardenController->saveNotice();
+        break;
+
+    case 'warden_update_food':
+        requireRole('warden');
+        $wardenController = new WardenController(DB::connect());
+        $wardenController->ajaxFood();
+        break;
+
+    case 'warden_update_laundry':
+        requireRole('warden');
+        $wardenController = new WardenController(DB::connect());
+        $wardenController->ajaxLaundry();
+        break;
+
+    case 'warden_update_cleaning':
+        requireRole('warden');
+        $wardenController = new WardenController(DB::connect());
+        $wardenController->ajaxCleaning();
+        break;
+
+    case 'warden_update_timing':
+        requireRole('warden');
+        $wardenController = new WardenController(DB::connect());
+        $wardenController->ajaxTiming();
         break;
 
     case 'owner_dashboard':
@@ -218,6 +298,10 @@ switch ($action) {
     case 'owner_staff':
         requireRole('owner');
         include 'views/dashboard/staff.php';
+        break;
+
+    case 'chatbot':
+        require_once __DIR__ . '/controllers/ChatbotController.php';
         break;
 
     case 'staff':

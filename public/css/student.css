@@ -725,3 +725,110 @@ body {
 .sd-btn-submit:hover {
   background-color: var(--amber-dark);
 }
+
+/* RESPONSIVE */
+@media (max-width: 1100px) {
+  .sd-cols-4,
+  .sd-cols-3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sd-room-outer,
+  .sd-room-left-card {
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .sd-room-right-card {
+    width: 100%;
+  }
+}
+
+@media (max-width: 820px) {
+  .sd-body-row {
+    flex-direction: column;
+  }
+
+  .sd-sidebar {
+    width: 100%;
+    min-width: 0;
+    padding: 16px;
+  }
+
+  .sd-sidebar-profile {
+    display: grid;
+    grid-template-columns: 64px 1fr;
+    column-gap: 12px;
+    align-items: center;
+  }
+
+  .sd-avatar {
+    width: 64px;
+    height: 64px;
+    grid-row: span 2;
+    margin-bottom: 0;
+  }
+
+  .sd-sidebar-nav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sd-main {
+    padding: 16px;
+  }
+
+  .sd-welcome-card,
+  .sd-form-actions,
+  .sd-form-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .sd-joined-badge,
+  .sd-write-btn {
+    text-align: center;
+  }
+
+  .sd-complaint-col-headers,
+  .sd-complaint-item {
+    grid-template-columns: 24px 1fr;
+  }
+
+  .sd-complaint-col-headers span:nth-child(n+4),
+  .sd-c-room,
+  .sd-badge {
+    grid-column: 2;
+  }
+}
+
+@media (max-width: 560px) {
+  .sd-sidebar-nav,
+  .sd-cols-4,
+  .sd-cols-3,
+  .sd-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sd-sidebar-logo img {
+    width: 46px;
+    height: 46px;
+  }
+
+  .sd-welcome-card {
+    padding: 18px;
+  }
+
+  .sd-welcome-card h1 {
+    font-size: 20px;
+  }
+
+  .sd-blue-panel,
+  .sd-info-card,
+  .sd-complaint-hero,
+  .sd-notice-card,
+  .sd-notice-header {
+    border-radius: 12px;
+    padding: 14px;
+  }
+}

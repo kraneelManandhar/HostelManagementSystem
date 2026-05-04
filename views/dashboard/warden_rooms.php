@@ -26,7 +26,7 @@ $complaintModel = new Complaint($pdo);
 $noticeModel = new Notice($pdo);
 $wardenController = new WardenController($pdo);
 
-$action = 'warden_laundry';
+$action = 'warden_rooms';
 
 $pageMap = [
     'warden_dashboard' => ['label' => 'Dashboard', 'icon' => 'ph-squares-four', 'title' => 'WARDEN DASHBOARD'],
@@ -44,7 +44,7 @@ $totalRooms = (int) $pdo->query("SELECT COUNT(*) FROM rooms")->fetchColumn();
 $pendingComplaints = (int) $pdo->query("SELECT COUNT(*) FROM complaints WHERE LOWER(status) = 'pending'")->fetchColumn();
 $notices = $noticeModel->all();
 
-$data = $wardenController->getLaundry();
+$data = $wardenController->getRooms();
 
 $wardenName = trim((string) ($_SESSION['user_name'] ?? 'WARDEN'));
 if ($wardenName === '') {
@@ -56,7 +56,7 @@ if ($wardenName === '') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laundry - Pentatonic Hostel</title>
+    <title>Rooms - Pentatonic Hostel</title>
     <script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="<?= $baseUrl ?>public/css/warden.css?v=2">
@@ -90,34 +90,66 @@ if ($wardenName === '') {
             <div class="wd-toolbar">
                 <label class="wd-search">
                     <i class="ph ph-magnifying-glass"></i>
-                    <input type="search" id="wardenSearch" placeholder="Search students">
+                    <input type="search" id="wardenSearch" placeholder="Search rooms">
                 </label>
             </div>
 
-            <div class="table-box">
-                <div class="table-header">
-                    <span>Student's name</span>
-                    <span>Status</span>
+            <div class="wd-room-add">
+                <form method="post" action="<?= $baseUrl ?>index.php?action=warden_add_room">
+                    <input type="text" name="number" placeholder="Room no." required>
+                    <select name="type">
+                        <option value="single">Single</option>
+                        <option value="double" selected>Double</option>
+                    </select>
+                    <button type="submit">Add room</button>
+                </form>
+            </div>
+
+            <div class="table-box wd-room-table">
+
+                <div class="table-header rooms-header">
+                    <span>Room</span>
+                    <span>Type</span>
+                    <span>Student 1</span>
+                    <span>Student 2</span>
+                    <span>Save</span>
                 </div>
 
-                <?php foreach($data as $s): 
-                    $isYes = $s['laundry'] ?? 0;
+                <?php foreach($data as $room):
+                    $roomId = (int) $room['id'];
+                    $studentOptions = $wardenController->getRoomStudentOptions($roomId);
                 ?>
 
-                <div class="row searchable-row" data-search="<?= htmlspecialchars(strtolower(($s['name'] ?? '') . ' ' . ($isYes ? 'yes completed' : 'no pending'))) ?>">
-                    <div class="cell">
-                        <?= htmlspecialchars($s['name']) ?>
-                    </div>
+                <form class="row rooms-row searchable-row" method="post" action="<?= $baseUrl ?>index.php?action=warden_save_room" data-search="<?= htmlspecialchars(strtolower(($room['number'] ?? '') . ' ' . ($room['type'] ?? '') . ' ' . ($room['student1_name'] ?? '') . ' ' . ($room['student2_name'] ?? ''))) ?>">
+                    <input type="hidden" name="room_id" value="<?= $roomId ?>">
 
-                    <div class="status-pill <?= $isYes ? 'yes' : 'no' ?>"
-                         data-id="<?= $s['id'] ?>"
-                         data-type="laundry">
+                    <input class="cell wd-input" type="text" name="number" value="<?= htmlspecialchars($room['number']) ?>" aria-label="Room number" required>
 
-                        <?= $isYes ? 'Yes' : 'No' ?>
+                    <select class="cell wd-select room-type-select" name="type" aria-label="Room type">
+                        <option value="single" <?= ($room['type'] ?? '') === 'single' ? 'selected' : '' ?>>Single</option>
+                        <option value="double" <?= ($room['type'] ?? '') === 'double' ? 'selected' : '' ?>>Double</option>
+                    </select>
 
-                    </div>
+                    <select class="cell wd-select" name="student1_id" aria-label="Student one">
+                        <option value="0">Unassigned</option>
+                        <?php foreach ($studentOptions as $student): ?>
+                            <option value="<?= (int) $student['id'] ?>" <?= (int) ($room['student1_id'] ?? 0) === (int) $student['id'] ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($student['name']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
 
-                </div>
+                    <select class="cell wd-select second-student-select" name="student2_id" aria-label="Student two">
+                        <option value="0">Unassigned</option>
+                        <?php foreach ($studentOptions as $student): ?>
+                            <option value="<?= (int) $student['id'] ?>" <?= (int) ($room['student2_id'] ?? 0) === (int) $student['id'] ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($student['name']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+
+                    <button class="wd-mini-btn" type="submit">Save</button>
+                </form>
 
                 <?php endforeach; ?>
 

@@ -104,7 +104,7 @@ $studentTwoContact = $occupantContacts[1] ?? 'number';
     <title>Management Double Rooms - Pentatonic Hostel</title>
     <script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="<?= $baseUrl ?>public/css/owner.css">
+    <link rel="stylesheet" href="<?= $baseUrl ?>public/css/owner.css?v=2">
 </head>
 <body>
 <div class="mr-page-wrap">
@@ -151,6 +151,7 @@ $studentTwoContact = $occupantContacts[1] ?? 'number';
                         <?php foreach ($doubleRooms as $room): ?>
                             <a
                                 class="mr-room-item <?= (int) $room['id'] === $selectedRoomId ? 'active' : '' ?>"
+                                data-search="<?= htmlspecialchars(strtolower(($room['number'] ?? '') . ' double ' . ($room['occupant_names'] ?? '') . ' ' . ($room['occupant_contacts'] ?? ''))) ?>"
                                 href="<?= $baseUrl ?>index.php?action=owner_rooms_double&room_id=<?= (int) $room['id'] ?>"
                             >
                                 <?= htmlspecialchars((string) ($room['number'] ?? 'Room')) ?>
@@ -180,6 +181,8 @@ $studentTwoContact = $occupantContacts[1] ?? 'number';
         </main>
     </div>
 </div>
+<script src="<?= $baseUrl ?>public/js/owner-search.js"></script>
 </body>
 </html>
+
 

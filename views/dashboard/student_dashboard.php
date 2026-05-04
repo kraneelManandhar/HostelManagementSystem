@@ -24,7 +24,7 @@ if (
 
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="/HostelManagementSystem/public/css/student.css">
+    <link rel="stylesheet" href="/HostelManagementSystem/public/css/student.css?v=2">
 </head>
 
 <body>
@@ -398,4 +398,5 @@ if (
 <script src="/HostelManagementSystem/public/js/student.js"></script>
 </body>
 </html>
+
 

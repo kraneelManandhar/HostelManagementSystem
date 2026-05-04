@@ -642,7 +642,7 @@ body {
     color: #64748b;
     font-size: 13px;
     line-height: 1.5;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
 }
 
 .password-card .form-group {
@@ -810,4 +810,3 @@ body {
         padding-bottom: 5px;
     }
 }
-
