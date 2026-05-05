@@ -12,7 +12,7 @@
 
         <?php if (isset($_GET['error'])): ?>
             <?php if ($_GET['error'] === 'weak_password'): ?>
-                <p class="error-msg">Password must be at least 6 characters long.</p>
+                <p class="error-msg">Password must contain both letters and numbers.</p>
             <?php elseif ($_GET['error'] === 'mismatch'): ?>
                 <p class="error-msg">Passwords do not match. Please try again.</p>
             <?php endif; ?>
@@ -30,6 +30,8 @@
                         name="password"
                         placeholder="••••••••"
                         minlength="6"
+                        pattern="(?=.*[A-Za-z])(?=.*\d).{6,}"
+                        title="Use at least 6 characters with letters and numbers"
                         required
                     >
                     <span onclick="togglePassword('password')" class="toggle-eye">
@@ -47,6 +49,8 @@
                         name="confirm_password"
                         placeholder="••••••••"
                         minlength="6"
+                        pattern="(?=.*[A-Za-z])(?=.*\d).{6,}"
+                        title="Use at least 6 characters with letters and numbers"
                         required
                     >
                     <span onclick="togglePassword('confirm_password')" class="toggle-eye">

@@ -95,5 +95,29 @@ class Student {
             ':room_id'               => $data['room_id'] ?? null
         ]);
     }
+
+    public function updateSecondaryInfo(int $id, array $data): bool {
+        $sql = "UPDATE students
+                SET contact_number = :contact_number,
+                    college_name = :college_name,
+                    permanent_address = :permanent_address,
+                    guardian_name = :guardian_name,
+                    guardian_relationship = :guardian_relationship,
+                    guardian_contact = :guardian_contact,
+                    profile_photo = COALESCE(:profile_photo, profile_photo)
+                WHERE id = :id";
+
+        $stmt = $this->conn->prepare($sql);
+        return $stmt->execute([
+            ':contact_number' => $data['contact_number'] ?? '',
+            ':college_name' => $data['college_name'] ?? '',
+            ':permanent_address' => $data['permanent_address'] ?? '',
+            ':guardian_name' => $data['guardian_name'] ?? '',
+            ':guardian_relationship' => $data['guardian_relationship'] ?? '',
+            ':guardian_contact' => $data['guardian_contact'] ?? '',
+            ':profile_photo' => $data['profile_photo'] ?? null,
+            ':id' => $id,
+        ]);
+    }
 }
 ?>

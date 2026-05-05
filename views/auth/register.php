@@ -3,6 +3,9 @@
 <main class="main-content">
     <div class="registration-card">
         <h2>Registration Form</h2>
+        <?php if (isset($_GET['error']) && $_GET['error'] === 'phone'): ?>
+            <p class="error-msg">Contact numbers must contain exactly 10 digits.</p>
+        <?php endif; ?>
 
         <!-- FIXED: Use BASE_URL instead of relative path -->
         <!-- views/auth/register.php -->
@@ -29,7 +32,7 @@
         </div>
         <div>
             <label>Contact number:</label>
-            <input type="text" name="contact_number" required>
+            <input type="tel" name="contact_number" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" title="Enter exactly 10 digits" required>
         </div>
         <div class="full-row">
             <label>Email address:</label>
@@ -80,7 +83,7 @@
         </div>
         <div>
             <label>Contact number:</label>
-            <input type="text" name="guardian_contact" required>
+            <input type="tel" name="guardian_contact" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" title="Enter exactly 10 digits" required>
         </div>
     </div>
 </div>
