@@ -1,14 +1,9 @@
-<?php
-if (!defined('BASE_URL')) {
-    define('BASE_URL', '/HostelManagementSystem-main/');
-}
-?>
 <footer class="footer">
     <div class="footer-container">
 
         <div class="footer-top">
             <div class="footer-logo">
-                <img src="<?= BASE_URL ?>public/images/logo.png" alt="Logo">
+                <img src="/HostelManagementSystem/public/images/logo.png" alt="Logo">
                 <span>Pentatonic Hostel</span>
             </div>
         </div>
@@ -35,6 +30,4 @@ if (!defined('BASE_URL')) {
     </div>
 </footer>
 
-<script src='<?= BASE_URL ?>public/js/main.js'></script>
-</body>
-</html>
+<script src='/HostelManagementSystem/public/js/main.js'></script>

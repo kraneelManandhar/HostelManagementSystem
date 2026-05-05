@@ -3,7 +3,7 @@ require_once __DIR__ . '/../../config/db.php';
 require_once __DIR__ . '/../../controllers/AuthController.php';
 
 if (!defined('BASE_URL')) {
-    define('BASE_URL', '/HostelManagementSystem-main/');
+    define('BASE_URL', '/HOSTELMANAGEMENTSYSTEM/');
 }
 
 $error = "";
@@ -48,8 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <p class="login-success">Registration successful! Please login.</p>
         <?php endif; ?>
 
-        <!-- FIXED: Added hidden action field -->
-        <form method="POST" action="<?= BASE_URL ?>index.php?action=login">
+        <form method="POST" action="">
             
             <div class="form-group">
                 <label>Email</label>

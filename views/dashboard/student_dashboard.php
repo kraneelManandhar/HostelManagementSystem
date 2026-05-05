@@ -8,7 +8,7 @@ if (
     empty($_SESSION['logged_in']) ||
     ($_SESSION['user_role'] ?? '') !== 'student'
 ) {
-    header("Location: /HostelManagementSystem-main/index.php?action=login");
+    header("Location: /HostelManagementSystem/index.php?action=login");
     exit;
 }
 ?>
@@ -24,7 +24,7 @@ if (
 
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="/HostelManagementSystem-main/public/css/student.css">
+    <link rel="stylesheet" href="/HostelManagementSystem/public/css/student.css">
 </head>
 
 <body>
@@ -36,8 +36,8 @@ if (
     <aside class="sd-sidebar">
 
         <div class="sd-sidebar-logo" id="goDashboard" style="cursor:pointer;"
-             onclick="window.location.href='/HostelManagementSystem-main/index.php?action=student_dashboard'">
-            <img src="/HostelManagementSystem-main/public/images/logo.png" alt="Logo">
+             onclick="window.location.href='/HostelManagementSystem/index.php?action=student_dashboard'">
+            <img src="/HostelManagementSystem/public/images/logo.png" alt="Logo">
             <span>Pentatonic hostel</span>
         </div>
 
@@ -52,16 +52,16 @@ if (
 
                         if (strpos($photo, 'public/') === 0) {
                             // e.g. "public/uploads/photos/file.jpg"
-                            $src = '/HostelManagementSystem-main/' . htmlspecialchars($photo);
+                            $src = '/HostelManagementSystem/' . htmlspecialchars($photo);
                         } elseif (strpos($photo, 'uploads/') === 0) {
                             // e.g. "uploads/photos/file.jpg"
-                            $src = '/HostelManagementSystem-main/public/' . htmlspecialchars($photo);
+                            $src = '/HostelManagementSystem/public/' . htmlspecialchars($photo);
                         } else {
                             // e.g. just "file.jpg"
-                            $src = '/HostelManagementSystem-main/public/uploads/' . htmlspecialchars($photo);
+                            $src = '/HostelManagementSystem/public/uploads/' . htmlspecialchars($photo);
                         }
                     } else {
-                        $src = '/HostelManagementSystem-main/public/images/default-avatar.png';
+                        $src = '/HostelManagementSystem/public/images/default-avatar.png';
                     }
                 ?>
                 <img src="<?= $src ?>"
@@ -99,7 +99,7 @@ if (
         <div class="sd-sidebar-spacer"></div>
 
         <button class="sd-signout-btn"
-                onclick="window.location.href='/HostelManagementSystem-main/index.php?action=logout'">
+                onclick="window.location.href='/HostelManagementSystem/index.php?action=logout'">
             <i class="ph ph-sign-out"></i> Sign out
         </button>
 
@@ -390,6 +390,6 @@ if (
 </div>
 </div>
 
-<script src="/HostelManagementSystem-main/public/js/student.js"></script>
+<script src="/HostelManagementSystem/public/js/student.js"></script>
 </body>
 </html>

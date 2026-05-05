@@ -59,7 +59,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       try {
         const response = await fetch(
-          "/HostelManagementSystem-main/index.php?action=complaint_add",
+          "/HostelManagementSystem/index.php?action=complaint_add",
           { method: "POST", body: formData },
         );
         const result = await response.json();
@@ -127,7 +127,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       try {
         const res = await fetch(
-          "/HostelManagementSystem-main/index.php?action=complaint_delete",
+          "/HostelManagementSystem/index.php?action=complaint_delete",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
