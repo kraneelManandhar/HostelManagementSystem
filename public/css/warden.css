@@ -214,6 +214,18 @@ body {
     background: transparent;
 }
 
+.wd-search-empty {
+    width: 100%;
+    max-width: 900px;
+    margin: -4px auto 20px;
+    padding: 18px 22px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.74);
+    color: #5f6c80;
+    text-align: center;
+    font-size: 14px;
+}
+
 /* ===== DASHBOARD CARDS ===== */
 .wd-grid {
     width: 100%;
@@ -630,6 +642,24 @@ body {
     transform: translateY(0);
 }
 
+.table-box,
+.wd-room-table,
+.wd-notices {
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+.table-header,
+.row,
+.rooms-header,
+.rooms-row,
+.students-header,
+.students-row,
+.timing-header,
+.timing-row {
+    min-width: 720px;
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 1100px) {
     .wd-sidebar {
@@ -648,25 +678,27 @@ body {
         padding: 18px;
     }
     .wd-sidebar-nav {
-        flex-direction: row;
-        flex-wrap: wrap;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
     .wd-nav-btn {
-        width: auto;
-        flex: 1;
-        min-width: 140px;
+        width: 100%;
+        min-width: 0;
+        white-space: normal;
     }
     .wd-grid,
+    .wd-room-add form {
+        grid-template-columns: 1fr;
+    }
     .table-header,
     .row,
+    .rooms-header,
+    .rooms-row,
     .students-header,
     .students-row,
     .timing-header,
-    .timing-row,
-    .rooms-header,
-    .rooms-row,
-    .wd-room-add form {
-        grid-template-columns: 1fr;
+    .timing-row {
+        min-width: 640px;
     }
     .wd-search,
     .status-pill,
@@ -681,5 +713,33 @@ body {
     }
     .wd-notice-actions > * {
         flex: 1;
+    }
+}
+
+@media (max-width: 560px) {
+    .wd-main {
+        padding: 14px;
+    }
+
+    .wd-sidebar-nav {
+        grid-template-columns: 1fr;
+    }
+
+    .wd-title-bar {
+        font-size: 15px;
+        padding: 12px 16px;
+    }
+
+    .wd-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .wd-card {
+        min-height: 96px;
+    }
+
+    .wd-toolbar {
+        justify-content: stretch;
     }
 }

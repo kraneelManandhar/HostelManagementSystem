@@ -59,17 +59,43 @@ document.querySelectorAll('.row').forEach(row => {
 });
 
 /* ===== SEARCH ===== */
-const searchInput = document.getElementById('wardenSearch');
-if (searchInput) {
-  searchInput.addEventListener('input', () => {
-    const query = searchInput.value.trim().toLowerCase();
+document.querySelectorAll('#wardenSearch, .warden-search').forEach(searchInput => {
+  const scope = searchInput.closest('.wd-main') || document;
+  const rows = Array.from(scope.querySelectorAll('.searchable-row'));
+  const tableBox = scope.querySelector('.table-box') || rows[0]?.parentElement;
+  let emptyState = scope.querySelector('.wd-search-empty');
 
-    document.querySelectorAll('.searchable-row').forEach(row => {
+  if (!emptyState && tableBox) {
+    emptyState = document.createElement('div');
+    emptyState.className = 'wd-search-empty';
+    emptyState.textContent = 'No matching records found.';
+    emptyState.hidden = true;
+    tableBox.after(emptyState);
+  }
+
+  function filterRows() {
+    const terms = searchInput.value
+      .trim()
+      .toLowerCase()
+      .split(/\s+/)
+      .filter(Boolean);
+    let visibleCount = 0;
+
+    rows.forEach(row => {
       const haystack = (row.dataset.search || row.textContent || '').toLowerCase();
-      row.hidden = query !== '' && !haystack.includes(query);
+      const isMatch = terms.length === 0 || terms.every(term => haystack.includes(term));
+      row.hidden = !isMatch;
+      if (isMatch) visibleCount += 1;
     });
-  });
-}
+
+    if (emptyState) {
+      emptyState.hidden = terms.length === 0 || visibleCount > 0;
+    }
+  }
+
+  searchInput.addEventListener('input', filterRows);
+  filterRows();
+});
 
 /* ===== ROOM EDIT HELPERS ===== */
 document.querySelectorAll('.rooms-row').forEach(row => {

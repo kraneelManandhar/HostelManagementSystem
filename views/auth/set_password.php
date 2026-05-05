@@ -21,7 +21,7 @@
             <div class="form-group">
                 <label>Password</label>
                 <div class="password-wrapper">
-                    <input type="password" name="password" id="password" required placeholder="••••••••" minlength="6">
+                    <input type="password" name="password" id="password" required placeholder="••••••••" minlength="6" pattern="(?=.*[A-Za-z])(?=.*\d).{6,}" title="Use at least 6 characters with letters and numbers">
                     <span onclick="togglePassword('password')" class="toggle-eye">
                         <i class="ph ph-eye"></i>
                     </span>
@@ -31,7 +31,7 @@
             <div class="form-group">
                 <label>Re-type Password</label>
                 <div class="password-wrapper">
-                    <input type="password" name="confirm_password" id="confirm_password" required placeholder="••••••••" minlength="6">
+                    <input type="password" name="confirm_password" id="confirm_password" required placeholder="••••••••" minlength="6" pattern="(?=.*[A-Za-z])(?=.*\d).{6,}" title="Use at least 6 characters with letters and numbers">
                     <span onclick="togglePassword('confirm_password')" class="toggle-eye">
                         <i class="ph ph-eye"></i>
                     </span>
@@ -39,7 +39,7 @@
             </div>
 
             <?php if (isset($_GET['error']) && $_GET['error'] === 'password'): ?>
-                <p class="error-msg">Passwords must match and be at least 6 characters.</p>
+                <p class="error-msg">Passwords must match and contain both letters and numbers.</p>
             <?php endif; ?>
 
             <button type="submit" class="signup-btn">Sign up</button>

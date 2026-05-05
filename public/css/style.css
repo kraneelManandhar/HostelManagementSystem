@@ -709,6 +709,17 @@ body {
     border-radius: 8px;
 }
 
+.registration-card .error-msg {
+    color: #dc2626;
+    font-size: 13px;
+    margin: 0 0 16px;
+    text-align: center;
+    background: #fee2e2;
+    padding: 10px;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
 .password-card .success-msg {
     color: #16a34a;
     font-size: 13px;
@@ -800,6 +811,30 @@ body {
 
 
 /* Responsive adjustment */
+@media (max-width: 900px) {
+    .main-content {
+        padding: 18px;
+    }
+
+    .registration-card,
+    .login-card,
+    .password-card {
+        width: min(100%, 720px);
+    }
+
+    .reg-section {
+        align-items: stretch;
+    }
+
+    .reg-input-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .photo-box {
+        width: 100%;
+    }
+}
+
 @media (max-width: 600px) {
     .reg-section {
         flex-direction: column;
@@ -808,5 +843,28 @@ body {
     .reg-label-side {
         flex: none;
         padding-bottom: 5px;
+    }
+
+    .registration-card,
+    .login-card,
+    .password-card {
+        padding: 22px 16px;
+        border-radius: 12px;
+    }
+
+    .reg-input-grid,
+    .room-options {
+        grid-template-columns: 1fr;
+    }
+
+    .full-row {
+        grid-column: auto;
+    }
+
+    .submit-container,
+    .main-submit-btn,
+    .signup-btn,
+    .login-btn {
+        width: 100%;
     }
 }

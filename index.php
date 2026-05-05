@@ -67,6 +67,16 @@ switch ($action) {
 
     case 'register_step1':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $contactNumber = trim($_POST['contact_number'] ?? '');
+            $guardianContact = trim($_POST['guardian_contact'] ?? '');
+
+            if (!preg_match('/^\d{10}$/', $contactNumber) || !preg_match('/^\d{10}$/', $guardianContact)) {
+                header('Location: ' . BASE_URL . 'index.php?action=register&error=phone');
+                exit;
+            }
+
+            $_POST['contact_number'] = $contactNumber;
+            $_POST['guardian_contact'] = $guardianContact;
             $_SESSION['reg_data'] = $_POST;
 
             if (!empty($_FILES['profile_photo']['name'])) {
@@ -75,7 +85,7 @@ switch ($action) {
                     mkdir($uploadDir, 0755, true);
                 }
 
-                $ext = pathinfo($_FILES['profile_photo']['name'], PATHINFO_EXTENSION);
+                $ext      = pathinfo($_FILES['profile_photo']['name'], PATHINFO_EXTENSION);
                 $filename = uniqid() . '_' . rand(100000000, 999999999) . '.' . $ext;
                 move_uploaded_file($_FILES['profile_photo']['tmp_name'], $uploadDir . $filename);
                 $_SESSION['reg_data']['profile_photo'] = $filename;
@@ -94,18 +104,22 @@ switch ($action) {
 
     case 'register_final':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $password = $_POST['password'] ?? '';
+            $password        = $_POST['password']         ?? '';
             $confirmPassword = $_POST['confirm_password'] ?? '';
 
-            if (empty($password) || $password !== $confirmPassword || strlen($password) < 6) {
+            if (
+                empty($password) ||
+                $password !== $confirmPassword ||
+                !preg_match('/^(?=.*[A-Za-z])(?=.*\d).{6,}$/', $password)
+            ) {
                 header('Location: ' . BASE_URL . 'index.php?action=set_password&error=password');
                 exit;
             }
 
-            $data = $_SESSION['reg_data'] ?? [];
+            $data             = $_SESSION['reg_data'] ?? [];
             $data['password'] = password_hash($password, PASSWORD_DEFAULT);
 
-            $pdo = DB::connect();
+            $pdo               = DB::connect();
             $studentController = new StudentController($pdo);
             $studentController->register($data);
 
@@ -126,52 +140,120 @@ switch ($action) {
         exit;
 
     case 'forgot_password':
-        $pdo = DB::connect();
+        $pdo  = DB::connect();
         $ctrl = new PasswordResetController($pdo);
         $ctrl->showForgotForm();
         break;
 
     case 'forgot_password_submit':
-        $pdo = DB::connect();
+        $pdo  = DB::connect();
         $ctrl = new PasswordResetController($pdo);
         $ctrl->handleForgotPassword();
         break;
 
     case 'reset_password':
-        $pdo = DB::connect();
+        $pdo  = DB::connect();
         $ctrl = new PasswordResetController($pdo);
         $ctrl->showResetForm();
         break;
 
     case 'reset_password_submit':
-        $pdo = DB::connect();
+        $pdo  = DB::connect();
         $ctrl = new PasswordResetController($pdo);
         $ctrl->handleResetPassword();
         break;
 
     case 'student_dashboard':
         requireRole('student');
-        $pdo = DB::connect();
+        $pdo               = DB::connect();
         $studentController = new StudentController($pdo);
-        extract($studentController->getDashboardData($_SESSION['user_id']));
+        $data              = $studentController->getDashboardData($_SESSION['user_id']);
+
+        // If no room assigned yet, send to room picker
+        if (empty($data['room'])) {
+            header('Location: ' . BASE_URL . 'index.php?action=room_selection');
+            exit;
+        }
+
+        extract($data);
         include 'views/dashboard/student_dashboard.php';
         break;
+
+    case 'room_selection':
+        requireRole('student');
+        $pdo               = DB::connect();
+        $studentController = new StudentController($pdo);
+
+        // If student already has a room, skip straight to dashboard
+        $data = $studentController->getDashboardData($_SESSION['user_id']);
+        if (!empty($data['room'])) {
+            $_SESSION['room_assigned'] = true;
+            header('Location: ' . BASE_URL . 'index.php?action=student_dashboard');
+            exit;
+        }
+
+        // Fetch student's preferred room type and available rooms
+        $stmt = $pdo->prepare("SELECT preferred_room_type FROM students WHERE id = ?");
+        $stmt->execute([$_SESSION['user_id']]);
+        $studentRow    = $stmt->fetch(PDO::FETCH_ASSOC);
+        $preferredType = $studentRow['preferred_room_type'] ?? 'single';
+
+        $roomModel      = new Room($pdo);
+        $availableRooms = $roomModel->getByTypeWithOccupancy($preferredType);
+
+        include 'views/dashboard/room_selection.php';
+        break;
+
+    case 'save_room':
+        requireRole('student');
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: ' . BASE_URL . 'index.php?action=room_selection');
+            exit;
+        }
+
+        $room_id  = (int) ($_POST['room_id']  ?? 0);
+        $bed_slot = trim($_POST['bed_slot']    ?? '');
+
+        if (!$room_id || !in_array($bed_slot, ['student1', 'student2'], true)) {
+            header('Location: ' . BASE_URL . 'index.php?action=room_selection&error=invalid');
+            exit;
+        }
+
+        $pdo       = DB::connect();
+        $roomModel = new Room($pdo);
+        $ok        = $roomModel->assignStudent($room_id, (int) $_SESSION['user_id'], $bed_slot);
+
+        if ($ok) {
+            $_SESSION['room_assigned'] = true;
+            header('Location: ' . BASE_URL . 'index.php?action=student_dashboard');
+        } else {
+            // Slot was taken between page load and submit — let them pick again
+            header('Location: ' . BASE_URL . 'index.php?action=room_selection&error=taken');
+        }
+        exit;
 
     case 'complaint_add':
         requireRole('student');
         $pdo = DB::connect();
-        $cc = new ComplaintController($pdo);
+        $cc  = new ComplaintController($pdo);
         $cc->store();
         break;
 
     case 'complaint_delete':
         requireRole('student');
         $pdo = DB::connect();
-        $cc = new ComplaintController($pdo);
+        $cc  = new ComplaintController($pdo);
         $cc->delete();
         break;
 
-    /* ===== WARDEN PAGES - Standalone ===== */
+    case 'student_profile_update':
+        requireRole('student');
+        $pdo = DB::connect();
+        $studentController = new StudentController($pdo);
+        $studentController->updateProfile((int) $_SESSION['user_id']);
+        break;
+
     case 'warden_dashboard':
         requireRole('warden');
         include 'views/dashboard/wardenDashboard.php';
@@ -212,7 +294,6 @@ switch ($action) {
         include 'views/dashboard/timing.php';
         break;
 
-    /* ===== WARDEN AJAX ACTIONS ===== */
     case 'warden_save_room':
         requireRole('warden');
         $wardenController = new WardenController(DB::connect());
@@ -298,10 +379,6 @@ switch ($action) {
     case 'owner_staff':
         requireRole('owner');
         include 'views/dashboard/staff.php';
-        break;
-
-    case 'chatbot':
-        require_once __DIR__ . '/controllers/ChatbotController.php';
         break;
 
     case 'staff':
