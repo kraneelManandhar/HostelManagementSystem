@@ -10,17 +10,6 @@ if (
     header("Location: " . BASE_URL . "index.php?action=login");
     exit;
 }
-
-// Show room selection modal if no room assigned yet
-$showRoomModal  = empty($room);
-$availableRooms = [];
-$preferredType  = 'single';
-
-if ($showRoomModal) {
-    $preferredType  = $student['preferred_room_type'] ?? 'single';
-    $roomModel      = new Room($GLOBALS['pdo']);
-    $availableRooms = $roomModel->getAvailableByType($preferredType);
-}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -33,7 +22,7 @@ if ($showRoomModal) {
     <link rel="stylesheet" href="<?= BASE_URL ?>public/css/student.css">
 </head>
 
-<body>
+<body class="<?= $showRoomModal ? 'rs-modal-open' : '' ?>">
 <div class="sd-page-wrap">
 <div class="sd-body-row">
 
@@ -91,7 +80,7 @@ if ($showRoomModal) {
         </button>
     </aside>
 
-    <!-- MAIN -->
+    <!-- MAIN CONTENT -->
     <main class="sd-main">
 
         <div class="sd-welcome-card">
@@ -127,12 +116,11 @@ if ($showRoomModal) {
                 </div>
             </div>
 
-            <!-- Room Details — layout depends on room type -->
+            <!-- Room Details -->
             <?php if (!empty($room)): ?>
                 <?php $isDouble = strtolower($room['type'] ?? '') === 'double'; ?>
 
                 <?php if ($isDouble): ?>
-                <!-- DOUBLE SITTER: left panel + right panel -->
                 <div class="sd-room-outer">
                     <div class="sd-room-left-wrap">
                         <div class="sd-info-card sd-room-left-card">
@@ -148,7 +136,7 @@ if ($showRoomModal) {
                     <div class="sd-room-right-card">
                         <div class="sd-info-field">
                             <label>Room type</label>
-                            <span>Double sitter</span>
+                            <span><?= htmlspecialchars($room['type'] ?? '—') ?> sitter</span>
                         </div>
                         <div class="sd-info-field">
                             <label>Roommate</label>
@@ -157,7 +145,6 @@ if ($showRoomModal) {
                     </div>
                 </div>
                 <?php else: ?>
-                <!-- SINGLE: standard card -->
                 <div class="sd-info-card">
                     <h3>Room details</h3>
                     <div class="sd-info-grid sd-cols-3">
@@ -166,12 +153,8 @@ if ($showRoomModal) {
                             <span><?= htmlspecialchars($room['number'] ?? '—') ?></span>
                         </div>
                         <div class="sd-info-field">
-                            <label>Bed slot</label>
-                            <span><?= htmlspecialchars($room['bed_slot'] ?? '—') ?></span>
-                        </div>
-                        <div class="sd-info-field">
                             <label>Room type</label>
-                            <span><?= htmlspecialchars($room['type'] ?? '—') ?></span>
+                            <span><?= htmlspecialchars($room['type'] ?? '—') ?> sitter</span>
                         </div>
                     </div>
                 </div>
@@ -321,8 +304,8 @@ if ($showRoomModal) {
 </div>
 
 <?php if ($showRoomModal): ?>
-<!-- ROOM SELECTION MODAL — shown when student has no room yet.
-     Cannot be dismissed; student must pick a room and Save. -->
+<!-- ROOM SELECTION MODAL - overlay on top of the blurred dashboard
+     Student MUST pick a room; the modal cannot be dismissed. -->
 <div class="rs-overlay" id="roomSelectionModal">
     <div class="rs-modal">
 
@@ -337,8 +320,6 @@ if ($showRoomModal) {
                         <button
                             class="rs-room-pill <?= $i === 0 ? 'active' : '' ?>"
                             data-room-id="<?= $r['id'] ?>"
-                            data-s1="<?= $r['student1_id'] ? '1' : '0' ?>"
-                            data-s2="<?= $r['student2_id'] ? '1' : '0' ?>"
                             data-type="<?= htmlspecialchars($r['type']) ?>"
                             data-number="<?= htmlspecialchars($r['number']) ?>"
                         ><?= htmlspecialchars($r['number']) ?></button>
@@ -347,20 +328,26 @@ if ($showRoomModal) {
             </div>
         </div>
 
-        <!-- RIGHT: detail panel -->
+        <!-- RIGHT: room detail panel -->
         <div class="rs-right">
             <div class="rs-title-bar">SELECT YOUR ROOM</div>
 
             <?php if (!empty($availableRooms)): ?>
             <div class="rs-detail">
-                <div class="rs-room-label"      id="rsRoomLabel">Room number <?= htmlspecialchars($availableRooms[0]['number']) ?></div>
-                <div class="rs-room-type-label" id="rsTypeLabel"><?= htmlspecialchars($availableRooms[0]['type']) ?> sitter room</div>
-                <div class="rs-beds-wrap"       id="rsBedsWrap"></div>
+                <div class="rs-room-label"      id="rsRoomLabel">
+                    Room number <?= htmlspecialchars($availableRooms[0]['number']) ?>
+                </div>
+                <div class="rs-room-type-label" id="rsTypeLabel">
+                    <?= htmlspecialchars($availableRooms[0]['type']) ?> sitter room
+                </div>
+                <div class="rs-beds-wrap" id="rsBedsWrap"></div>
 
-                <form method="POST" action="<?= BASE_URL ?>index.php?action=save_room" id="rsForm">
+                <!-- Hidden form — submitted via AJAX -->
+                <form id="rsForm">
                     <input type="hidden" name="room_id"  id="rsInputRoomId"  value="<?= $availableRooms[0]['id'] ?>">
                     <input type="hidden" name="bed_slot" id="rsInputBedSlot" value="">
-                    <button type="submit" class="rs-save-btn" id="rsSaveBtn" disabled style="opacity:0.4;cursor:not-allowed;">Save</button>
+                    <button type="button" class="rs-save-btn" id="rsSaveBtn"
+                            disabled style="opacity:0.4;cursor:not-allowed;">Save</button>
                 </form>
             </div>
             <?php else: ?>
@@ -373,12 +360,25 @@ if ($showRoomModal) {
 
     </div>
 </div>
+
+<!-- ROOM ASSIGNED SUCCESS ALERT -->
+<div class="rs-success-alert" id="rsSuccessAlert">
+    <div class="rs-success-box">
+        <div class="rs-success-icon">
+            <i class="ph-fill ph-check-circle"></i>
+        </div>
+        <h3>Room Assigned Successfully!</h3>
+        <p id="rsSuccessMsg">Your room has been selected.</p>
+        <div class="rs-success-progress" id="rsSuccessProgress"></div>
+    </div>
+</div>
 <?php endif; ?>
 
 <script>
-    const BASE_URL = "<?= BASE_URL ?>";
-    const RS_ROOMS = <?= json_encode($availableRooms ?? [], JSON_HEX_TAG) ?>;
-    const RS_SHOW  = <?= $showRoomModal ? 'true' : 'false' ?>;
+    const BASE_URL     = "<?= BASE_URL ?>";
+    const RS_ROOMS     = <?= json_encode($availableRooms ?? [], JSON_HEX_TAG) ?>;
+    const RS_SHOW      = <?= $showRoomModal ? 'true' : 'false' ?>;
+    const RS_SAVE_URL  = "<?= BASE_URL ?>index.php?action=save_room";
 </script>
 <script src="<?= BASE_URL ?>public/js/student.js"></script>
 </body>

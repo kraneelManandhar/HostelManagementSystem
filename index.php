@@ -73,7 +73,6 @@ switch ($action) {
                 if (!is_dir($uploadDir)) {
                     mkdir($uploadDir, 0755, true);
                 }
-
                 $ext      = pathinfo($_FILES['profile_photo']['name'], PATHINFO_EXTENSION);
                 $filename = uniqid() . '_' . rand(100000000, 999999999) . '.' . $ext;
                 move_uploaded_file($_FILES['profile_photo']['tmp_name'], $uploadDir . $filename);
@@ -83,7 +82,6 @@ switch ($action) {
             header('Location: ' . BASE_URL . 'index.php?action=set_password');
             exit;
         }
-
         include 'views/auth/register.php';
         break;
 
@@ -148,52 +146,48 @@ switch ($action) {
         $ctrl->handleResetPassword();
         break;
 
+    /**
+     * STUDENT DASHBOARD
+     * If student has no room yet, we render the dashboard WITH the room-selection modal (popup overlay).
+     */
     case 'student_dashboard':
         requireRole('student');
         $pdo               = DB::connect();
         $studentController = new StudentController($pdo);
         $data              = $studentController->getDashboardData($_SESSION['user_id']);
 
-        // If no room assigned yet, send to room picker
-        if (empty($data['room'])) {
-            header('Location: ' . BASE_URL . 'index.php?action=room_selection');
-            exit;
+        $showRoomModal  = empty($data['room']);
+        $availableRooms = [];
+
+        if ($showRoomModal) {
+            $preferredType  = $data['student']['preferred_room_type'] ?? 'single';
+            $roomModel      = new Room($pdo);
+            $availableRooms = $roomModel->getAvailableByType($preferredType);
         }
 
         extract($data);
         include 'views/dashboard/student_dashboard.php';
         break;
 
+    /**
+     * ROOM SELECTION (kept for backwards compat / direct URL hits)
+     * Redirects to student_dashboard which now handles the modal inline.
+     */
     case 'room_selection':
         requireRole('student');
-        $pdo               = DB::connect();
-        $studentController = new StudentController($pdo);
+        header('Location: ' . BASE_URL . 'index.php?action=student_dashboard');
+        exit;
 
-        // If student already has a room, skip straight to dashboard
-        $data = $studentController->getDashboardData($_SESSION['user_id']);
-        if (!empty($data['room'])) {
-            $_SESSION['room_assigned'] = true;
-            header('Location: ' . BASE_URL . 'index.php?action=student_dashboard');
-            exit;
-        }
-
-        // Fetch student's preferred room type and available rooms
-        $stmt = $pdo->prepare("SELECT preferred_room_type FROM students WHERE id = ?");
-        $stmt->execute([$_SESSION['user_id']]);
-        $studentRow    = $stmt->fetch(PDO::FETCH_ASSOC);
-        $preferredType = $studentRow['preferred_room_type'] ?? 'single';
-
-        $roomModel      = new Room($pdo);
-        $availableRooms = $roomModel->getAvailableByType($preferredType);
-
-        include 'views/dashboard/room_selection.php';
-        break;
-
+    /**
+     * SAVE ROOM
+     * Returns JSON so the JS can show the success alert then redirect.
+     */
     case 'save_room':
         requireRole('student');
+        header('Content-Type: application/json');
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: ' . BASE_URL . 'index.php?action=room_selection');
+            echo json_encode(['success' => false, 'message' => 'Invalid request method.']);
             exit;
         }
 
@@ -201,7 +195,7 @@ switch ($action) {
         $bed_slot = trim($_POST['bed_slot']    ?? '');
 
         if (!$room_id || !in_array($bed_slot, ['student1', 'student2'], true)) {
-            header('Location: ' . BASE_URL . 'index.php?action=room_selection&error=invalid');
+            echo json_encode(['success' => false, 'message' => 'Invalid room or bed selection.']);
             exit;
         }
 
@@ -211,10 +205,16 @@ switch ($action) {
 
         if ($ok) {
             $_SESSION['room_assigned'] = true;
-            header('Location: ' . BASE_URL . 'index.php?action=student_dashboard');
+            echo json_encode([
+                'success'      => true,
+                'message'      => 'Room assigned successfully!',
+                'redirect_url' => BASE_URL . 'index.php?action=student_dashboard'
+            ]);
         } else {
-            // Slot was taken between page load and submit — let them pick again
-            header('Location: ' . BASE_URL . 'index.php?action=room_selection&error=taken');
+            echo json_encode([
+                'success' => false,
+                'message' => 'That bed was just taken. Please choose another.'
+            ]);
         }
         exit;
 
@@ -301,4 +301,3 @@ function requireRole($role) {
         exit;
     }
 }
-?>
