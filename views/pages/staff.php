@@ -5,12 +5,12 @@ include(__DIR__ . '/../layout/header.php');
 
     <!-- Register Now button -->
     <div class="register-bar">
-        <a href="/HostelManagementSystem/views/auth/register.php" class="register-btn">Register now !!</a>
+        <a href="<?= BASE_URL ?>index.php?action=register" class="register-btn">Register now !!</a>
     </div>
 
     <!-- Staff Member 1: Details -->
     <div class="section-block">
-        <img src="/HostelManagementSystem/public/images/staff1.jpg" alt="Ananya Arora">
+        <img src="<?= BASE_URL ?>public/images/staff1.jpg" alt="Ananya Arora">
 
         <div class="section-text">
             <h3 class="staff-name">Ananya Arora</h3>
@@ -26,7 +26,7 @@ include(__DIR__ . '/../layout/header.php');
 
     <!-- Staff Member 2: Details -->
     <div class="section-block reverse">
-        <img src="/HostelManagementSystem/public/images/staff2.jpg" alt="Marcus Lindberg">
+        <img src="<?= BASE_URL ?>public/images/staff2.jpg" alt="Marcus Lindberg">
 
         <div class="section-text">
             <h3 class="staff-name">Marcus Lindberg</h3>
@@ -42,7 +42,7 @@ include(__DIR__ . '/../layout/header.php');
 
     <!-- Staff Member 3: Details -->
     <div class="section-block">
-        <img src="/HostelManagementSystem/public/images/staff3.jpg" alt="Priya Tamrakar">
+        <img src="<?= BASE_URL ?>public/images/staff3.jpg" alt="Priya Tamrakar">
 
         <div class="section-text">
             <h3 class="staff-name">Priya Tamrakar</h3>
@@ -59,3 +59,4 @@ include(__DIR__ . '/../layout/header.php');
 </main>
 
 <?php include(__DIR__ . '/../layout/footer.php'); ?>
+

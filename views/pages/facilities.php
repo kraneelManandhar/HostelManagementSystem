@@ -6,39 +6,39 @@ include(__DIR__ . '/../layout/header.php');
 
     <!-- Register Now button -->
     <div class="register-bar">
-        <a href="/HostelManagementSystem/views/auth/register.php" class="register-btn">Register now !!</a>
+        <a href="<?= BASE_URL ?>index.php?action=register" class="register-btn">Register now !!</a>
     </div>
 
     <!-- Facilities Grid -->
     <div class="facilities-grid">
 
         <div class="facility-card">
-            <img src="/HostelManagementSystem/public/images/study-section.jpg" alt="Study Section">
+            <img src="<?= BASE_URL ?>public/images/study-section.jpg" alt="Study Section">
             <p>Study section</p>
         </div>
 
         <div class="facility-card">
-            <img src="/HostelManagementSystem/public/images/laundry.jpg" alt="Laundry Room">
+            <img src="<?= BASE_URL ?>public/images/laundry.jpg" alt="Laundry Room">
             <p>Laundry Room</p>
         </div>
 
         <div class="facility-card">
-            <img src="/HostelManagementSystem/public/images/game-room.jpg" alt="Game Room">
+            <img src="<?= BASE_URL ?>public/images/game-room.jpg" alt="Game Room">
             <p>Game Room</p>
         </div>
 
         <div class="facility-card">
-            <img src="/HostelManagementSystem/public/images/parking-area.jpg" alt="Parking Area">
+            <img src="<?= BASE_URL ?>public/images/parking-area.jpg" alt="Parking Area">
             <p>Parking Area</p>
         </div>
 
         <div class="facility-card">
-            <img src="/HostelManagementSystem/public/images/gym.jpg" alt="Gym">
+            <img src="<?= BASE_URL ?>public/images/gym.jpg" alt="Gym">
             <p>Gym</p>
         </div>
 
         <div class="facility-card">
-            <img src="/HostelManagementSystem/public/images/rooftop-sitting.jpg" alt="Roof Sitting Area">
+            <img src="<?= BASE_URL ?>public/images/rooftop-sitting.jpg" alt="Roof Sitting Area">
             <p>Rooftop Sitting Area</p>
         </div>
 

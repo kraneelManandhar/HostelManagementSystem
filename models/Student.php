@@ -1,104 +1,123 @@
-<<<<<<< HEAD
 <?php
-require_once '../config/db.php';
+require_once __DIR__ . '/../config/db.php';
 
 class Student {
     private $conn;
 
-    public function __construct(){
-        $this->conn = DB::connect();
+    public function __construct($pdo = null){
+        if ($pdo !== null) {
+            $this->conn = $pdo;
+        } else {
+            $this->conn = DB::connect();
+        }
     }
 
     public function getAll(){
-        return $this->conn->query("
-            SELECT s.*, 
-            f.status as food,
-            l.status as laundry,
-            b.status as bathroom,
-            t.time_in, t.time_out
-            FROM students s
-            LEFT JOIN food f ON s.id=f.student_id
-            LEFT JOIN laundry l ON s.id=l.student_id
-            LEFT JOIN bathroom b ON s.id=b.student_id
-            LEFT JOIN timing t ON s.id=t.student_id
-        ")->fetchAll(PDO::FETCH_ASSOC);
+        $sql = "SELECT s.*, r.number as room_number, r.type as room_type
+                FROM students s 
+                LEFT JOIN rooms r ON s.id IN (r.student1_id, r.student2_id) OR s.room_id = r.id";
+        $stmt = $this->conn->query($sql);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function add($name,$email,$contact){
-        $this->conn->prepare("INSERT INTO students(name,email,contact) VALUES(?,?,?)")
-            ->execute([$name,$email,$contact]);
-
-        $id = $this->conn->lastInsertId();
-
-        $this->conn->prepare("INSERT INTO food VALUES(?,0)")->execute([$id]);
-        $this->conn->prepare("INSERT INTO laundry VALUES(?,0)")->execute([$id]);
-        $this->conn->prepare("INSERT INTO bathroom VALUES(?,0)")->execute([$id]);
-        $this->conn->prepare("INSERT INTO timing VALUES(?,NULL,NULL)")->execute([$id]);
+    public function add($fname, $mname, $lname, $email, $password, $room_id){
+        $sql = "INSERT INTO students (first_name, middle_name, last_name, email, password, room_id) 
+                VALUES (?, ?, ?, ?, ?, ?)";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([$fname, $mname, $lname, $email, $password, $room_id]);
+        return $this->conn->lastInsertId();
     }
 
     public function delete($id){
-        $this->conn->prepare("DELETE FROM students WHERE id=?")->execute([$id]);
+        $stmt = $this->conn->prepare("DELETE FROM students WHERE id = ?");
+        return $stmt->execute([$id]);
     }
 
-    public function toggle($table,$id){
-        $this->conn->query("UPDATE $table SET status = NOT status WHERE student_id=$id");
+    public function toggle($table, $student_id){
+        $allowed_tables = ['food', 'laundry', 'bathroom'];
+        if (in_array($table, $allowed_tables)) {
+            $sql = "UPDATE $table SET status = NOT status WHERE student_id = ?";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([$student_id]);
+        }
     }
 
-    public function updateTime($id,$in,$out){
-        $stmt = $this->conn->prepare("UPDATE timing SET time_in=?, time_out=? WHERE student_id=?");
-        $stmt->execute([$in,$out,$id]);
+    public function updateTime($id, $in, $out){
+        $stmt = $this->conn->prepare("UPDATE timing SET check_in = ?, check_out = ? WHERE student_id = ?");
+        $stmt->execute([$in, $out, $id]);
+    }
+
+    /**
+     * Find student by email (for student login)
+     */
+    public function findByEmail($email) {
+        $stmt = $this->conn->prepare("SELECT * FROM students WHERE email = ?");
+        $stmt->execute([$email]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function registerStudent($data) {
+        if (empty($data['password'])) {
+            throw new Exception("Password is required");
+        }
+
+        $sql = "INSERT INTO students (
+            first_name, middle_name, last_name, date_of_birth,
+            contact_number, email, password, profile_photo,
+            college_name, permanent_address, date_of_joining,
+            guardian_name, guardian_relationship, guardian_contact,
+            preferred_room_type, room_id, created_at
+        ) VALUES (
+            :first_name, :middle_name, :last_name, :date_of_birth,
+            :contact_number, :email, :password, :profile_photo,
+            :college_name, :permanent_address, :date_of_joining,
+            :guardian_name, :guardian_relationship, :guardian_contact,
+            :preferred_room_type, :room_id, NOW()
+        )";
+
+        $stmt = $this->conn->prepare($sql);
+        return $stmt->execute([
+            ':first_name'            => $data['first_name'] ?? '',
+            ':middle_name'           => !empty($data['middle_name']) ? $data['middle_name'] : null,
+            ':last_name'             => $data['last_name'] ?? '',
+            ':date_of_birth'         => $data['date_of_birth'] ?? null,
+            ':contact_number'        => $data['contact_number'] ?? '',
+            ':email'                 => $data['email'] ?? '',
+            ':password'              => $data['password'],
+            ':profile_photo'         => $data['profile_photo'] ?? null,
+            ':college_name'          => $data['college_name'] ?? '',
+            ':permanent_address'     => $data['permanent_address'] ?? '',
+            ':date_of_joining'       => $data['date_of_joining'] ?? null,
+            ':guardian_name'         => $data['guardian_name'] ?? '',
+            ':guardian_relationship' => $data['guardian_relationship'] ?? '',
+            ':guardian_contact'      => $data['guardian_contact'] ?? '',
+            ':preferred_room_type'   => $data['preferred_room_type'] ?? 'double',
+            ':room_id'               => $data['room_id'] ?? null
+        ]);
+    }
+
+    public function updateSecondaryInfo(int $id, array $data): bool {
+        $sql = "UPDATE students
+                SET contact_number = :contact_number,
+                    college_name = :college_name,
+                    permanent_address = :permanent_address,
+                    guardian_name = :guardian_name,
+                    guardian_relationship = :guardian_relationship,
+                    guardian_contact = :guardian_contact,
+                    profile_photo = COALESCE(:profile_photo, profile_photo)
+                WHERE id = :id";
+
+        $stmt = $this->conn->prepare($sql);
+        return $stmt->execute([
+            ':contact_number' => $data['contact_number'] ?? '',
+            ':college_name' => $data['college_name'] ?? '',
+            ':permanent_address' => $data['permanent_address'] ?? '',
+            ':guardian_name' => $data['guardian_name'] ?? '',
+            ':guardian_relationship' => $data['guardian_relationship'] ?? '',
+            ':guardian_contact' => $data['guardian_contact'] ?? '',
+            ':profile_photo' => $data['profile_photo'] ?? null,
+            ':id' => $id,
+        ]);
     }
 }
-=======
-<?php
-require_once '../config/db.php';
-
-class Student {
-    private $conn;
-
-    public function __construct(){
-        $this->conn = DB::connect();
-    }
-
-    public function getAll(){
-        return $this->conn->query("
-            SELECT s.*, 
-            f.status as food,
-            l.status as laundry,
-            b.status as bathroom,
-            t.time_in, t.time_out
-            FROM students s
-            LEFT JOIN food f ON s.id=f.student_id
-            LEFT JOIN laundry l ON s.id=l.student_id
-            LEFT JOIN bathroom b ON s.id=b.student_id
-            LEFT JOIN timing t ON s.id=t.student_id
-        ")->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    public function add($name,$email,$contact){
-        $this->conn->prepare("INSERT INTO students(name,email,contact) VALUES(?,?,?)")
-            ->execute([$name,$email,$contact]);
-
-        $id = $this->conn->lastInsertId();
-
-        $this->conn->prepare("INSERT INTO food VALUES(?,0)")->execute([$id]);
-        $this->conn->prepare("INSERT INTO laundry VALUES(?,0)")->execute([$id]);
-        $this->conn->prepare("INSERT INTO bathroom VALUES(?,0)")->execute([$id]);
-        $this->conn->prepare("INSERT INTO timing VALUES(?,NULL,NULL)")->execute([$id]);
-    }
-
-    public function delete($id){
-        $this->conn->prepare("DELETE FROM students WHERE id=?")->execute([$id]);
-    }
-
-    public function toggle($table,$id){
-        $this->conn->query("UPDATE $table SET status = NOT status WHERE student_id=$id");
-    }
-
-    public function updateTime($id,$in,$out){
-        $stmt = $this->conn->prepare("UPDATE timing SET time_in=?, time_out=? WHERE student_id=?");
-        $stmt->execute([$in,$out,$id]);
-    }
-}
->>>>>>> a1168b8b45eef63cc27118b6696886423dcefc31
 ?>
