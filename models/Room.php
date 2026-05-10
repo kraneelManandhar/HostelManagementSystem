@@ -82,7 +82,7 @@ class Room {
             return false;
         }
 
-        $col = $slot . '_id';   // student1_id  or  student2_id
+        $col = $slot . '_id';   
 
         // Make sure the slot is still free 
         $check = $this->pdo->prepare("SELECT $col FROM rooms WHERE id = ?");
