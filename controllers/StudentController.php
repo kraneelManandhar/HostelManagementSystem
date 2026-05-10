@@ -42,54 +42,6 @@ class StudentController {
         return $this->model->registerStudent($data);
     }
 
-    // Room selection page (GET)
-    // Shows rooms matching the student's preferred_room_type
-    public function showRoomSelection() {
-        $student_id = $_SESSION['user_id'] ?? 0;
-
-        // Fetch student to read preferred_room_type
-        $stmt = $this->pdo->prepare("SELECT preferred_room_type FROM students WHERE id = ?");
-        $stmt->execute([$student_id]);
-        $student = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        $preferredType   = $student['preferred_room_type'] ?? 'single';
-        $roomModel       = new Room($this->pdo);
-        $availableRooms  = $roomModel->getAvailableByType($preferredType);
-
-        // Render the view
-        if (!defined('BASE_URL')) {
-            define('BASE_URL', '/HostelManagementSystem/');
-        }
-
-        include __DIR__ . '/../views/dashboard/room_selection.php';
-    }
-
-    // Save room choice (POST from room_selection form)
-    public function saveRoomSelection() {
-        $student_id = $_SESSION['user_id'] ?? 0;
-        $room_id    = (int) ($_POST['room_id']  ?? 0);
-        $bed_slot   = trim($_POST['bed_slot'] ?? '');
-
-        // Validate
-        if (!$student_id || !$room_id || !in_array($bed_slot, ['student1', 'student2'], true)) {
-            header("Location: " . BASE_URL . "index.php?action=room_selection&error=invalid");
-            exit;
-        }
-
-        $roomModel = new Room($this->pdo);
-        $ok        = $roomModel->assignStudent($room_id, $student_id, $bed_slot);
-
-        if ($ok) {
-            // Mark room as assigned in session so the redirect guard works
-            $_SESSION['room_assigned'] = true;
-            header("Location: " . BASE_URL . "index.php?action=student_dashboard");
-        } else {
-            // Slot was grabbed by someone else between page load and submit
-            header("Location: " . BASE_URL . "index.php?action=room_selection&error=taken");
-        }
-        exit;
-    }
-
     // Dashboard data
     public function getDashboardData($student_id) {
         // Student

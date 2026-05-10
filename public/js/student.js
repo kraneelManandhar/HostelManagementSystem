@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  // 2. MODAL CONTROLS
+  // 2. COMPLAINT MODAL CONTROLS
   const modal = document.getElementById("complaintModal");
   const openBtn = document.getElementById("openComplaintForm");
   const closeBtn = document.getElementById("closeComplaintForm");
@@ -18,7 +18,6 @@ document.addEventListener("DOMContentLoaded", function () {
   if (openBtn)
     openBtn.addEventListener("click", () => modal.classList.add("open"));
   if (closeBtn) closeBtn.addEventListener("click", closeModal);
-
   if (modal) {
     modal.addEventListener("click", (e) => {
       if (e.target === modal) closeModal();
@@ -31,15 +30,25 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // 3. SUBMIT COMPLAINT
   const submitBtn = document.getElementById("submitComplaint");
-
   if (submitBtn) {
     submitBtn.addEventListener("click", async function () {
       const form = document.getElementById("complaintForm");
       const titleInput = form.querySelector('input[name="title"]');
+      const descriptionInput = form.querySelector(
+        'textarea[name="description"]',
+      );
       const issue = titleInput?.value?.trim();
+      const description = descriptionInput?.value?.trim();
 
       if (!issue) {
-        alert("Please fill in the Issue field.");
+        showStudentToast("Please fill in the Issue field.", "error");
+        titleInput?.focus();
+        return;
+      }
+
+      if (!description) {
+        showStudentToast("Please fill in the Description field.", "error");
+        descriptionInput?.focus();
         return;
       }
 
@@ -53,7 +62,10 @@ document.addEventListener("DOMContentLoaded", function () {
         const result = await response.json();
 
         if (!result.success) {
-          alert(result.message || "Failed to submit complaint");
+          showStudentToast(
+            result.message || "Failed to submit complaint.",
+            "error",
+          );
           return;
         }
 
@@ -63,9 +75,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Switch UI to complaints tab
         switchPage("complaints");
+        showStudentToast("Complaint submitted successfully.", "success");
       } catch (error) {
         console.error("Error:", error);
-        alert("Server error while submitting complaint.");
+        showStudentToast("Server error while submitting complaint.", "error");
       }
     });
   }
@@ -81,7 +94,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const item = document.createElement("div");
     item.className = "sd-complaint-item";
-
     item.innerHTML = `
       <input type="radio" name="selected-complaint" value="${data.id}">
       <span class="sd-c-title">${escHtml(data.issue)}</span>
@@ -89,13 +101,11 @@ document.addEventListener("DOMContentLoaded", function () {
       <span class="sd-c-room">${escHtml(data.room || "—")}</span>
       <span class="sd-badge">Pending</span>
     `;
-
     list.appendChild(item);
   }
 
   // 5. DELETE COMPLAINT
   const trashBtn = document.getElementById("deleteComplaint");
-
   if (trashBtn) {
     trashBtn.addEventListener("click", async function () {
       const selected = document.querySelector(
@@ -103,9 +113,15 @@ document.addEventListener("DOMContentLoaded", function () {
       );
 
       if (!selected) {
-        alert("Please select a complaint first.");
+        showStudentToast("Please select a complaint first.", "error");
         return;
       }
+
+      const confirmed = await showStudentConfirm({
+        title: "Are you sure you want to delete the complaint?",
+        confirmText: "Delete",
+      });
+      if (!confirmed) return;
 
       const complaintId = selected.value;
 
@@ -118,18 +134,18 @@ document.addEventListener("DOMContentLoaded", function () {
             body: JSON.stringify({ id: complaintId }),
           },
         );
-
         const result = await res.json();
 
         if (!result.success) {
-          alert(result.message || "Delete failed");
+          showStudentToast(result.message || "Delete failed.", "error");
           return;
         }
 
         selected.closest(".sd-complaint-item").remove();
+        showStudentToast("Complaint deleted successfully.", "success");
       } catch (err) {
         console.error(err);
-        alert("Server error while deleting complaint.");
+        showStudentToast("Server error while deleting complaint.", "error");
       }
     });
   }
@@ -142,6 +158,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
   if (typeof SD_INITIAL_TAB !== "undefined" && SD_INITIAL_TAB) {
     switchPage(SD_INITIAL_TAB);
+  }
+
+  if (typeof SD_FLASH !== "undefined" && SD_FLASH?.message) {
+    showStudentToast(SD_FLASH.message, SD_FLASH.type || "success");
   }
 
   // 7. HELPERS
@@ -166,19 +186,100 @@ document.addEventListener("DOMContentLoaded", function () {
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;");
   }
+
+  function showStudentToast(message, type) {
+    const toast = document.getElementById("sdToast");
+    if (!toast) return;
+
+    toast.textContent = message;
+    toast.classList.remove(
+      "sd-toast-success",
+      "sd-toast-error",
+      "sd-toast-show",
+    );
+    toast.classList.add(
+      type === "error" ? "sd-toast-error" : "sd-toast-success",
+    );
+
+    window.setTimeout(() => toast.classList.add("sd-toast-show"), 30);
+    window.setTimeout(() => toast.classList.remove("sd-toast-show"), 3200);
+  }
+
+  function showStudentConfirm({ title, message, confirmText }) {
+    const dialog = document.getElementById("studentConfirmDialog");
+    const titleEl = document.getElementById("studentConfirmTitle");
+    const messageEl = document.getElementById("studentConfirmMessage");
+    const cancelBtn = document.getElementById("studentConfirmCancel");
+    const okBtn = document.getElementById("studentConfirmOk");
+
+    if (!dialog || !titleEl || !messageEl || !cancelBtn || !okBtn) {
+      return Promise.resolve(false);
+    }
+
+    titleEl.textContent = title || "Are you sure?";
+    if (message) {
+      messageEl.textContent = message;
+      messageEl.hidden = false;
+    } else {
+      messageEl.textContent = "";
+      messageEl.hidden = true;
+    }
+    okBtn.textContent = confirmText || "Confirm";
+    dialog.classList.add("open");
+    dialog.setAttribute("aria-hidden", "false");
+    okBtn.focus();
+
+    return new Promise((resolve) => {
+      function close(result) {
+        dialog.classList.remove("open");
+        dialog.setAttribute("aria-hidden", "true");
+        cancelBtn.removeEventListener("click", onCancel);
+        okBtn.removeEventListener("click", onOk);
+        dialog.removeEventListener("click", onBackdrop);
+        document.removeEventListener("keydown", onKeydown);
+        resolve(result);
+      }
+
+      function onCancel() {
+        close(false);
+      }
+
+      function onOk() {
+        close(true);
+      }
+
+      function onBackdrop(e) {
+        if (e.target === dialog) close(false);
+      }
+
+      function onKeydown(e) {
+        if (e.key === "Escape") close(false);
+      }
+
+      cancelBtn.addEventListener("click", onCancel);
+      okBtn.addEventListener("click", onOk);
+      dialog.addEventListener("click", onBackdrop);
+      document.addEventListener("keydown", onKeydown);
+    });
+  }
 });
 
 // 8. ROOM SELECTION MODAL
 // Runs only when RS_SHOW === true (student has no room yet).
 if (typeof RS_SHOW !== "undefined" && RS_SHOW) {
   const rooms = RS_ROOMS || [];
+  const overlay = document.getElementById("roomSelectionModal");
+  const dashboardWrap = document.querySelector(".sd-page-wrap");
   const pillList = document.getElementById("rsPillList");
   const roomLabel = document.getElementById("rsRoomLabel");
   const typeLabel = document.getElementById("rsTypeLabel");
-  const bedsWrap = document.getElementById("rsBedsWrap");
+  let bedsWrap = document.getElementById("rsBedsWrap");
   const inputRoomId = document.getElementById("rsInputRoomId");
   const inputBedSlot = document.getElementById("rsInputBedSlot");
   const saveBtn = document.getElementById("rsSaveBtn");
+
+  overlay?.classList.add("open");
+  dashboardWrap?.classList.add("rs-blurred");
 
   // Track currently selected bed slot for double rooms
   let selectedSlot = "";
@@ -186,9 +287,9 @@ if (typeof RS_SHOW !== "undefined" && RS_SHOW) {
   /* SVG helpers */
   function rsBedSVG(occupied, selected) {
     let c;
-    if (selected) c = "#e8b84b";
+    if (selected) c = "#f0b429";
     else if (occupied) c = "#e05252";
-    else c = "#222";
+    else c = "#18a558";
     return `<svg viewBox="0 0 120 70" xmlns="http://www.w3.org/2000/svg" class="rs-bed-svg">
       <rect x="5"   y="28" width="110" height="36" rx="4" fill="none" stroke="${c}" stroke-width="5"/>
       <rect x="5"   y="10" width="18"  height="54" rx="3" fill="none" stroke="${c}" stroke-width="5"/>
@@ -200,109 +301,51 @@ if (typeof RS_SHOW !== "undefined" && RS_SHOW) {
 
   function rsStatusLabel(occupied, selected) {
     let cls, text;
-    if (selected) {
-      cls = "selected";
-      text = "SELECTED";
-    } else if (occupied) {
+    if (occupied) {
       cls = "occupied";
-      text = "OCCUPIED";
+      text = "Occupied";
+    } else if (selected) {
+      cls = "selected";
+      text = "Selected";
     } else {
       cls = "empty";
-      text = "EMPTY";
+      text = "Available";
     }
     return `<div class="rs-bed-status ${cls}">${text}</div>`;
   }
 
-  /* render beds */
-  function rsRenderBeds(room) {
-    const s1 = !!parseInt(room.student1_id);
-    const s2 = !!parseInt(room.student2_id);
-
-    // Reset selected slot when switching rooms
-    selectedSlot = "";
-
-    if (room.type === "single") {
-      // Single room: only one bed; auto-select if free
-      if (!s1) {
-        selectedSlot = "student1";
-        inputBedSlot.value = "student1";
-      } else {
-        inputBedSlot.value = "";
-      }
-
-      bedsWrap.innerHTML = `
-        <div class="rs-bed-block" data-slot="student1" data-occupied="${s1 ? "1" : "0"}">
-          ${rsStatusLabel(s1, !s1)}
-          ${rsBedSVG(s1, !s1)}
-        </div>`;
-    } else {
-      // Double room: user must click a free bed to select it
-      bedsWrap.innerHTML = `
-        <div class="rs-bed-block ${!s1 ? "rs-bed-selectable" : ""}"
-             data-slot="student1" data-occupied="${s1 ? "1" : "0"}">
-          ${rsStatusLabel(s1, false)}
-          ${rsBedSVG(s1, false)}
-        </div>
-        <div class="rs-bed-block ${!s2 ? "rs-bed-selectable" : ""}"
-             data-slot="student2" data-occupied="${s2 ? "1" : "0"}">
-          ${rsStatusLabel(s2, false)}
-          ${rsBedSVG(s2, false)}
-        </div>`;
-
-      inputBedSlot.value = "";
-
-      // Click handler on the beds wrap (event delegation)
-      bedsWrap.addEventListener("click", onBedClick);
-    }
-
-    updateSaveBtn();
+  function rsChoiceLabel(occupied, selected) {
+    const text = occupied
+      ? "Not available"
+      : selected
+        ? "Your choice"
+        : "Click to choose";
+    return `<div class="rs-bed-choice">${text}</div>`;
   }
 
-  /* bed click */
-  function onBedClick(e) {
-    const block = e.target.closest(".rs-bed-block");
-    if (!block) return;
-    if (block.dataset.occupied === "1") return;
+  function rsBedBlock(slot, occupied, selected) {
+    const classes = ["rs-bed-block"];
+    if (occupied) classes.push("is-occupied");
+    if (!occupied) classes.push("rs-bed-selectable");
+    if (selected) classes.push("selected");
 
-    selectedSlot = block.dataset.slot;
-    inputBedSlot.value = selectedSlot;
-
-    // Re-render all bed blocks to reflect selection
-    const allBlocks = bedsWrap.querySelectorAll(".rs-bed-block");
-    allBlocks.forEach((b) => {
-      const occ = b.dataset.occupied === "1";
-      const isSel = b.dataset.slot === selectedSlot;
-      b.innerHTML = rsStatusLabel(occ, isSel) + rsBedSVG(occ, isSel);
-    });
-
-    updateSaveBtn();
+    return `
+      <div class="${classes.join(" ")}" data-slot="${slot}" data-occupied="${occupied ? "1" : "0"}">
+        ${rsStatusLabel(occupied, selected)}
+        ${rsBedSVG(occupied, selected)}
+        ${rsChoiceLabel(occupied, selected)}
+      </div>`;
   }
 
   /* save button state */
   function updateSaveBtn() {
+    if (!saveBtn) return;
     const ok = !!inputBedSlot.value;
     saveBtn.disabled = !ok;
-    saveBtn.style.opacity = ok ? "1" : "0.4";
-    saveBtn.style.cursor = ok ? "pointer" : "not-allowed";
-  }
-
-  /* select room */
-  function rsSelectRoom(room) {
-    // Remove old bed-click listener before re-rendering
-    bedsWrap.replaceWith(bedsWrap.cloneNode(false));
-    // Re-grab reference after DOM swap
-    const newBedsWrap = document.getElementById("rsBedsWrap");
-
-    roomLabel.textContent = "Room number " + room.number;
-    typeLabel.textContent = room.type + " sitter room";
-    inputRoomId.value = room.id;
-
-    // Reassign module-level reference
-    Object.assign(window, { _rsBedsWrap: newBedsWrap });
-    renderBedsIn(newBedsWrap, room);
   }
 
   function renderBedsIn(wrap, room) {
+    if (!wrap || !room) return;
     const s1 = !!parseInt(room.student1_id);
     const s2 = !!parseInt(room.student2_id);
 
@@ -314,23 +357,11 @@ if (typeof RS_SHOW !== "undefined" && RS_SHOW) {
         selectedSlot = "student1";
         inputBedSlot.value = "student1";
       }
-      wrap.innerHTML = `
-        <div class="rs-bed-block" data-slot="student1" data-occupied="${s1 ? "1" : "0"}">
-          ${rsStatusLabel(s1, !s1)}
-          ${rsBedSVG(s1, !s1)}
-        </div>`;
+      wrap.innerHTML = rsBedBlock("student1", s1, !s1);
     } else {
       wrap.innerHTML = `
-        <div class="rs-bed-block ${!s1 ? "rs-bed-selectable" : ""}"
-             data-slot="student1" data-occupied="${s1 ? "1" : "0"}">
-          ${rsStatusLabel(s1, false)}
-          ${rsBedSVG(s1, false)}
-        </div>
-        <div class="rs-bed-block ${!s2 ? "rs-bed-selectable" : ""}"
-             data-slot="student2" data-occupied="${s2 ? "1" : "0"}">
-          ${rsStatusLabel(s2, false)}
-          ${rsBedSVG(s2, false)}
-        </div>`;
+        ${rsBedBlock("student1", s1, false)}
+        ${rsBedBlock("student2", s2, false)}`;
 
       // Attach fresh listener
       wrap.addEventListener("click", function bedClick(e) {
@@ -343,7 +374,11 @@ if (typeof RS_SHOW !== "undefined" && RS_SHOW) {
         wrap.querySelectorAll(".rs-bed-block").forEach((b) => {
           const occ = b.dataset.occupied === "1";
           const isSel = b.dataset.slot === selectedSlot;
-          b.innerHTML = rsStatusLabel(occ, isSel) + rsBedSVG(occ, isSel);
+          b.classList.toggle("selected", isSel);
+          b.innerHTML =
+            rsStatusLabel(occ, isSel) +
+            rsBedSVG(occ, isSel) +
+            rsChoiceLabel(occ, isSel);
         });
 
         updateSaveBtn();
@@ -355,7 +390,16 @@ if (typeof RS_SHOW !== "undefined" && RS_SHOW) {
 
   /* init */
   if (rooms.length > 0 && bedsWrap) {
-    renderBedsIn(bedsWrap, rooms[0]);
+    const initialRoom =
+      rooms.find(
+        (room) =>
+          typeof RS_INITIAL_ROOM_ID !== "undefined" &&
+          room.id == RS_INITIAL_ROOM_ID,
+      ) || rooms[0];
+    if (roomLabel) roomLabel.textContent = "Room number " + initialRoom.number;
+    if (typeLabel) typeLabel.textContent = initialRoom.type + " sitter room";
+    if (inputRoomId) inputRoomId.value = initialRoom.id;
+    renderBedsIn(bedsWrap, initialRoom);
   }
 
   /* pill clicks */
@@ -379,8 +423,8 @@ if (typeof RS_SHOW !== "undefined" && RS_SHOW) {
       const fresh = bedsWrap.cloneNode(false);
       bedsWrap.parentNode.replaceChild(fresh, bedsWrap);
 
-      const liveWrap = document.getElementById("rsBedsWrap");
-      renderBedsIn(liveWrap, room);
+      bedsWrap = document.getElementById("rsBedsWrap");
+      renderBedsIn(bedsWrap, room);
     });
   }
 }

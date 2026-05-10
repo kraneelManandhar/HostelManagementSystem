@@ -50,29 +50,6 @@ class Room {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    // NEW: return rooms of a given type that still have a free slot
-    public function getAvailableByType(string $type): array {
-        if ($type === 'single') {
-            // single room: student1_id must be NULL
-            $stmt = $this->pdo->prepare("
-                SELECT * FROM rooms
-                WHERE type = 'single'
-                  AND student1_id IS NULL
-                ORDER BY number ASC
-            ");
-        } else {
-            // double room: at least one slot free
-            $stmt = $this->pdo->prepare("
-                SELECT * FROM rooms
-                WHERE type = 'double'
-                  AND (student1_id IS NULL OR student2_id IS NULL)
-                ORDER BY number ASC
-            ");
-        }
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
     public function getByTypeWithOccupancy(string $type): array {
         $stmt = $this->pdo->prepare("
             SELECT
@@ -107,15 +84,13 @@ class Room {
     }
 
     // NEW: assign a student to a specific slot in a room.
-    // $slot is 'student1' or 'student2'
-    // Returns true on success, false if the slot is already taken.
     public function assignStudent(int $room_id, int $student_id, string $slot): bool {
         // Validate slot name
         if (!in_array($slot, ['student1', 'student2'], true)) {
             return false;
         }
 
-        $col = $slot . '_id';   // student1_id  or  student2_id
+        $col = $slot . '_id';   
 
         // Make sure the slot is still free 
         $check = $this->pdo->prepare("SELECT type, $col FROM rooms WHERE id = ?");
@@ -123,7 +98,7 @@ class Room {
         $row = $check->fetch(PDO::FETCH_ASSOC);
 
         if (!$row || $row[$col] !== null) {
-            return false;   // slot already taken
+            return false;   
         }
 
         if ($row['type'] === 'single' && $slot !== 'student1') {

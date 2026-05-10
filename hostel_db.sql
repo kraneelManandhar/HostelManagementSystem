@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 03, 2026 at 03:18 PM
+-- Generation Time: May 05, 2026 at 08:31 PM
 -- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- PHP Version: 8.0.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -55,7 +55,9 @@ CREATE TABLE `complaints` (
 --
 
 INSERT INTO `complaints` (`id`, `student_id`, `room_id`, `title`, `description`, `status`, `created_at`) VALUES
-(14, 5, 1, 'Unhygienic Bathroom', 'Bathroom is not maintained.', 'Pending', '2026-04-27 19:20:34');
+(19, 22, 9, 'Unhygienic Bathroom', 'Bathroom hygiene is not maintained in a decent manner.', 'Pending', '2026-05-05 17:08:34'),
+(20, 19, 1, 'Food Quality Degraded', 'The food quality has degraded since past few days.\r\nWe are not having a balanced diet.', 'Pending', '2026-05-05 17:11:14'),
+(21, 24, 2, 'Unhygienic Bathroom', 'Sanitation of Bathroom is not maintained for several days.', 'Pending', '2026-05-05 18:18:02');
 
 -- --------------------------------------------------------
 
@@ -77,7 +79,6 @@ CREATE TABLE `fees` (
 --
 
 INSERT INTO `fees` (`id`, `student_id`, `total`, `paid`, `status`) VALUES
-(1, 5, 670.00, 670.00, 'Paid'),
 (2, 2, 0.00, 0.00, 'Pending'),
 (3, 3, 0.00, 0.00, 'Paid'),
 (4, 8, 0.00, 0.00, 'Pending'),
@@ -85,7 +86,11 @@ INSERT INTO `fees` (`id`, `student_id`, `total`, `paid`, `status`) VALUES
 (6, 10, 0.00, 0.00, 'Paid'),
 (7, 11, 0.00, 0.00, 'Pending'),
 (8, 12, 0.00, 0.00, 'Pending'),
-(10, 14, 0.00, 0.00, 'Pending');
+(10, 14, 0.00, 0.00, 'Pending'),
+(15, 19, 0.00, 0.00, 'Pending'),
+(16, 21, 0.00, 0.00, 'Pending'),
+(17, 22, 0.00, 0.00, 'Pending'),
+(19, 24, 0.00, 0.00, 'Pending');
 
 -- --------------------------------------------------------
 
@@ -161,7 +166,9 @@ CREATE TABLE `password_resets` (
 INSERT INTO `password_resets` (`id`, `email`, `token`, `expires_at`, `used`, `created_at`) VALUES
 (5, 'shirisha@gmail.com', '1d94e98f94a1caed297acd8b5f4318eac251206bdebe5432d513ab4877bbd331', '2026-05-02 18:17:42', 0, '2026-05-02 15:17:42'),
 (6, 'np03cs4a240241@heraldcollege.edu.np', 'a0b9160f4c2e7209929be1c091aa31280166bfe13a1d8aa7294a38167f959047', '2026-05-03 14:57:17', 0, '2026-05-03 11:57:17'),
-(9, 'mahhansykto@gmail.com', '4a981da132665a2602d5b2af4a1b615364ebd380d81a04af3fba7789a6edb22b', '2026-05-03 18:47:02', 1, '2026-05-03 12:02:02');
+(9, 'mahhansykto@gmail.com', '4a981da132665a2602d5b2af4a1b615364ebd380d81a04af3fba7789a6edb22b', '2026-05-03 18:47:02', 1, '2026-05-03 12:02:02'),
+(10, 'abibshag@gmail.com', '75aba3748e5e59b7527d81c6dcd5e8e12e9af573daa235c2f373e9e1d99c2446', '2026-05-04 01:04:37', 1, '2026-05-03 18:19:37'),
+(11, 'adishree700@gmail.com', '0a87f745ab12bcfc172ab5fc1f1c704b78e4fb54a76c808e798835ea76fe1c52', '2026-05-05 19:36:18', 1, '2026-05-05 12:51:18');
 
 -- --------------------------------------------------------
 
@@ -182,8 +189,22 @@ CREATE TABLE `rooms` (
 --
 
 INSERT INTO `rooms` (`id`, `number`, `type`, `student1_id`, `student2_id`) VALUES
-(1, 'A1', 'single', NULL, NULL),
-(2, 'B12', 'double', NULL, NULL);
+(1, 'A1', 'single', 19, NULL),
+(2, 'A2', 'single', 24, NULL),
+(3, 'A3', 'single', NULL, NULL),
+(4, 'A4', 'single', NULL, NULL),
+(5, 'B1', 'single', NULL, NULL),
+(6, 'B2', 'single', NULL, NULL),
+(7, 'B3', 'single', NULL, NULL),
+(8, 'B4', 'single', NULL, NULL),
+(9, 'C1', 'double', 21, 22),
+(10, 'C2', 'double', NULL, NULL),
+(11, 'C3', 'double', NULL, NULL),
+(12, 'C4', 'double', NULL, NULL),
+(13, 'D1', 'double', NULL, NULL),
+(14, 'D2', 'double', NULL, NULL),
+(15, 'D3', 'double', NULL, NULL),
+(16, 'D4', 'double', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -219,13 +240,16 @@ CREATE TABLE `students` (
 INSERT INTO `students` (`id`, `first_name`, `middle_name`, `last_name`, `contact_number`, `date_of_birth`, `email`, `password`, `profile_photo`, `college_name`, `permanent_address`, `date_of_joining`, `guardian_name`, `guardian_relationship`, `guardian_contact`, `preferred_room_type`, `room_id`, `created_at`) VALUES
 (2, 'Kraneel', '', 'Manandhar', '9841243263', '2006-09-21', 'np03cs4a240241@heraldcollege.edu.np', '$2y$10$IWEGEfbBvojFb452tTvI6OJ8ZZ/ppuSOcMqsTSLJHqn5arJXz8Ds2', 'student_69f0cbe7bbe944.48522978.jpg', 'Herald College', 'Gongabu', '2023-11-15', 'Gagdjabcjchaokcnakjc cajcbkjack', 'Parent', '900000000000', 'double', NULL, '2026-04-25 09:47:34'),
 (3, 'Mega', NULL, 'Knight', '00000000000', '2024-03-07', 'nvflzivunjxkexexis@vtmpj.net', '$2y$10$yfF4mmux7YVo5Q3Y2donxee9qRN60.ra7vFTnIWojiVqyCeQnp8p6', 'public/uploads/69ecabe5ddef8_192754067.png', 'Herald College', 'Samakhushi', '2023-03-15', 'Normal Knight', 'Sibling', '9999999999', 'single', NULL, '2026-04-25 11:56:41'),
-(5, 'Abibsha', 'Rani', 'Ghaju', '9841123456', '2006-03-19', 'abibshag@gmail.com', '$2y$10$7uJiz4TECM2jerM9bzOHreVwv8/v3/ECVQTnQrCy75dndglxsRr8e', '69efa7e89ca1a_721605999.png', 'Global College', 'Bhaktapur', '2026-04-27', 'Srijana Ghaju', 'Parent', '9841234560', 'single', 1, '2026-04-27 18:16:18'),
 (8, 'Prajwal', 'Raj', 'Bansi', '00000000000', '2014-10-15', 'mahhansykto@gmail.com', '$2y$10$gI0kXHxtmBTrPFdkauRGHuAmRjFICxtwcQjbJkMku7IOkWeEnBNpG', '69f05760b81e4_577959422.jpg', 'Herald College', 'Samakhushi', '2033-11-21', 'Ryal Bhattarai', 'Sibling', '2222222222', 'double', NULL, '2026-04-28 06:45:09'),
 (9, 'Sirjeet', NULL, 'Niger', '1234567890', '2006-02-18', 'sirjeet@gmail.com', '$2y$10$KLxxH1gyCmaeBs032EPtV.6U6F7yFIzXYEE6lkpwJbp5dMCfDGdg2', '69f05ab1131df_895725329.jpeg', 'Niger College', 'Lumbini', '2025-05-31', 'GMR GAI', 'Parent', '0987654321', 'single', NULL, '2026-04-28 06:59:12'),
 (10, 'Pratigya', 'Pun', 'Magar', '9851036289', '2006-02-14', 'pratigya@gmail.com', '$2y$10$FOw3tI.34lniQlVHqGqu4Oq5XiDmT8ES86J2S02Gn2eckrnRkFWPy', '69f05cc31c3a7_848071048.jpg', 'Herald International College', 'Pokhara', '2024-02-07', 'Ram Pun Magar', 'Parent', '7890789078', 'single', NULL, '2026-04-28 07:08:01'),
 (11, 'Shirish', NULL, 'Magar', '1111111111', '2006-03-19', 'shirisha@gmail.com', '$2y$10$weaFUDrfrnVX8aZjtswIEulbon3xZEqg7D74zxX1ZJWmMul.GKogK', '69f0a10a2cef1_843549509.jpg', 'Niger College', 'Taplejung', '2023-02-05', 'Ryal Bhattarai', 'Other', '9999999999', 'double', NULL, '2026-04-28 11:59:23'),
 (12, 'Kushal', NULL, 'Miha', '45678987690', '2006-09-23', 'kushalmiha@gmail.com', '$2y$10$9c84wFw02rcHjn4YZyuNMemniOwrL1ReVQHoq76LjQU4jLDvIMbF.', NULL, 'Niger College', 'Tamel', '2008-03-06', 'nigga dai', 'Parent', '9999999999', 'double', NULL, '2026-04-29 03:22:36'),
-(14, 'Kraneel', NULL, 'Manandhar', '1111111111', '2007-02-09', 'kraneelmanandhar@gmail.com', '$2y$10$2VHLjRRrEgsvROBQAVWeBOY4uazARc4HKIXkUdt2/MkeyPlxTBeHq', '69f72dfe1d577_412660825.jpg', 'Herald College', 'Gongabu', '2025-07-23', 'Gagdjabcjchaokcnakjc cajcbkjack', 'Parent', '7890789078', 'double', NULL, '2026-05-03 11:14:45');
+(14, 'Kraneel', NULL, 'Manandhar', '1111111111', '2007-02-09', 'kraneelmanandhar@gmail.com', '$2y$10$2VHLjRRrEgsvROBQAVWeBOY4uazARc4HKIXkUdt2/MkeyPlxTBeHq', '69f72dfe1d577_412660825.jpg', 'Herald College', 'Gongabu', '2025-07-23', 'Gagdjabcjchaokcnakjc cajcbkjack', 'Parent', '7890789078', 'double', NULL, '2026-05-03 11:14:45'),
+(19, 'Shaily', 'Kumari', 'Nepal', '9723415678', '2006-08-17', 'np03cs4a240113@heraldcollege.edu.np', '$2y$10$7XALl5MjQAruuv.zI1JnMu2CYJQLxcj/FAZlQ9YLEi.T6v8vHFpRS', '69f9ffd3adb8a_725383609.png', 'Sankar Dev Campus', 'Jhapa', '2026-05-05', 'Shiv Nepal', 'Parent', '9756142367', 'single', 1, '2026-05-05 14:34:16'),
+(21, 'Adishree', '-', 'Ghaju', '9887654321', '2007-02-16', 'adishree700@gmail.com', '$2y$10$IXdeMbgWtPtbNieOMJRune73fvJyDFycHxA5FpTSm36FAtFdkL7qa', '69fa225b60c10_311297119.png', 'ABCD College', 'Bhaktapur', '2026-05-05', 'Dinesh Ghaju', 'Parent', '9887654321', 'double', 9, '2026-05-05 17:01:31'),
+(22, 'Abibi', '-', 'Thapa', '9898754321', '2006-03-05', 'abibighaju@gmail.com', '$2y$10$i3I1d7pTsrkCld6GshJS7.XF0G6x6tYdvkgHHKQExsZIrDyKvBJ5O', '69fa237040f5e_279561916.png', 'XYZ College', 'Bhaktapur', '2026-05-05', 'Anita Thapa', 'Parent', '98856342167', 'double', 9, '2026-05-05 17:06:08'),
+(24, 'Abibsha', 'Rani', 'Ghaju', '9841123463', '2006-03-19', 'abibshag@gmail.com', '$2y$10$5xz9ovpGcK3oji3zQVHrbOP0RqokEW1FI7s0/MA24q16zelinu/eS', '69fa319d6a17e_985648665.png', 'Global College', 'Bhaktapur', '2026-05-05', 'Abibsha Ghaju', 'Parent', '9745362712', 'single', 2, '2026-05-05 18:06:34');
 
 --
 -- Triggers `students`
@@ -374,13 +398,13 @@ ALTER TABLE `cleaning`
 -- AUTO_INCREMENT for table `complaints`
 --
 ALTER TABLE `complaints`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT for table `fees`
 --
 ALTER TABLE `fees`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `food`
@@ -404,19 +428,19 @@ ALTER TABLE `notices`
 -- AUTO_INCREMENT for table `password_resets`
 --
 ALTER TABLE `password_resets`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `rooms`
 --
 ALTER TABLE `rooms`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `students`
 --
 ALTER TABLE `students`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT for table `timing`
