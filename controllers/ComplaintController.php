@@ -39,6 +39,14 @@ class ComplaintController {
             return;
         }
 
+        if (!$description) {
+            echo json_encode([
+                "success" => false,
+                "message" => "Description is required."
+            ]);
+            return;
+        }
+
         $model = new Complaint($this->pdo);
         $id    = $model->create($student_id, $title, $description, $room);
 

@@ -300,6 +300,18 @@ if ($showRoomModal) {
 
 <div class="sd-toast" id="sdToast" role="status" aria-live="polite"></div>
 
+<div class="sd-confirm-overlay" id="studentConfirmDialog" aria-hidden="true">
+<div class="sd-confirm-box" role="dialog" aria-modal="true" aria-labelledby="studentConfirmTitle">
+    <i class="ph ph-warning-circle sd-confirm-icon"></i>
+    <h3 id="studentConfirmTitle">Are you sure you want to delete the complaint?</h3>
+    <p id="studentConfirmMessage" hidden></p>
+    <div class="sd-confirm-actions">
+        <button type="button" class="sd-confirm-cancel" id="studentConfirmCancel">Cancel</button>
+        <button type="button" class="sd-confirm-ok" id="studentConfirmOk">Delete</button>
+    </div>
+</div>
+</div>
+
 <!-- COMPLAINT MODAL -->
 <div class="sd-modal-overlay" id="complaintModal">
 <div class="sd-modal-box">

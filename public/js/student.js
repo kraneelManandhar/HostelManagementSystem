@@ -34,10 +34,21 @@ document.addEventListener("DOMContentLoaded", function () {
     submitBtn.addEventListener("click", async function () {
       const form = document.getElementById("complaintForm");
       const titleInput = form.querySelector('input[name="title"]');
+      const descriptionInput = form.querySelector(
+        'textarea[name="description"]',
+      );
       const issue = titleInput?.value?.trim();
+      const description = descriptionInput?.value?.trim();
 
       if (!issue) {
-        alert("Please fill in the Issue field.");
+        showStudentToast("Please fill in the Issue field.", "error");
+        titleInput?.focus();
+        return;
+      }
+
+      if (!description) {
+        showStudentToast("Please fill in the Description field.", "error");
+        descriptionInput?.focus();
         return;
       }
 
@@ -51,7 +62,10 @@ document.addEventListener("DOMContentLoaded", function () {
         const result = await response.json();
 
         if (!result.success) {
-          alert(result.message || "Failed to submit complaint.");
+          showStudentToast(
+            result.message || "Failed to submit complaint.",
+            "error",
+          );
           return;
         }
 
@@ -61,9 +75,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Switch UI to complaints tab
         switchPage("complaints");
+        showStudentToast("Complaint submitted successfully.", "success");
       } catch (error) {
         console.error("Error:", error);
-        alert("Server error while submitting complaint.");
+        showStudentToast("Server error while submitting complaint.", "error");
       }
     });
   }
@@ -98,13 +113,14 @@ document.addEventListener("DOMContentLoaded", function () {
       );
 
       if (!selected) {
-        alert("Please select a complaint first.");
+        showStudentToast("Please select a complaint first.", "error");
         return;
       }
 
-      const confirmed = confirm(
-        "Are you sure you want to delete this complaint?",
-      );
+      const confirmed = await showStudentConfirm({
+        title: "Are you sure you want to delete the complaint?",
+        confirmText: "Delete",
+      });
       if (!confirmed) return;
 
       const complaintId = selected.value;
@@ -121,15 +137,15 @@ document.addEventListener("DOMContentLoaded", function () {
         const result = await res.json();
 
         if (!result.success) {
-          alert(result.message || "Delete failed.");
+          showStudentToast(result.message || "Delete failed.", "error");
           return;
         }
 
         selected.closest(".sd-complaint-item").remove();
-        alert("Complaint deleted successfully.");
+        showStudentToast("Complaint deleted successfully.", "success");
       } catch (err) {
         console.error(err);
-        alert("Server error while deleting complaint.");
+        showStudentToast("Server error while deleting complaint.", "error");
       }
     });
   }
@@ -187,6 +203,64 @@ document.addEventListener("DOMContentLoaded", function () {
 
     window.setTimeout(() => toast.classList.add("sd-toast-show"), 30);
     window.setTimeout(() => toast.classList.remove("sd-toast-show"), 3200);
+  }
+
+  function showStudentConfirm({ title, message, confirmText }) {
+    const dialog = document.getElementById("studentConfirmDialog");
+    const titleEl = document.getElementById("studentConfirmTitle");
+    const messageEl = document.getElementById("studentConfirmMessage");
+    const cancelBtn = document.getElementById("studentConfirmCancel");
+    const okBtn = document.getElementById("studentConfirmOk");
+
+    if (!dialog || !titleEl || !messageEl || !cancelBtn || !okBtn) {
+      return Promise.resolve(false);
+    }
+
+    titleEl.textContent = title || "Are you sure?";
+    if (message) {
+      messageEl.textContent = message;
+      messageEl.hidden = false;
+    } else {
+      messageEl.textContent = "";
+      messageEl.hidden = true;
+    }
+    okBtn.textContent = confirmText || "Confirm";
+    dialog.classList.add("open");
+    dialog.setAttribute("aria-hidden", "false");
+    okBtn.focus();
+
+    return new Promise((resolve) => {
+      function close(result) {
+        dialog.classList.remove("open");
+        dialog.setAttribute("aria-hidden", "true");
+        cancelBtn.removeEventListener("click", onCancel);
+        okBtn.removeEventListener("click", onOk);
+        dialog.removeEventListener("click", onBackdrop);
+        document.removeEventListener("keydown", onKeydown);
+        resolve(result);
+      }
+
+      function onCancel() {
+        close(false);
+      }
+
+      function onOk() {
+        close(true);
+      }
+
+      function onBackdrop(e) {
+        if (e.target === dialog) close(false);
+      }
+
+      function onKeydown(e) {
+        if (e.key === "Escape") close(false);
+      }
+
+      cancelBtn.addEventListener("click", onCancel);
+      okBtn.addEventListener("click", onOk);
+      dialog.addEventListener("click", onBackdrop);
+      document.addEventListener("keydown", onKeydown);
+    });
   }
 });
 
