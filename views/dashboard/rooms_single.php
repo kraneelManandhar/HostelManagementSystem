@@ -119,7 +119,7 @@ $studentContact = $occupantContacts[0] ?? 'contact number';
             <nav class="mr-sidebar-nav">
                 <a class="mr-nav-btn" href="<?= $baseUrl ?>index.php?action=owner_dashboard"><i class="ph-fill ph-squares-four"></i><span>Dashboard</span></a>
                 <a class="mr-nav-btn" href="<?= $baseUrl ?>index.php?action=owner_students"><i class="ph ph-student"></i><span>Students</span></a>
-                <a class="mr-nav-btn active" href="<?= $baseUrl ?>index.php?action=owner_rooms_single"><i class="ph ph-bed"></i><span>Rooms</span></a>
+                <a class="mr-nav-btn active" href="<?= $baseUrl ?>index.php?action=owner_rooms"><i class="ph ph-bed"></i><span>Rooms</span></a>
                 <a class="mr-nav-btn" href="<?= $baseUrl ?>index.php?action=owner_fees"><i class="ph ph-money"></i><span>Fees</span></a>
                 <a class="mr-nav-btn" href="<?= $baseUrl ?>index.php?action=owner_complaints"><i class="ph ph-megaphone"></i><span>Complaints</span></a>
                 <a class="mr-nav-btn" href="<?= $baseUrl ?>index.php?action=owner_notices"><i class="ph ph-warning"></i><span>Notice</span></a>
@@ -150,7 +150,7 @@ $studentContact = $occupantContacts[0] ?? 'contact number';
                             <a
                                 class="mr-room-item <?= (int) $room['id'] === $selectedRoomId ? 'active' : '' ?>"
                                 data-search="<?= htmlspecialchars(strtolower(($room['number'] ?? '') . ' single ' . ($room['occupant_names'] ?? '') . ' ' . ($room['occupant_contacts'] ?? ''))) ?>"
-                                href="<?= $baseUrl ?>index.php?action=owner_rooms_single&room_id=<?= (int) $room['id'] ?>"
+                                href="<?= $baseUrl ?>index.php?action=owner_rooms&room_id=<?= (int) $room['id'] ?>"
                             >
                                 <?= htmlspecialchars((string) ($room['number'] ?? 'Room')) ?>
                             </a>

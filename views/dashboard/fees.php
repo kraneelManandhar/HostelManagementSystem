@@ -18,12 +18,11 @@ require_once __DIR__ . '/../../models/Fee.php';
 
 $pdo = DB::connect();
 $feeModel = new Fee($pdo);
-$supportsMarkPaid = method_exists($feeModel, 'markAsPaid');
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && $supportsMarkPaid) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $feeId = (int) ($_POST['fee_id'] ?? 0);
     if ($feeId > 0) {
-        $feeModel->markAsPaid($feeId);
+        $feeModel->toggleStatus($feeId);
     }
     header('Location: ' . $baseUrl . 'index.php?action=owner_fees');
     exit;
@@ -67,7 +66,7 @@ if ($managerName === '') {
             <nav class="mf-sidebar-nav">
                 <a class="mf-nav-btn" href="<?= $baseUrl ?>index.php?action=owner_dashboard"><i class="ph-fill ph-squares-four"></i><span>Dashboard</span></a>
                 <a class="mf-nav-btn" href="<?= $baseUrl ?>index.php?action=owner_students"><i class="ph ph-student"></i><span>Students</span></a>
-                <a class="mf-nav-btn" href="<?= $baseUrl ?>index.php?action=owner_rooms_single"><i class="ph ph-bed"></i><span>Rooms</span></a>
+                <a class="mf-nav-btn" href="<?= $baseUrl ?>index.php?action=owner_rooms"><i class="ph ph-bed"></i><span>Rooms</span></a>
                 <a class="mf-nav-btn active" href="<?= $baseUrl ?>index.php?action=owner_fees"><i class="ph ph-money"></i><span>Fees</span></a>
                 <a class="mf-nav-btn" href="<?= $baseUrl ?>index.php?action=owner_complaints"><i class="ph ph-megaphone"></i><span>Complaints</span></a>
                 <a class="mf-nav-btn" href="<?= $baseUrl ?>index.php?action=owner_notices"><i class="ph ph-warning"></i><span>Notice</span></a>
@@ -126,18 +125,12 @@ if ($managerName === '') {
                                 $status = strtolower(trim((string) ($fee['status'] ?? 'unpaid')));
                                 $isPaid = $status === 'paid';
                                 ?>
-                                <?php if ($supportsMarkPaid && !$isPaid): ?>
-                                    <form class="mf-status-form" method="post">
-                                        <input type="hidden" name="fee_id" value="<?= (int) $fee['id'] ?>">
-                                        <button class="mf-status-pill unpaid" type="submit">Unpaid</button>
-                                    </form>
-                                <?php else: ?>
-                                    <div class="mf-status-form">
-                                        <button class="mf-status-pill <?= $isPaid ? 'paid' : 'unpaid' ?>" type="button">
-                                            <?= $isPaid ? 'Paid' : 'Unpaid' ?>
-                                        </button>
-                                    </div>
-                                <?php endif; ?>
+                                <form class="mf-status-form" method="post">
+                                    <input type="hidden" name="fee_id" value="<?= (int) $fee['id'] ?>">
+                                    <button class="mf-status-pill <?= $isPaid ? 'paid' : 'unpaid' ?>" type="submit">
+                                        <?= $isPaid ? 'Paid' : 'Unpaid' ?>
+                                    </button>
+                                </form>
                             <?php endforeach; ?>
                         </div>
                     </div>

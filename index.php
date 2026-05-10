@@ -3,11 +3,22 @@ if (!defined('BASE_URL')) {
     define('BASE_URL', '/HostelManagementSystem/');
 }
 
+function buildAbsoluteUrl(string $relativePath): string
+{
+    $relativePath = '/' . ltrim($relativePath, '/');
+    if (!empty($_SERVER['HTTP_HOST'])) {
+        $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+        return $scheme . '://' . $_SERVER['HTTP_HOST'] . $relativePath;
+    }
+    return $relativePath;
+}
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
 require_once __DIR__ . '/config/db.php';
+require_once __DIR__ . '/config/mailer.php';
 require_once __DIR__ . '/models/Student.php';
 require_once __DIR__ . '/models/User.php';
 require_once __DIR__ . '/models/Room.php';
@@ -35,7 +46,8 @@ $publicPages = [
     'reset_password',
     'reset_password_submit',
     'staff',
-    'facilities'
+    'facilities',
+    'chatbot'
 ];
 
 if (isset($_SESSION['logged_in']) && in_array($action, $publicPages, true)) {
@@ -70,7 +82,7 @@ switch ($action) {
             $contactNumber = trim($_POST['contact_number'] ?? '');
             $guardianContact = trim($_POST['guardian_contact'] ?? '');
 
-            if (!preg_match('/^\d{10}$/', $contactNumber) || !preg_match('/^\d{10}$/', $guardianContact)) {
+            if (!preg_match('/^(98|97)\d{8}$/', $contactNumber) || !preg_match('/^(98|97)\d{8}$/', $guardianContact)) {
                 header('Location: ' . BASE_URL . 'index.php?action=register&error=phone');
                 exit;
             }
@@ -91,14 +103,57 @@ switch ($action) {
                 $_SESSION['reg_data']['profile_photo'] = $filename;
             }
 
-            header('Location: ' . BASE_URL . 'index.php?action=set_password');
+            // Generate verification token
+            $token = bin2hex(random_bytes(32));
+            $_SESSION['verification_token'] = $token;
+
+            // Send verification email
+            try {
+                $mail = getMailer();
+                $mail->addAddress($_POST['email'], $_POST['first_name'] . ' ' . $_POST['last_name']);
+                $mail->Subject = 'Verify Your Email - Hostel Management System';
+                $verificationLink = buildAbsoluteUrl(BASE_URL . 'index.php?action=set_password&token=' . $token);
+                $mail->Body    = "
+                    <h2>Email Verification Required</h2>
+                    <p>Dear {$_POST['first_name']} {$_POST['last_name']},</p>
+                    <p>Thank you for registering with Hostel Management System.</p>
+                    <p>Please click the link below to verify your email and continue with setting your password:</p>
+                    <p><a href='{$verificationLink}'>Verify Email and Set Password</a></p>
+                    <p>If the link doesn't work, copy and paste this URL into your browser: {$verificationLink}</p>
+                    <br>
+                    <p>Best regards,<br>Hostel Management Team</p>
+                ";
+                $mail->send();
+            } catch (Exception $e) {
+                // Log error but don't stop registration
+                error_log("Email sending failed: " . $e->getMessage());
+            }
+
+            header('Location: ' . BASE_URL . 'index.php?action=register_verify');
             exit;
         }
 
         include 'views/auth/register.php';
         break;
 
+    case 'register_verify':
+        include 'views/auth/register_verify.php';
+        break;
+
     case 'set_password':
+        // Check verification token or existing reg_data
+        if (isset($_GET['token'])) {
+            if ($_GET['token'] === ($_SESSION['verification_token'] ?? '')) {
+                // Valid token, allow access
+                unset($_SESSION['verification_token']); // Token used
+            } else {
+                header('Location: ' . BASE_URL . 'index.php?action=register&error=invalid_token');
+                exit;
+            }
+        } elseif (!isset($_SESSION['reg_data'])) {
+            header('Location: ' . BASE_URL . 'index.php?action=register');
+            exit;
+        }
         include 'views/auth/set_password.php';
         break;
 
@@ -351,6 +406,11 @@ switch ($action) {
         include 'views/dashboard/students.php';
         break;
 
+    case 'owner_rooms':
+        requireRole('owner');
+        include 'views/dashboard/owner_rooms_all.php';
+        break;
+
     case 'owner_rooms_single':
         requireRole('owner');
         include 'views/dashboard/rooms_single.php';
@@ -387,6 +447,10 @@ switch ($action) {
 
     case 'facilities':
         include 'views/pages/facilities.php';
+        break;
+
+    case 'chatbot':
+        require_once __DIR__ . '/controllers/ChatbotController.php';
         break;
 
     default:

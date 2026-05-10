@@ -709,6 +709,24 @@ body {
     border-radius: 8px;
 }
 
+.registration-card {
+    background: var(--white);
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(2, 36, 72, 0.12);
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.registration-card h2 {
+    text-align: center;
+    color: var(--primary-dark);
+    margin-bottom: 20px;
+    font-size: 24px;
+    font-weight: 700;
+}
+
 .registration-card .error-msg {
     color: #dc2626;
     font-size: 13px;

@@ -20,6 +20,29 @@ if ($userMessage === '') {
     exit;
 }
 
+$hostelKeywords = [
+    'hostel', 'room', 'rooms', 'bed', 'beds', 'facility', 'facilities',
+    'fee', 'fees', 'staff', 'warden', 'owner', 'mess', 'canteen',
+    'security', 'laundry', 'cleaning', 'notice', 'complaint', 'student',
+    'registration', 'admission', 'housing', 'dorm', 'dormitory', 'wifi',
+    'internet', 'study', 'board', 'meal', 'food', 'maintenance'
+];
+$userLower = strtolower($userMessage);
+$hasHostelTopic = false;
+foreach ($hostelKeywords as $keyword) {
+    if (strpos($userLower, $keyword) !== false) {
+        $hasHostelTopic = true;
+        break;
+    }
+}
+
+if (!$hasHostelTopic) {
+    echo json_encode([
+        "reply" => "I can only answer questions about Hostel facilities, rooms, fees, staff, notices, and related hostel services. Please ask a hostel-related question."
+    ]);
+    exit;
+}
+
 $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
 $dotenv->safeLoad();
 
@@ -39,16 +62,15 @@ $payload = [
     "model" => $model,
     "messages" => [
         [
-            "role" => "system", 
-            "content" => "You are the official AI Assistant for Pentatonic Hostel. 
-Your goal is to help students with facilities, fees, and staff contacts.
+            "role" => "system",
+            "content" => "You are the official AI Assistant for Pentatonic Hostel. You must only answer questions related to hostel facilities, rooms, fees, staff, notices, student housing, mess, laundry, cleaning, security, and hostel policies. If the user asks anything unrelated to the hostel, refuse politely with a short statement that you only answer hostel-related questions.
 
 STRICT FORMATTING RULES:
 1. NEVER use Markdown formatting like asterisks (**) or bullet points (-).
-2. ONLY use plain text with numbered lists (1, 2, 3).
+2. ONLY use plain text with numbered lists (1, 2, 3) when appropriate.
 3. Use a single line break between different sections.
 4. Keep the tone professional and the answers concise.
-5.Keep answers short and mostly under 200 tokens.
+5. Keep answers short and mostly under 200 tokens.
 
 Example format:
 1. Facilities: We offer WiFi, laundry, and a study area.

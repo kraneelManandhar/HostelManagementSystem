@@ -74,7 +74,7 @@ $unpaidFees = (int) $pdo->query("SELECT COUNT(*) FROM fees WHERE LOWER(status) <
                     <i class="ph ph-student"></i>
                     <span>Students</span>
                 </a>
-                <a class="md-nav-btn" href="<?= $baseUrl ?>index.php?action=owner_rooms_single">
+                <a class="md-nav-btn" href="<?= $baseUrl ?>index.php?action=owner_rooms">
                     <i class="ph ph-bed"></i>
                     <span>Rooms</span>
                 </a>

@@ -25,4 +25,23 @@ class Fee {
         ");
         return $stmt->execute([$fee_id]);
     }
+
+    /**
+     * Toggle fee status between Paid and Unpaid.
+     */
+    public function toggleStatus($fee_id) {
+        $stmt = $this->pdo->prepare("
+            SELECT status FROM fees WHERE id = ?
+        ");
+        $stmt->execute([$fee_id]);
+        $current = $stmt->fetchColumn();
+        
+        $newStatus = strtolower($current) === 'paid' ? 'Unpaid' : 'Paid';
+        $paidAmount = $newStatus === 'Paid' ? 'total' : '0';
+        
+        $stmt = $this->pdo->prepare("
+            UPDATE fees SET status = ?, paid = $paidAmount WHERE id = ?
+        ");
+        return $stmt->execute([$newStatus, $fee_id]);
+    }
 }
