@@ -15,11 +15,24 @@ if (
 $showRoomModal  = empty($room);
 $availableRooms = [];
 $preferredType  = 'single';
+$initialRoomIndex = 0;
+$sdFlash = $_SESSION['sd_flash'] ?? null;
+unset($_SESSION['sd_flash']);
 
 if ($showRoomModal) {
     $preferredType  = $student['preferred_room_type'] ?? 'single';
     $roomModel      = new Room($GLOBALS['pdo']);
-    $availableRooms = $roomModel->getAvailableByType($preferredType);
+    $availableRooms = $roomModel->getByTypeWithOccupancy($preferredType);
+
+    foreach ($availableRooms as $idx => $candidateRoom) {
+        $candidateFull = (($candidateRoom['type'] ?? '') === 'single' && !empty($candidateRoom['student1_id']))
+            || (($candidateRoom['type'] ?? '') === 'double' && !empty($candidateRoom['student1_id']) && !empty($candidateRoom['student2_id']));
+
+        if (!$candidateFull) {
+            $initialRoomIndex = $idx;
+            break;
+        }
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -148,7 +161,7 @@ if ($showRoomModal) {
                     <div class="sd-room-right-card">
                         <div class="sd-info-field">
                             <label>Room type</label>
-                            <span>Double sitter</span>
+                            <span><?= htmlspecialchars($room['type'] ?? '—') ?> room</span>
                         </div>
                         <div class="sd-info-field">
                             <label>Roommate</label>
@@ -166,12 +179,8 @@ if ($showRoomModal) {
                             <span><?= htmlspecialchars($room['number'] ?? '—') ?></span>
                         </div>
                         <div class="sd-info-field">
-                            <label>Bed slot</label>
-                            <span><?= htmlspecialchars($room['bed_slot'] ?? '—') ?></span>
-                        </div>
-                        <div class="sd-info-field">
                             <label>Room type</label>
-                            <span><?= htmlspecialchars($room['type'] ?? '—') ?></span>
+                            <span><?= htmlspecialchars($room['type'] ?? '—') ?> room</span>
                         </div>
                     </div>
                 </div>
@@ -289,6 +298,8 @@ if ($showRoomModal) {
 </div>
 </div>
 
+<div class="sd-toast" id="sdToast" role="status" aria-live="polite"></div>
+
 <!-- COMPLAINT MODAL -->
 <div class="sd-modal-overlay" id="complaintModal">
 <div class="sd-modal-box">
@@ -321,64 +332,15 @@ if ($showRoomModal) {
 </div>
 
 <?php if ($showRoomModal): ?>
-<!-- ROOM SELECTION MODAL — shown when student has no room yet.
-     Cannot be dismissed; student must pick a room and Save. -->
-<div class="rs-overlay" id="roomSelectionModal">
-    <div class="rs-modal">
-
-        <!-- LEFT: scrollable pill list -->
-        <div class="rs-left">
-            <div class="rs-list-header">Room no.</div>
-            <div class="rs-room-list" id="rsPillList">
-                <?php if (empty($availableRooms)): ?>
-                    <p class="rs-no-rooms">No rooms available.<br>Contact the warden.</p>
-                <?php else: ?>
-                    <?php foreach ($availableRooms as $i => $r): ?>
-                        <button
-                            class="rs-room-pill <?= $i === 0 ? 'active' : '' ?>"
-                            data-room-id="<?= $r['id'] ?>"
-                            data-s1="<?= $r['student1_id'] ? '1' : '0' ?>"
-                            data-s2="<?= $r['student2_id'] ? '1' : '0' ?>"
-                            data-type="<?= htmlspecialchars($r['type']) ?>"
-                            data-number="<?= htmlspecialchars($r['number']) ?>"
-                        ><?= htmlspecialchars($r['number']) ?></button>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </div>
-        </div>
-
-        <!-- RIGHT: detail panel -->
-        <div class="rs-right">
-            <div class="rs-title-bar">SELECT YOUR ROOM</div>
-
-            <?php if (!empty($availableRooms)): ?>
-            <div class="rs-detail">
-                <div class="rs-room-label"      id="rsRoomLabel">Room number <?= htmlspecialchars($availableRooms[0]['number']) ?></div>
-                <div class="rs-room-type-label" id="rsTypeLabel"><?= htmlspecialchars($availableRooms[0]['type']) ?> sitter room</div>
-                <div class="rs-beds-wrap"       id="rsBedsWrap"></div>
-
-                <form method="POST" action="<?= BASE_URL ?>index.php?action=save_room" id="rsForm">
-                    <input type="hidden" name="room_id"  id="rsInputRoomId"  value="<?= $availableRooms[0]['id'] ?>">
-                    <input type="hidden" name="bed_slot" id="rsInputBedSlot" value="">
-                    <button type="submit" class="rs-save-btn" id="rsSaveBtn" disabled style="opacity:0.4;cursor:not-allowed;">Save</button>
-                </form>
-            </div>
-            <?php else: ?>
-            <div class="rs-detail rs-empty-state">
-                <i class="ph ph-bed"></i>
-                <p>No rooms available for your type.<br>Contact the warden to be assigned manually.</p>
-            </div>
-            <?php endif; ?>
-        </div>
-
-    </div>
-</div>
+    <?php include __DIR__ . '/room_selection.php'; ?>
 <?php endif; ?>
 
 <script>
     const BASE_URL = "<?= BASE_URL ?>";
     const RS_ROOMS = <?= json_encode($availableRooms ?? [], JSON_HEX_TAG) ?>;
     const RS_SHOW  = <?= $showRoomModal ? 'true' : 'false' ?>;
+    const RS_INITIAL_ROOM_ID = <?= json_encode($availableRooms[$initialRoomIndex]['id'] ?? null) ?>;
+    const SD_FLASH = <?= json_encode($sdFlash, JSON_HEX_TAG) ?>;
     const SD_INITIAL_TAB = <?= json_encode($_GET['tab'] ?? 'dashboard') ?>;
 </script>
 <script src="<?= BASE_URL ?>public/js/student.js"></script>
