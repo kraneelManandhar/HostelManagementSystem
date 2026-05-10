@@ -1,15 +1,12 @@
 document.addEventListener("DOMContentLoaded", function () {
   // SIDEBAR NAVIGATION
   const navButtons = document.querySelectorAll(".sd-nav-btn[data-page]");
+  const pageTriggers = document.querySelectorAll("[data-page]");
   const pages = document.querySelectorAll(".sd-page");
 
-  navButtons.forEach((button) => {
+  pageTriggers.forEach((button) => {
     button.addEventListener("click", function () {
-      navButtons.forEach((btn) => btn.classList.remove("active"));
-      pages.forEach((page) => page.classList.remove("active"));
-      button.classList.add("active");
-      const targetPage = document.getElementById("page-" + button.dataset.page);
-      if (targetPage) targetPage.classList.add("active");
+      switchPage(button.dataset.page);
     });
   });
 
@@ -31,7 +28,7 @@ document.addEventListener("DOMContentLoaded", function () {
     modal.classList.remove("open");
   }
 
-  // SUBMIT COMPLAINT
+  // 3. SUBMIT COMPLAINT
   const submitBtn = document.getElementById("submitComplaint");
   if (submitBtn) {
     submitBtn.addEventListener("click", async function () {
@@ -49,10 +46,7 @@ document.addEventListener("DOMContentLoaded", function () {
       try {
         const response = await fetch(
           BASE_URL + "index.php?action=complaint_add",
-          {
-            method: "POST",
-            body: formData,
-          },
+          { method: "POST", body: formData },
         );
         const result = await response.json();
 
@@ -64,8 +58,9 @@ document.addEventListener("DOMContentLoaded", function () {
         addComplaintToUI(result.data);
         closeModal();
         form.reset();
+
+        // Switch UI to complaints tab
         switchPage("complaints");
-        alert("Your complaint has been submitted successfully.");
       } catch (error) {
         console.error("Error:", error);
         alert("Server error while submitting complaint.");
@@ -77,6 +72,8 @@ document.addEventListener("DOMContentLoaded", function () {
   function addComplaintToUI(data) {
     const list = document.getElementById("sd-complaints-list");
     if (!list) return;
+
+    // Remove "no complaints" placeholder if present
     const empty = list.querySelector("p");
     if (empty) empty.remove();
 
@@ -137,19 +134,28 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // LOGO: switch back to dashboard tab
+  // 6. LOGO : switch back to dashboard tab
   const logo = document.getElementById("goDashboard");
   if (logo) {
     logo.addEventListener("click", () => switchPage("dashboard"));
   }
 
+  if (typeof SD_INITIAL_TAB !== "undefined" && SD_INITIAL_TAB) {
+    switchPage(SD_INITIAL_TAB);
+  }
+
+  // 7. HELPERS
   function switchPage(pageKey) {
+    const targetPage = document.getElementById(`page-${pageKey}`);
+    if (!targetPage) return;
+
     navButtons.forEach((btn) => btn.classList.remove("active"));
     pages.forEach((page) => page.classList.remove("active"));
+
     document
       .querySelector(`.sd-nav-btn[data-page="${pageKey}"]`)
       ?.classList.add("active");
-    document.getElementById(`page-${pageKey}`)?.classList.add("active");
+    targetPage.classList.add("active");
   }
 
   function escHtml(str) {
@@ -162,24 +168,27 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 });
 
-// ROOM SELECTION MODAL
+// 8. ROOM SELECTION MODAL
+// Runs only when RS_SHOW === true (student has no room yet).
 if (typeof RS_SHOW !== "undefined" && RS_SHOW) {
   const rooms = RS_ROOMS || [];
+  const pillList = document.getElementById("rsPillList");
+  const roomLabel = document.getElementById("rsRoomLabel");
+  const typeLabel = document.getElementById("rsTypeLabel");
+  const bedsWrap = document.getElementById("rsBedsWrap");
+  const inputRoomId = document.getElementById("rsInputRoomId");
+  const inputBedSlot = document.getElementById("rsInputBedSlot");
+  const saveBtn = document.getElementById("rsSaveBtn");
 
-  function getRefs() {
-    return {
-      pillList: document.getElementById("rsPillList"),
-      roomLabel: document.getElementById("rsRoomLabel"),
-      typeLabel: document.getElementById("rsTypeLabel"),
-      bedsWrap: document.getElementById("rsBedsWrap"),
-      inputRoomId: document.getElementById("rsInputRoomId"),
-      inputBedSlot: document.getElementById("rsInputBedSlot"),
-      saveBtn: document.getElementById("rsSaveBtn"),
-    };
-  }
+  // Track currently selected bed slot for double rooms
+  let selectedSlot = "";
 
-  function bedSVG(occupied, selected) {
-    let c = selected ? "#000000" : occupied ? "#e05252" : "#222";
+  /* SVG helpers */
+  function rsBedSVG(occupied, selected) {
+    let c;
+    if (selected) c = "#e8b84b";
+    else if (occupied) c = "#e05252";
+    else c = "#222";
     return `<svg viewBox="0 0 120 70" xmlns="http://www.w3.org/2000/svg" class="rs-bed-svg">
       <rect x="5"   y="28" width="110" height="36" rx="4" fill="none" stroke="${c}" stroke-width="5"/>
       <rect x="5"   y="10" width="18"  height="54" rx="3" fill="none" stroke="${c}" stroke-width="5"/>
@@ -189,149 +198,189 @@ if (typeof RS_SHOW !== "undefined" && RS_SHOW) {
     </svg>`;
   }
 
-  function statusLabel(occupied, selected) {
-    if (selected) return `<div class="rs-bed-status selected">SELECTED</div>`;
-    if (occupied) return `<div class="rs-bed-status occupied">OCCUPIED</div>`;
-    return `<div class="rs-bed-status empty">EMPTY</div>`;
+  function rsStatusLabel(occupied, selected) {
+    let cls, text;
+    if (selected) {
+      cls = "selected";
+      text = "SELECTED";
+    } else if (occupied) {
+      cls = "occupied";
+      text = "OCCUPIED";
+    } else {
+      cls = "empty";
+      text = "EMPTY";
+    }
+    return `<div class="rs-bed-status ${cls}">${text}</div>`;
   }
 
-  function updateSaveBtn(inputBedSlot, saveBtn) {
+  /* render beds */
+  function rsRenderBeds(room) {
+    const s1 = !!parseInt(room.student1_id);
+    const s2 = !!parseInt(room.student2_id);
+
+    // Reset selected slot when switching rooms
+    selectedSlot = "";
+
+    if (room.type === "single") {
+      // Single room: only one bed; auto-select if free
+      if (!s1) {
+        selectedSlot = "student1";
+        inputBedSlot.value = "student1";
+      } else {
+        inputBedSlot.value = "";
+      }
+
+      bedsWrap.innerHTML = `
+        <div class="rs-bed-block" data-slot="student1" data-occupied="${s1 ? "1" : "0"}">
+          ${rsStatusLabel(s1, !s1)}
+          ${rsBedSVG(s1, !s1)}
+        </div>`;
+    } else {
+      // Double room: user must click a free bed to select it
+      bedsWrap.innerHTML = `
+        <div class="rs-bed-block ${!s1 ? "rs-bed-selectable" : ""}"
+             data-slot="student1" data-occupied="${s1 ? "1" : "0"}">
+          ${rsStatusLabel(s1, false)}
+          ${rsBedSVG(s1, false)}
+        </div>
+        <div class="rs-bed-block ${!s2 ? "rs-bed-selectable" : ""}"
+             data-slot="student2" data-occupied="${s2 ? "1" : "0"}">
+          ${rsStatusLabel(s2, false)}
+          ${rsBedSVG(s2, false)}
+        </div>`;
+
+      inputBedSlot.value = "";
+
+      // Click handler on the beds wrap (event delegation)
+      bedsWrap.addEventListener("click", onBedClick);
+    }
+
+    updateSaveBtn();
+  }
+
+  /* bed click */
+  function onBedClick(e) {
+    const block = e.target.closest(".rs-bed-block");
+    if (!block) return;
+    if (block.dataset.occupied === "1") return;
+
+    selectedSlot = block.dataset.slot;
+    inputBedSlot.value = selectedSlot;
+
+    // Re-render all bed blocks to reflect selection
+    const allBlocks = bedsWrap.querySelectorAll(".rs-bed-block");
+    allBlocks.forEach((b) => {
+      const occ = b.dataset.occupied === "1";
+      const isSel = b.dataset.slot === selectedSlot;
+      b.innerHTML = rsStatusLabel(occ, isSel) + rsBedSVG(occ, isSel);
+    });
+
+    updateSaveBtn();
+  }
+
+  /* save button state */
+  function updateSaveBtn() {
     const ok = !!inputBedSlot.value;
     saveBtn.disabled = !ok;
     saveBtn.style.opacity = ok ? "1" : "0.4";
     saveBtn.style.cursor = ok ? "pointer" : "not-allowed";
   }
 
-  function renderBeds(wrap, room, inputBedSlot, saveBtn) {
+  /* select room */
+  function rsSelectRoom(room) {
+    // Remove old bed-click listener before re-rendering
+    bedsWrap.replaceWith(bedsWrap.cloneNode(false));
+    // Re-grab reference after DOM swap
+    const newBedsWrap = document.getElementById("rsBedsWrap");
+
+    roomLabel.textContent = "Room number " + room.number;
+    typeLabel.textContent = room.type + " sitter room";
+    inputRoomId.value = room.id;
+
+    // Reassign module-level reference
+    Object.assign(window, { _rsBedsWrap: newBedsWrap });
+    renderBedsIn(newBedsWrap, room);
+  }
+
+  function renderBedsIn(wrap, room) {
     const s1 = !!parseInt(room.student1_id);
     const s2 = !!parseInt(room.student2_id);
 
+    selectedSlot = "";
     inputBedSlot.value = "";
 
     if (room.type === "single") {
-      // Auto-select if free
-      const selected = !s1;
-      if (selected) inputBedSlot.value = "student1";
-
+      if (!s1) {
+        selectedSlot = "student1";
+        inputBedSlot.value = "student1";
+      }
       wrap.innerHTML = `
         <div class="rs-bed-block" data-slot="student1" data-occupied="${s1 ? "1" : "0"}">
-          ${statusLabel(s1, selected)}
-          ${bedSVG(s1, selected)}
+          ${rsStatusLabel(s1, !s1)}
+          ${rsBedSVG(s1, !s1)}
         </div>`;
     } else {
       wrap.innerHTML = `
-        <div class="rs-bed-block ${!s1 ? "rs-bed-selectable" : ""}" data-slot="student1" data-occupied="${s1 ? "1" : "0"}">
-          ${statusLabel(s1, false)}
-          ${bedSVG(s1, false)}
+        <div class="rs-bed-block ${!s1 ? "rs-bed-selectable" : ""}"
+             data-slot="student1" data-occupied="${s1 ? "1" : "0"}">
+          ${rsStatusLabel(s1, false)}
+          ${rsBedSVG(s1, false)}
         </div>
-        <div class="rs-bed-block ${!s2 ? "rs-bed-selectable" : ""}" data-slot="student2" data-occupied="${s2 ? "1" : "0"}">
-          ${statusLabel(s2, false)}
-          ${bedSVG(s2, false)}
+        <div class="rs-bed-block ${!s2 ? "rs-bed-selectable" : ""}"
+             data-slot="student2" data-occupied="${s2 ? "1" : "0"}">
+          ${rsStatusLabel(s2, false)}
+          ${rsBedSVG(s2, false)}
         </div>`;
 
-      wrap.addEventListener("click", function (e) {
+      // Attach fresh listener
+      wrap.addEventListener("click", function bedClick(e) {
         const block = e.target.closest(".rs-bed-block");
         if (!block || block.dataset.occupied === "1") return;
 
-        inputBedSlot.value = block.dataset.slot;
+        selectedSlot = block.dataset.slot;
+        inputBedSlot.value = selectedSlot;
 
         wrap.querySelectorAll(".rs-bed-block").forEach((b) => {
           const occ = b.dataset.occupied === "1";
-          const isSel = b.dataset.slot === block.dataset.slot;
-          b.innerHTML = statusLabel(occ, isSel) + bedSVG(occ, isSel);
+          const isSel = b.dataset.slot === selectedSlot;
+          b.innerHTML = rsStatusLabel(occ, isSel) + rsBedSVG(occ, isSel);
         });
 
-        updateSaveBtn(inputBedSlot, saveBtn);
+        updateSaveBtn();
       });
     }
 
-    updateSaveBtn(inputBedSlot, saveBtn);
+    updateSaveBtn();
   }
 
-  function selectRoom(room) {
-    const refs = getRefs();
-    refs.roomLabel.textContent = "Room number " + room.number;
-    refs.typeLabel.textContent = room.type + " sitter room";
-    refs.inputRoomId.value = room.id;
-
-    // Replace bedsWrap to clear old listeners
-    const fresh = refs.bedsWrap.cloneNode(false);
-    refs.bedsWrap.parentNode.replaceChild(fresh, refs.bedsWrap);
-
-    renderBeds(fresh, room, refs.inputBedSlot, refs.saveBtn);
+  /* init */
+  if (rooms.length > 0 && bedsWrap) {
+    renderBedsIn(bedsWrap, rooms[0]);
   }
 
-  // Init first room
-  if (rooms.length > 0) {
-    const refs = getRefs();
-    if (refs.bedsWrap)
-      renderBeds(refs.bedsWrap, rooms[0], refs.inputBedSlot, refs.saveBtn);
-  }
-
-  // Pill clicks
-  const pillList = document.getElementById("rsPillList");
+  /* pill clicks */
   if (pillList) {
     pillList.addEventListener("click", function (e) {
       const btn = e.target.closest(".rs-room-pill");
       if (!btn) return;
+
       document
         .querySelectorAll(".rs-room-pill")
         .forEach((p) => p.classList.remove("active"));
       btn.classList.add("active");
+
       const room = rooms.find((r) => r.id == btn.dataset.roomId);
-      if (room) selectRoom(room);
-    });
-  }
+      if (!room) return;
 
-  // SAVE BUTTON — submit via fetch, show success alert, redirect
-  const saveBtn = document.getElementById("rsSaveBtn");
-  if (saveBtn) {
-    saveBtn.addEventListener("click", async function () {
-      const refs = getRefs();
-      const roomId = refs.inputRoomId.value;
-      const bedSlot = refs.inputBedSlot.value;
+      roomLabel.textContent = "Room number " + room.number;
+      typeLabel.textContent = room.type + " sitter room";
+      inputRoomId.value = room.id;
 
-      if (!roomId || !bedSlot) return;
+      const fresh = bedsWrap.cloneNode(false);
+      bedsWrap.parentNode.replaceChild(fresh, bedsWrap);
 
-      saveBtn.disabled = true;
-      saveBtn.style.opacity = "0.6";
-
-      try {
-        const formData = new FormData();
-        formData.append("room_id", roomId);
-        formData.append("bed_slot", bedSlot);
-
-        const res = await fetch(RS_SAVE_URL, {
-          method: "POST",
-          body: formData,
-        });
-        const result = await res.json();
-
-        if (!result.success) {
-          alert(result.message || "Could not save room. Please try again.");
-          saveBtn.disabled = false;
-          saveBtn.style.opacity = "1";
-          return;
-        }
-
-        // Show success alert then redirect
-        const alert = document.getElementById("rsSuccessAlert");
-        const msg = document.getElementById("rsSuccessMsg");
-        if (msg)
-          msg.textContent = result.message || "Your room has been selected.";
-        if (alert) alert.classList.add("visible");
-
-        setTimeout(() => {
-          window.location.href =
-            result.redirect_url ||
-            BASE_URL + "index.php?action=student_dashboard";
-        }, 3000);
-      } catch (err) {
-        console.error(err);
-        alert("Server error. Please try again.");
-        saveBtn.disabled = false;
-        saveBtn.style.opacity = "1";
-      }
+      const liveWrap = document.getElementById("rsBedsWrap");
+      renderBedsIn(liveWrap, room);
     });
   }
 }

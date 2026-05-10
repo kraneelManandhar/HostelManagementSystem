@@ -73,6 +73,39 @@ class Room {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function getByTypeWithOccupancy(string $type): array {
+        $stmt = $this->pdo->prepare("
+            SELECT
+                r.*,
+                TRIM(CONCAT(
+                    COALESCE(s1.first_name, ''),
+                    ' ',
+                    COALESCE(s1.middle_name, ''),
+                    ' ',
+                    COALESCE(s1.last_name, '')
+                )) AS student1_name,
+                TRIM(CONCAT(
+                    COALESCE(s2.first_name, ''),
+                    ' ',
+                    COALESCE(s2.middle_name, ''),
+                    ' ',
+                    COALESCE(s2.last_name, '')
+                )) AS student2_name,
+                CASE
+                    WHEN r.type = 'single' AND r.student1_id IS NULL THEN 1
+                    WHEN r.type = 'double' AND (r.student1_id IS NULL OR r.student2_id IS NULL) THEN 1
+                    ELSE 0
+                END AS has_free_bed
+            FROM rooms r
+            LEFT JOIN students s1 ON s1.id = r.student1_id
+            LEFT JOIN students s2 ON s2.id = r.student2_id
+            WHERE r.type = ?
+            ORDER BY r.number ASC
+        ");
+        $stmt->execute([$type]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     // NEW: assign a student to a specific slot in a room.
     // $slot is 'student1' or 'student2'
     // Returns true on success, false if the slot is already taken.
@@ -82,15 +115,19 @@ class Room {
             return false;
         }
 
-        $col = $slot . '_id';   
+        $col = $slot . '_id';   // student1_id  or  student2_id
 
         // Make sure the slot is still free 
-        $check = $this->pdo->prepare("SELECT $col FROM rooms WHERE id = ?");
+        $check = $this->pdo->prepare("SELECT type, $col FROM rooms WHERE id = ?");
         $check->execute([$room_id]);
         $row = $check->fetch(PDO::FETCH_ASSOC);
 
         if (!$row || $row[$col] !== null) {
             return false;   // slot already taken
+        }
+
+        if ($row['type'] === 'single' && $slot !== 'student1') {
+            return false;
         }
 
         // Write the room's slot column

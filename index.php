@@ -18,6 +18,7 @@ require_once __DIR__ . '/controllers/StudentController.php';
 require_once __DIR__ . '/controllers/AuthController.php';
 require_once __DIR__ . '/controllers/ComplaintController.php';
 require_once __DIR__ . '/controllers/PasswordResetController.php';
+require_once __DIR__ . '/controllers/WardenController.php';
 
 $action = $_GET['action'] ?? 'home';
 
@@ -66,6 +67,16 @@ switch ($action) {
 
     case 'register_step1':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $contactNumber = trim($_POST['contact_number'] ?? '');
+            $guardianContact = trim($_POST['guardian_contact'] ?? '');
+
+            if (!preg_match('/^\d{10}$/', $contactNumber) || !preg_match('/^\d{10}$/', $guardianContact)) {
+                header('Location: ' . BASE_URL . 'index.php?action=register&error=phone');
+                exit;
+            }
+
+            $_POST['contact_number'] = $contactNumber;
+            $_POST['guardian_contact'] = $guardianContact;
             $_SESSION['reg_data'] = $_POST;
 
             if (!empty($_FILES['profile_photo']['name'])) {
@@ -94,7 +105,11 @@ switch ($action) {
             $password        = $_POST['password']         ?? '';
             $confirmPassword = $_POST['confirm_password'] ?? '';
 
-            if (empty($password) || $password !== $confirmPassword || strlen($password) < 6) {
+            if (
+                empty($password) ||
+                $password !== $confirmPassword ||
+                !preg_match('/^(?=.*[A-Za-z])(?=.*\d).{6,}$/', $password)
+            ) {
                 header('Location: ' . BASE_URL . 'index.php?action=set_password&error=password');
                 exit;
             }
@@ -156,38 +171,46 @@ switch ($action) {
         $studentController = new StudentController($pdo);
         $data              = $studentController->getDashboardData($_SESSION['user_id']);
 
-        $showRoomModal  = empty($data['room']);
-        $availableRooms = [];
-
-        if ($showRoomModal) {
-            $preferredType  = $data['student']['preferred_room_type'] ?? 'single';
-            $roomModel      = new Room($pdo);
-            $availableRooms = $roomModel->getAvailableByType($preferredType);
+        // If no room assigned yet, send to room picker
+        if (empty($data['room'])) {
+            header('Location: ' . BASE_URL . 'index.php?action=room_selection');
+            exit;
         }
 
         extract($data);
         include 'views/dashboard/student_dashboard.php';
         break;
 
-    /**
-     * ROOM SELECTION (kept for backwards compat / direct URL hits)
-     * Redirects to student_dashboard which now handles the modal inline.
-     */
     case 'room_selection':
         requireRole('student');
-        header('Location: ' . BASE_URL . 'index.php?action=student_dashboard');
-        exit;
+        $pdo               = DB::connect();
+        $studentController = new StudentController($pdo);
 
-    /**
-     * SAVE ROOM
-     * Returns JSON so the JS can show the success alert then redirect.
-     */
+        // If student already has a room, skip straight to dashboard
+        $data = $studentController->getDashboardData($_SESSION['user_id']);
+        if (!empty($data['room'])) {
+            $_SESSION['room_assigned'] = true;
+            header('Location: ' . BASE_URL . 'index.php?action=student_dashboard');
+            exit;
+        }
+
+        // Fetch student's preferred room type and available rooms
+        $stmt = $pdo->prepare("SELECT preferred_room_type FROM students WHERE id = ?");
+        $stmt->execute([$_SESSION['user_id']]);
+        $studentRow    = $stmt->fetch(PDO::FETCH_ASSOC);
+        $preferredType = $studentRow['preferred_room_type'] ?? 'single';
+
+        $roomModel      = new Room($pdo);
+        $availableRooms = $roomModel->getByTypeWithOccupancy($preferredType);
+
+        include 'views/dashboard/room_selection.php';
+        break;
+
     case 'save_room':
         requireRole('student');
-        header('Content-Type: application/json');
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            echo json_encode(['success' => false, 'message' => 'Invalid request method.']);
+            header('Location: ' . BASE_URL . 'index.php?action=room_selection');
             exit;
         }
 
@@ -195,7 +218,7 @@ switch ($action) {
         $bed_slot = trim($_POST['bed_slot']    ?? '');
 
         if (!$room_id || !in_array($bed_slot, ['student1', 'student2'], true)) {
-            echo json_encode(['success' => false, 'message' => 'Invalid room or bed selection.']);
+            header('Location: ' . BASE_URL . 'index.php?action=room_selection&error=invalid');
             exit;
         }
 
@@ -205,16 +228,10 @@ switch ($action) {
 
         if ($ok) {
             $_SESSION['room_assigned'] = true;
-            echo json_encode([
-                'success'      => true,
-                'message'      => 'Room assigned successfully!',
-                'redirect_url' => BASE_URL . 'index.php?action=student_dashboard'
-            ]);
+            header('Location: ' . BASE_URL . 'index.php?action=student_dashboard');
         } else {
-            echo json_encode([
-                'success' => false,
-                'message' => 'That bed was just taken. Please choose another.'
-            ]);
+            // Slot was taken between page load and submit — let them pick again
+            header('Location: ' . BASE_URL . 'index.php?action=room_selection&error=taken');
         }
         exit;
 
@@ -232,9 +249,93 @@ switch ($action) {
         $cc->delete();
         break;
 
+    case 'student_profile_update':
+        requireRole('student');
+        $pdo = DB::connect();
+        $studentController = new StudentController($pdo);
+        $studentController->updateProfile((int) $_SESSION['user_id']);
+        break;
+
     case 'warden_dashboard':
         requireRole('warden');
         include 'views/dashboard/wardenDashboard.php';
+        break;
+
+    case 'warden_students':
+        requireRole('warden');
+        include 'views/dashboard/warden_students.php';
+        break;
+
+    case 'warden_rooms':
+        requireRole('warden');
+        include 'views/dashboard/warden_rooms.php';
+        break;
+
+    case 'warden_notices':
+        requireRole('warden');
+        include 'views/dashboard/warden_notices.php';
+        break;
+
+    case 'warden_food':
+        requireRole('warden');
+        include 'views/dashboard/food.php';
+        break;
+
+    case 'warden_laundry':
+        requireRole('warden');
+        include 'views/dashboard/laundry.php';
+        break;
+
+    case 'warden_cleaning':
+        requireRole('warden');
+        include 'views/dashboard/cleaning.php';
+        break;
+
+    case 'warden_timing':
+        requireRole('warden');
+        include 'views/dashboard/timing.php';
+        break;
+
+    case 'warden_save_room':
+        requireRole('warden');
+        $wardenController = new WardenController(DB::connect());
+        $wardenController->saveRoom();
+        break;
+
+    case 'warden_add_room':
+        requireRole('warden');
+        $wardenController = new WardenController(DB::connect());
+        $wardenController->addRoom();
+        break;
+
+    case 'warden_save_notice':
+        requireRole('warden');
+        $wardenController = new WardenController(DB::connect());
+        $wardenController->saveNotice();
+        break;
+
+    case 'warden_update_food':
+        requireRole('warden');
+        $wardenController = new WardenController(DB::connect());
+        $wardenController->ajaxFood();
+        break;
+
+    case 'warden_update_laundry':
+        requireRole('warden');
+        $wardenController = new WardenController(DB::connect());
+        $wardenController->ajaxLaundry();
+        break;
+
+    case 'warden_update_cleaning':
+        requireRole('warden');
+        $wardenController = new WardenController(DB::connect());
+        $wardenController->ajaxCleaning();
+        break;
+
+    case 'warden_update_timing':
+        requireRole('warden');
+        $wardenController = new WardenController(DB::connect());
+        $wardenController->ajaxTiming();
         break;
 
     case 'owner_dashboard':

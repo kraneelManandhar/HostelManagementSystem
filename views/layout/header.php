@@ -18,7 +18,8 @@ $currentAction = $_GET['action'] ?? 'home';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pentatonic Hostel</title>
 
-    <link rel="stylesheet" href="<?= BASE_URL ?>public/css/style.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>public/css/style.css?v=2">
+    <link rel="stylesheet" href="<?= BASE_URL ?>public/css/chatbot.css?v=2">
 
     <script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web"></script>
 </head>
@@ -63,3 +64,4 @@ $currentAction = $_GET['action'] ?? 'home';
 
     </div>
 </header>
+

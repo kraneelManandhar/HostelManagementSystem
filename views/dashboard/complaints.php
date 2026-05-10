@@ -70,7 +70,7 @@ if ($managerName === '') {
     <title>Management Complaints - Pentatonic Hostel</title>
     <script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="<?= $baseUrl ?>public/css/owner.css">
+    <link rel="stylesheet" href="<?= $baseUrl ?>public/css/owner.css?v=2">
 </head>
 <body>
 <div class="mc-page-wrap">
@@ -146,7 +146,7 @@ if ($managerName === '') {
                             $studentName = 'N/A';
                         }
                         ?>
-                        <div class="mc-row">
+                        <div class="mc-row" data-search="<?= htmlspecialchars(strtolower($studentName . ' ' . ($complaint['title'] ?? '') . ' ' . ($complaint['description'] ?? '') . ' ' . ($complaint['room_number'] ?? '') . ' ' . ($complaint['status'] ?? ''))) ?>">
                             <div class="mc-cell"><?= htmlspecialchars($studentName) ?></div>
                             <div class="mc-cell"><?= htmlspecialchars((string) ($complaint['title'] ?? '')) ?></div>
                             <div class="mc-cell"><?= htmlspecialchars((string) ($complaint['description'] ?? '')) ?></div>
@@ -167,6 +167,8 @@ if ($managerName === '') {
         </main>
     </div>
 </div>
+<script src="<?= $baseUrl ?>public/js/owner-search.js"></script>
 </body>
 </html>
+
 

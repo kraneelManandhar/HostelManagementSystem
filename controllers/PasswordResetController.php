@@ -96,7 +96,7 @@ class PasswordResetController
             exit;
         }
 
-        if (empty($password) || strlen($password) < 6) {
+        if (empty($password) || !preg_match('/^(?=.*[A-Za-z])(?=.*\d).{6,}$/', $password)) {
             header('Location: ' . BASE_URL . 'index.php?action=reset_password&token=' . urlencode($token) . '&error=weak_password');
             exit;
         }

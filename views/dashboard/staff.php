@@ -26,18 +26,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($_POST['email'] ?? '');
     $contactNumber = trim($_POST['contact_number'] ?? '');
     $role = trim($_POST['role'] ?? 'staff');
+    $password = $_POST['password'] ?? '';
 
     if (!in_array($role, $allowedRoles, true)) {
         $role = 'staff';
     }
 
+    if ($contactNumber !== '' && !preg_match('/^\d{10}$/', $contactNumber)) {
+        header('Location: ' . $baseUrl . 'index.php?action=owner_staff&msg=invalid_phone');
+        exit;
+    }
+
+    if (($formAction === 'add' || $password !== '') && !preg_match('/^(?=.*[A-Za-z])(?=.*\d).{6,}$/', $password)) {
+        header('Location: ' . $baseUrl . 'index.php?action=owner_staff&msg=invalid_password');
+        exit;
+    }
+
     // ADD new user
-    if ($formAction === 'add' && $firstName !== '' && $lastName !== '' && $email !== '' && !empty($_POST['password'])) {
+    if ($formAction === 'add' && $firstName !== '' && $lastName !== '' && $email !== '' && $password !== '') {
         $userModel->add([
             'first_name' => $firstName,
             'last_name' => $lastName,
             'email' => $email,
-            'password' => $_POST['password'],
+            'password' => $password,
             'role' => $role,
             'contact_number' => $contactNumber,
         ]);
@@ -47,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // EDIT existing user
     if ($formAction === 'edit' && $userId > 0 && $firstName !== '' && $lastName !== '' && $email !== '') {
-        if (!empty($_POST['password'])) {
+        if ($password !== '') {
             $stmt = $pdo->prepare("
                 UPDATE users 
                 SET first_name = ?, last_name = ?, email = ?, password = ?, role = ?, contact_number = ?
@@ -55,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ");
             $stmt->execute([
                 $firstName, $lastName, $email,
-                password_hash($_POST['password'], PASSWORD_DEFAULT),
+                password_hash($password, PASSWORD_DEFAULT),
                 $role, $contactNumber, $userId
             ]);
         } else {
@@ -140,7 +151,7 @@ $msg = $_GET['msg'] ?? '';
     <title>Staff - Pentatonic Hostel</title>
     <script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="<?= $baseUrl ?>public/css/owner.css">
+    <link rel="stylesheet" href="<?= $baseUrl ?>public/css/owner.css?v=2">
 </head>
 <body>
 <div class="sf-page-wrap">
@@ -184,6 +195,10 @@ $msg = $_GET['msg'] ?? '';
                 <div class="sf-alert success"><i class="ph-fill ph-check-circle"></i> Staff member updated successfully!</div>
             <?php elseif ($msg === 'deleted'): ?>
                 <div class="sf-alert success"><i class="ph-fill ph-check-circle"></i> Staff member deleted successfully!</div>
+            <?php elseif ($msg === 'invalid_phone'): ?>
+                <div class="sf-alert error"><i class="ph-fill ph-warning-circle"></i> Contact number must contain exactly 10 digits.</div>
+            <?php elseif ($msg === 'invalid_password'): ?>
+                <div class="sf-alert error"><i class="ph-fill ph-warning-circle"></i> Password must contain both letters and numbers.</div>
             <?php endif; ?>
 
             <!-- Search & Add -->
@@ -257,7 +272,7 @@ $msg = $_GET['msg'] ?? '';
 
                     <div class="sf-field">
                         <label>Contact Number</label>
-                        <input type="text" name="contact_number" value="<?= htmlspecialchars($selectedUser['contact_number'] ?? '') ?>" placeholder="+977-XXXXXXXXXX">
+                        <input type="tel" name="contact_number" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" title="Enter exactly 10 digits" value="<?= htmlspecialchars($selectedUser['contact_number'] ?? '') ?>" placeholder="10 digit phone number">
                     </div>
 
                     <div class="sf-field">
@@ -273,7 +288,7 @@ $msg = $_GET['msg'] ?? '';
 
                     <div class="sf-field full">
                         <label>Password <?= $isEditing ? '(leave blank to keep current)' : '*' ?></label>
-                        <input type="password" name="password" placeholder="<?= $isEditing ? 'Enter new password (optional)' : 'Enter password' ?>" <?= $isEditing ? '' : 'required' ?>>
+                        <input type="password" name="password" minlength="6" pattern="(?=.*[A-Za-z])(?=.*\d).{6,}" title="Use at least 6 characters with letters and numbers" placeholder="<?= $isEditing ? 'Enter new password (optional)' : 'Enter password' ?>" <?= $isEditing ? '' : 'required' ?>>
                     </div>
 
                     <div class="sf-actions">
@@ -300,3 +315,4 @@ $msg = $_GET['msg'] ?? '';
 </div>
 </body>
 </html>
+

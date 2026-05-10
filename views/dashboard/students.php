@@ -19,11 +19,14 @@ require_once __DIR__ . '/../../models/Student.php';
 $pdo = DB::connect();
 $studentModel = new Student($pdo);
 
-function ownerRedirect(string $baseUrl, ?int $selectedId = null): void
+function ownerRedirect(string $baseUrl, ?int $selectedId = null, string $msg = ''): void
 {
     $target = $baseUrl . 'index.php?action=owner_students';
     if ($selectedId) {
         $target .= '&student_id=' . $selectedId;
+    }
+    if ($msg !== '') {
+        $target .= '&msg=' . urlencode($msg);
     }
     header('Location: ' . $target);
     exit;
@@ -31,6 +34,22 @@ function ownerRedirect(string $baseUrl, ?int $selectedId = null): void
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $formAction = $_POST['form_action'] ?? '';
+    $studentId = (int) ($_POST['student_id'] ?? 0);
+
+    if ($formAction === 'add' || $formAction === 'edit') {
+        $contactNumber = trim($_POST['contact_number'] ?? '');
+        $guardianContact = trim($_POST['guardian_contact'] ?? '');
+
+        if (
+            ($contactNumber !== '' && !preg_match('/^\d{10}$/', $contactNumber)) ||
+            ($guardianContact !== '' && !preg_match('/^\d{10}$/', $guardianContact))
+        ) {
+            ownerRedirect($baseUrl, $studentId ?: null, 'invalid_phone');
+        }
+
+        $_POST['contact_number'] = $contactNumber;
+        $_POST['guardian_contact'] = $guardianContact;
+    }
 
     if ($formAction === 'add') {
         $profilePhoto = null;
@@ -68,7 +87,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($formAction === 'edit') {
-        $studentId = (int) ($_POST['student_id'] ?? 0);
         $currentPhoto = $_POST['current_photo'] ?? null;
 
         if (!empty($_FILES['profile_photo']['name'])) {
@@ -152,6 +170,8 @@ if ($managerName === '') {
     $managerName = 'FULL NAME';
 }
 
+$msg = $_GET['msg'] ?? '';
+
 $selectedPhoto = $selectedStudent['profile_photo'] ?? '';
 if (!empty($selectedPhoto)) {
     $selectedPhoto = ltrim($selectedPhoto, '/');
@@ -174,7 +194,7 @@ if (!empty($selectedPhoto)) {
     <title>Management Students - Pentatonic Hostel</title>
     <script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="<?= $baseUrl ?>public/css/owner.css">
+    <link rel="stylesheet" href="<?= $baseUrl ?>public/css/owner.css?v=2">
 </head>
 <body>
 <div class="ms-page-wrap">
@@ -214,6 +234,9 @@ if (!empty($selectedPhoto)) {
 
         <main class="ms-main">
             <div class="ms-title-bar">STUDENTS</div>
+            <?php if ($msg === 'invalid_phone'): ?>
+                <div class="ms-alert error">Contact numbers must contain exactly 10 digits.</div>
+            <?php endif; ?>
 
             <div class="ms-content">
                 <section class="ms-list-panel">
@@ -228,6 +251,7 @@ if (!empty($selectedPhoto)) {
                             ?>
                             <a
                                 class="ms-student-item <?= (int) $studentItem['id'] === $selectedId ? 'active' : '' ?>"
+                                data-search="<?= htmlspecialchars(strtolower($fullName . ' ' . ($studentItem['email'] ?? '') . ' ' . ($studentItem['contact_number'] ?? ''))) ?>"
                                 href="<?= $baseUrl ?>index.php?action=owner_students&student_id=<?= (int) $studentItem['id'] ?>"
                             >
                                 <?= htmlspecialchars($fullName) ?>
@@ -283,7 +307,7 @@ if (!empty($selectedPhoto)) {
                                 </div>
                                 <div class="ms-field">
                                     <label>Contact number</label>
-                                    <input type="text" name="contact_number" value="<?= htmlspecialchars($selectedStudent['contact_number'] ?? '') ?>">
+                                    <input type="tel" name="contact_number" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" title="Enter exactly 10 digits" value="<?= htmlspecialchars($selectedStudent['contact_number'] ?? '') ?>">
                                 </div>
                                 <div class="ms-field full">
                                     <label>Email address</label>
@@ -321,7 +345,7 @@ if (!empty($selectedPhoto)) {
                                 </div>
                                 <div class="ms-field">
                                     <label>Contact number</label>
-                                    <input type="text" name="guardian_contact" value="<?= htmlspecialchars($selectedStudent['guardian_contact'] ?? '') ?>">
+                                    <input type="tel" name="guardian_contact" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" title="Enter exactly 10 digits" value="<?= htmlspecialchars($selectedStudent['guardian_contact'] ?? '') ?>">
                                 </div>
                             </div>
                         </section>
@@ -357,5 +381,7 @@ if (!empty($selectedPhoto)) {
         </main>
     </div>
 </div>
+<script src="<?= $baseUrl ?>public/js/owner-search.js"></script>
 </body>
 </html>
+

@@ -24,8 +24,9 @@ $pdo = DB::connect();
 $studentModel = new Student($pdo);
 $complaintModel = new Complaint($pdo);
 $noticeModel = new Notice($pdo);
+$wardenController = new WardenController($pdo);
 
-$action = 'warden_dashboard';
+$action = 'warden_notices';
 
 $pageMap = [
     'warden_dashboard' => ['label' => 'Dashboard', 'icon' => 'ph-squares-four', 'title' => 'WARDEN DASHBOARD'],
@@ -43,6 +44,17 @@ $totalRooms = (int) $pdo->query("SELECT COUNT(*) FROM rooms")->fetchColumn();
 $pendingComplaints = (int) $pdo->query("SELECT COUNT(*) FROM complaints WHERE LOWER(status) = 'pending'")->fetchColumn();
 $notices = $noticeModel->all();
 
+$data = $notices;
+
+$noticeEditId = (int) ($_GET['edit_notice'] ?? 0);
+$editNotice = null;
+foreach ($notices as $notice) {
+    if ((int) ($notice['id'] ?? 0) === $noticeEditId) {
+        $editNotice = $notice;
+        break;
+    }
+}
+
 $wardenName = trim((string) ($_SESSION['user_name'] ?? 'WARDEN'));
 if ($wardenName === '') {
     $wardenName = 'WARDEN';
@@ -53,7 +65,7 @@ if ($wardenName === '') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Warden Dashboard - Pentatonic Hostel</title>
+    <title>Notices - Pentatonic Hostel</title>
     <script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="<?= $baseUrl ?>public/css/warden.css?v=2">
@@ -84,46 +96,50 @@ if ($wardenName === '') {
         <main class="wd-main">
             <div class="wd-title-bar"><?= htmlspecialchars($pageMap[$action]['title']) ?></div>
 
-            <section class="wd-grid">
-                <a class="wd-card" href="<?= $baseUrl ?>index.php?action=warden_students">
-                    <div class="wd-card-title">Students</div>
-                    <div class="wd-card-badge"><?= $totalStudents ?></div>
-                </a>
-                <a class="wd-card" href="<?= $baseUrl ?>index.php?action=warden_food">
-                    <div class="wd-card-title">Food</div>
-                </a>
-                <a class="wd-card" href="<?= $baseUrl ?>index.php?action=warden_laundry">
-                    <div class="wd-card-title">Laundry</div>
-                </a>
-                <a class="wd-card" href="<?= $baseUrl ?>index.php?action=warden_rooms">
-                    <div class="wd-card-title">Rooms</div>
-                    <div class="wd-card-badge"><?= $totalRooms ?></div>
-                </a>
-                <a class="wd-card" href="<?= $baseUrl ?>index.php?action=warden_cleaning">
-                    <div class="wd-card-title">Bathroom Cleaning</div>
-                </a>
-                <a class="wd-card" href="<?= $baseUrl ?>index.php?action=warden_timing">
-                    <div class="wd-card-title">Timing</div>
-                </a>
-                <a class="wd-card" href="<?= $baseUrl ?>index.php?action=warden_notices">
-                    <div class="wd-card-title">Notice</div>
-                </a>
-            </section>
+            <div class="wd-notice-editor">
+                <form method="post" action="<?= $baseUrl ?>index.php?action=warden_save_notice">
+                    <input type="hidden" name="notice_id" value="<?= (int) ($editNotice['id'] ?? 0) ?>">
 
-            <section class="wd-notices">
-                <h3>Recent Notices</h3>
-                <?php if (empty($notices)): ?>
-                    <p style="font-size:13px; color:#888;">No notices available.</p>
-                <?php else: ?>
-                    <?php foreach (array_slice($notices, 0, 5) as $n): ?>
-                        <div class="wd-notice-card">
-                            <h4><?= htmlspecialchars($n['title']) ?></h4>
-                            <p><?= htmlspecialchars($n['description']) ?></p>
-                            <div class="wd-notice-meta"><?= htmlspecialchars($n['date']) ?> | <?= htmlspecialchars($n['author'] ?? 'HOSTEL MANAGEMENT') ?></div>
+                    <div class="wd-notice-field">
+                        <label>Notice title</label>
+                        <input type="text" name="title" placeholder="title" value="<?= htmlspecialchars($editNotice['title'] ?? '') ?>" required>
+                    </div>
+
+                    <div class="wd-notice-field">
+                        <label>Description</label>
+                        <textarea name="description" placeholder="message" required><?= htmlspecialchars($editNotice['description'] ?? '') ?></textarea>
+                    </div>
+
+                    <div class="wd-notice-actions">
+                        <input type="date" name="date" value="<?= htmlspecialchars($editNotice['date'] ?? date('Y-m-d')) ?>">
+                        <button type="submit"><?= $editNotice ? 'Update notice' : 'Send notice' ?></button>
+                        <?php if ($editNotice): ?>
+                            <a href="<?= $baseUrl ?>index.php?action=warden_notices">Cancel</a>
+                        <?php endif; ?>
+                    </div>
+                </form>
+            </div>
+
+            <div class="wd-notice-list">
+                <div class="wd-toolbar notice-search">
+                    <label class="wd-search">
+                        <i class="ph ph-magnifying-glass"></i>
+                        <input type="search" id="wardenSearch" placeholder="Search notices">
+                    </label>
+                </div>
+
+                <?php foreach ($data as $notice): ?>
+                    <article class="wd-notice-card searchable-row" data-search="<?= htmlspecialchars(strtolower(($notice['title'] ?? '') . ' ' . ($notice['description'] ?? '') . ' ' . ($notice['date'] ?? ''))) ?>">
+                        <h4><?= htmlspecialchars($notice['title']) ?></h4>
+                        <p><?= htmlspecialchars($notice['description']) ?></p>
+                        <div class="wd-notice-meta">
+                            <?= htmlspecialchars($notice['date']) ?> |
+                            <?= htmlspecialchars($notice['author'] ?? 'HOSTEL MANAGEMENT') ?>
+                            <a href="<?= $baseUrl ?>index.php?action=warden_notices&edit_notice=<?= (int) $notice['id'] ?>">Edit</a>
                         </div>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </section>
+                    </article>
+                <?php endforeach; ?>
+            </div>
         </main>
     </div>
 </div>
@@ -131,6 +147,6 @@ if ($wardenName === '') {
 <script>
     window.BASE_URL = <?= json_encode($baseUrl) ?>;
 </script>
-<script src="<?= $baseUrl ?>public/js/script.js?v=2"></script>
+<script src="<?= $baseUrl ?>public/js/script.js"></script>
 </body>
 </html>

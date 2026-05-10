@@ -115,5 +115,59 @@ class StudentController {
 
         return compact('student', 'room', 'fees', 'notices', 'complaints');
     }
+
+    public function updateProfile(int $student_id): void {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: ' . BASE_URL . 'index.php?action=student_dashboard');
+            exit;
+        }
+
+        $contactNumber = trim($_POST['contact_number'] ?? '');
+        $guardianContact = trim($_POST['guardian_contact'] ?? '');
+
+        if (
+            !preg_match('/^\d{10}$/', $contactNumber) ||
+            !preg_match('/^\d{10}$/', $guardianContact)
+        ) {
+            header('Location: ' . BASE_URL . 'index.php?action=student_dashboard&tab=profile&profile_error=phone');
+            exit;
+        }
+
+        $profilePhoto = null;
+        if (
+            isset($_FILES['profile_photo']) &&
+            $_FILES['profile_photo']['error'] === UPLOAD_ERR_OK &&
+            is_uploaded_file($_FILES['profile_photo']['tmp_name'])
+        ) {
+            $allowedTypes = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp'];
+            $mimeType = mime_content_type($_FILES['profile_photo']['tmp_name']);
+
+            if (!isset($allowedTypes[$mimeType])) {
+                header('Location: ' . BASE_URL . 'index.php?action=student_dashboard&tab=profile&profile_error=image');
+                exit;
+            }
+
+            $uploadDir = __DIR__ . '/../public/uploads/';
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0755, true);
+            }
+
+            $profilePhoto = uniqid('student_', true) . '.' . $allowedTypes[$mimeType];
+            move_uploaded_file($_FILES['profile_photo']['tmp_name'], $uploadDir . $profilePhoto);
+        }
+
+        $this->model->updateSecondaryInfo($student_id, [
+            'contact_number' => $contactNumber,
+            'college_name' => trim($_POST['college_name'] ?? ''),
+            'permanent_address' => trim($_POST['permanent_address'] ?? ''),
+            'guardian_name' => trim($_POST['guardian_name'] ?? ''),
+            'guardian_relationship' => trim($_POST['guardian_relationship'] ?? ''),
+            'guardian_contact' => $guardianContact,
+            'profile_photo' => $profilePhoto,
+        ]);
+
+        header('Location: ' . BASE_URL . 'index.php?action=student_dashboard&tab=profile&profile_updated=1');
+        exit;
+    }
 }
 ?>
