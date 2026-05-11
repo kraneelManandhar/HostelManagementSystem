@@ -106,7 +106,11 @@ if ($managerName === '') {
                         </thead>
                         <tbody>
                             <?php foreach ($rooms as $room): ?>
-                            <tr class="searchable-row" data-search="<?= htmlspecialchars(strtolower($room['number'] . ' ' . $room['type'] . ' ' . $room['student1_name'] . ' ' . $room['student1_contact'] . ' ' . $room['student2_name'] . ' ' . $room['student2_contact'])) ?>">
+                            <tr
+                                class="searchable-row"
+                                data-room-number="<?= htmlspecialchars((string) ($room['number'] ?? '')) ?>"
+                                data-search="<?= htmlspecialchars(strtolower('room ' . $room['number'] . ' ' . $room['type'] . ' ' . $room['student1_name'] . ' ' . $room['student1_contact'] . ' ' . $room['student2_name'] . ' ' . $room['student2_contact'])) ?>"
+                            >
                                 <td><?= htmlspecialchars((string) ($room['number'] ?? '')) ?></td>
                                 <td><?= htmlspecialchars(ucfirst((string) ($room['type'] ?? ''))) ?></td>
                                 <td><?= htmlspecialchars((string) ($room['student1_name'] ?? 'Unassigned')) ?></td>

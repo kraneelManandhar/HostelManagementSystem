@@ -103,7 +103,11 @@ if ($wardenName === '') {
                 </div>
 
                 <?php foreach($data as $s): ?>
-                <div class="row students-row searchable-row" data-search="<?= htmlspecialchars(strtolower(($s['name'] ?? '') . ' ' . ($s['email'] ?? '') . ' ' . ($s['contact_number'] ?? '') . ' ' . ($s['room_number'] ?? ''))) ?>">
+                <div
+                    class="row students-row searchable-row"
+                    data-room-number="<?= htmlspecialchars((string) ($s['room_number'] ?? '')) ?>"
+                    data-search="<?= htmlspecialchars(strtolower(($s['name'] ?? '') . ' ' . ($s['email'] ?? '') . ' ' . ($s['contact_number'] ?? '') . ' room ' . ($s['room_number'] ?? ''))) ?>"
+                >
 
                     <div class="cell">
                         <?= htmlspecialchars($s['name']) ?>

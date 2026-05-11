@@ -129,7 +129,7 @@ body {
   right: 16px;
   transform: translateY(-50%);
   cursor: pointer;
-  color: #475569;
+  color: #000000;
 }
 
 .login-submit-btn {
@@ -545,6 +545,36 @@ body {
     width: 100%;
     max-width: 420px;
     margin: 0 auto;
+    position: relative;
+}
+
+.login-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 36px;
+    padding: 7px 12px;
+    margin-bottom: 18px;
+    border: 1px solid #d7dee8;
+    border-radius: 8px;
+    background: var(--white);
+    color: var(--black);
+    font-family: "Inter", sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.login-back-btn i {
+    color: var(--black);
+    font-size: 18px;
+    line-height: 1;
+}
+
+.login-back-btn:hover {
+    background: #f8fafc;
+    border-color: #94a3b8;
 }
 
 .login-logo {
@@ -660,16 +690,29 @@ body {
     right: 14px;
     top: 50%;
     transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: 0;
+    background: transparent;
     cursor: pointer;
-    color: #94a3b8;
+    color: var(--black);
     font-size: 18px;
     line-height: 1;
-    padding: 4px;
+    padding: 0;
     transition: color 0.2s;
 }
 
 .login-card .toggle-eye:hover {
-    color: var(--primary-dark);
+    color: var(--black);
+}
+
+.login-card .toggle-eye i {
+    color: var(--black);
+    font-size: 20px;
+    line-height: 1;
 }
 
 /* Login Button */

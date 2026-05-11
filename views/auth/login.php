@@ -33,6 +33,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <main class="login-page" style="background: radial-gradient(circle at center, #ffffff 0%, #a5c1e5 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center;">
     <div class="login-card">
+        <button type="button" class="login-back-btn" onclick="goBack()" aria-label="Go back">
+            <i class="ph ph-arrow-left" aria-hidden="true"></i>
+            <span>Back</span>
+        </button>
         
         <div class="login-logo">
             <img src="<?= BASE_URL ?>public/images/logo.png" alt="Logo">
@@ -63,9 +67,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <label>Password</label>
                 <div class="password-wrapper">
                     <input type="password" name="password" id="password" placeholder="••••••••" required>
-                    <span onclick="togglePassword('password')" class="toggle-eye">
-                        <i class="ph ph-eye"></i>
-                    </span>
+                    <button type="button" onclick="togglePassword('password', this)" class="toggle-eye" aria-label="Show password">
+                        <i class="ph ph-eye" aria-hidden="true"></i>
+                    </button>
                 </div>
             </div>
 
@@ -80,9 +84,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 </main>
 
+<script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web"></script>
 <script>
-function togglePassword(id) {
+function goBack() {
+    if (window.history.length > 1) {
+        window.history.back();
+        return;
+    }
+
+    window.location.href = "<?= BASE_URL ?>index.php?action=home";
+}
+
+function togglePassword(id, button) {
     const input = document.getElementById(id);
-    input.type = input.type === 'password' ? 'text' : 'password';
+    const icon = button.querySelector('i');
+    const isHidden = input.type === 'password';
+
+    input.type = isHidden ? 'text' : 'password';
+    button.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+    icon.className = isHidden ? 'ph ph-eye-slash' : 'ph ph-eye';
 }
 </script>

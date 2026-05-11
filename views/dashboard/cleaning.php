@@ -104,7 +104,11 @@ if ($wardenName === '') {
                     $isYes = (int) ($r['cleaning'] ?? 0) === 1;
                 ?>
 
-                <div class="row searchable-row" data-search="<?= htmlspecialchars(strtolower(($r['number'] ?? '') . ' ' . ($isYes ? 'done yes' : 'pending no'))) ?>">
+                <div
+                    class="row searchable-row"
+                    data-room-number="<?= htmlspecialchars((string) ($r['number'] ?? '')) ?>"
+                    data-search="<?= htmlspecialchars(strtolower('room ' . ($r['number'] ?? '') . ' ' . ($isYes ? 'done yes' : 'pending no'))) ?>"
+                >
 
                     <div class="cell">
                         Room <?= htmlspecialchars($r['number']) ?>

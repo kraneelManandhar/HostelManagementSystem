@@ -1447,6 +1447,12 @@
             color: #94a3b8;
             font-size: 14px;
         }
+        .owner-search-empty {
+            text-align: center;
+            padding: 24px 14px;
+            color: #94a3b8;
+            font-size: 14px;
+        }
         
         /* Form */
         .sf-form-section {

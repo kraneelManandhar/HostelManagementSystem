@@ -65,6 +65,35 @@ document.querySelectorAll('#wardenSearch, .warden-search').forEach(searchInput =
   const tableBox = scope.querySelector('.table-box') || rows[0]?.parentElement;
   let emptyState = scope.querySelector('.wd-search-empty');
 
+  function normalize(value) {
+    return (value || '')
+      .toString()
+      .replace(/[|_-]+/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .toLowerCase();
+  }
+
+  function rowText(row) {
+    const controlValues = Array.from(row.querySelectorAll('input, select, textarea'))
+      .filter(control => control.type !== 'hidden')
+      .map(control => {
+        if (control.tagName === 'SELECT') {
+          return control.options[control.selectedIndex]?.text || control.value;
+        }
+        return control.value;
+      })
+      .filter(Boolean)
+      .join(' ');
+
+    const searchableText = [
+      row.dataset.search,
+      row.dataset.roomNumber ? `room ${row.dataset.roomNumber}` : '',
+      controlValues
+    ].filter(Boolean).join(' ');
+    return normalize(searchableText || row.textContent);
+  }
+
   if (!emptyState && tableBox) {
     emptyState = document.createElement('div');
     emptyState.className = 'wd-search-empty';
@@ -82,7 +111,7 @@ document.querySelectorAll('#wardenSearch, .warden-search').forEach(searchInput =
     let visibleCount = 0;
 
     rows.forEach(row => {
-      const haystack = (row.dataset.search || row.textContent || '').toLowerCase();
+      const haystack = rowText(row);
       const isMatch = terms.length === 0 || terms.every(term => haystack.includes(term));
       row.hidden = !isMatch;
       if (isMatch) visibleCount += 1;
@@ -94,6 +123,11 @@ document.querySelectorAll('#wardenSearch, .warden-search').forEach(searchInput =
   }
 
   searchInput.addEventListener('input', filterRows);
+  rows.forEach(row => {
+    row.querySelectorAll('input, select, textarea').forEach(control => {
+      control.addEventListener('change', filterRows);
+    });
+  });
   filterRows();
 });
 

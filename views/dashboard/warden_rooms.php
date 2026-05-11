@@ -120,7 +120,13 @@ if ($wardenName === '') {
                     $studentOptions = $wardenController->getRoomStudentOptions($roomId);
                 ?>
 
-                <form class="row rooms-row searchable-row" method="post" action="<?= $baseUrl ?>index.php?action=warden_save_room" data-search="<?= htmlspecialchars(strtolower(($room['number'] ?? '') . ' ' . ($room['type'] ?? '') . ' ' . ($room['student1_name'] ?? '') . ' ' . ($room['student2_name'] ?? ''))) ?>">
+                <form
+                    class="row rooms-row searchable-row"
+                    method="post"
+                    action="<?= $baseUrl ?>index.php?action=warden_save_room"
+                    data-room-number="<?= htmlspecialchars((string) ($room['number'] ?? '')) ?>"
+                    data-search="<?= htmlspecialchars(strtolower('room ' . ($room['number'] ?? '') . ' ' . ($room['type'] ?? '') . ' ' . ($room['student1_name'] ?? '') . ' ' . ($room['student1_contact'] ?? '') . ' ' . ($room['student2_name'] ?? '') . ' ' . ($room['student2_contact'] ?? ''))) ?>"
+                >
                     <input type="hidden" name="room_id" value="<?= $roomId ?>">
 
                     <input class="cell wd-input" type="text" name="number" value="<?= htmlspecialchars($room['number']) ?>" aria-label="Room number" required>

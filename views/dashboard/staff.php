@@ -93,31 +93,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Get search term
 $search = trim($_GET['search'] ?? '');
 
-// Build query with search
-if ($search !== '') {
-    $searchTerm = '%' . $search . '%';
-    $stmt = $pdo->prepare("
-        SELECT * FROM users 
-        WHERE role IN ('staff', 'warden', 'admin')
-        AND (
-            first_name LIKE ? OR 
-            last_name LIKE ? OR 
-            email LIKE ? OR 
-            contact_number LIKE ?
-        )
-        ORDER BY id DESC
-    ");
-    $stmt->execute([$searchTerm, $searchTerm, $searchTerm, $searchTerm]);
-} else {
-    $stmt = $pdo->query("
-        SELECT * FROM users 
-        WHERE role IN ('staff', 'warden', 'admin')
-        ORDER BY id DESC
-    ");
-}
+$stmt = $pdo->query("
+    SELECT * FROM users
+    WHERE role IN ('staff', 'warden', 'admin')
+    ORDER BY id DESC
+");
 $staffUsers = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Get selected user for editing
@@ -229,7 +211,7 @@ $msg = $_GET['msg'] ?? '';
                 <?php if (empty($staffUsers)): ?>
                     <div class="sf-no-results">
                         <i class="ph ph-users" style="font-size: 32px; margin-bottom: 8px; display: block;"></i>
-                        <?= $search ? 'No staff found matching "' . htmlspecialchars($search) . '"' : 'No staff members found' ?>
+                        No staff members found
                     </div>
                 <?php else: ?>
                     <?php foreach ($staffUsers as $staffUser): ?>
@@ -238,11 +220,12 @@ $msg = $_GET['msg'] ?? '';
                             $roleClass = 'role-' . ($staffUser['role'] ?? 'staff');
                         ?>
                         <a class="sf-row <?= (int) $staffUser['id'] === $selectedId ? 'active' : '' ?>"
-                           href="<?= $baseUrl ?>index.php?action=owner_staff&user_id=<?= (int) $staffUser['id'] ?><?= $search ? '&search=' . urlencode($search) : '' ?>">
+                           data-search="<?= htmlspecialchars(strtolower($fullName . ' ' . ($staffUser['contact_number'] ?? '') . ' ' . ($staffUser['role'] ?? '') . ' ' . ($staffUser['email'] ?? ''))) ?>"
+                           href="<?= $baseUrl ?>index.php?action=owner_staff&user_id=<?= (int) $staffUser['id'] ?>">
                             <div class="sf-cell name"><?= htmlspecialchars($fullName ?: 'N/A') ?></div>
-                            <div class="sf-cell"><?= htmlspecialchars((string) ($staffUser['contact_number'] ?? '—')) ?></div>
+                            <div class="sf-cell"><?= htmlspecialchars((string) ($staffUser['contact_number'] ?? '-')) ?></div>
                             <div class="sf-cell role"><span class="<?= $roleClass ?>"><?= htmlspecialchars(ucfirst((string) ($staffUser['role'] ?? 'staff'))) ?></span></div>
-                            <div class="sf-cell"><?= htmlspecialchars((string) ($staffUser['email'] ?? '—')) ?></div>
+                            <div class="sf-cell"><?= htmlspecialchars((string) ($staffUser['email'] ?? '-')) ?></div>
                         </a>
                     <?php endforeach; ?>
                 <?php endif; ?>
@@ -313,6 +296,7 @@ $msg = $_GET['msg'] ?? '';
         </main>
     </div>
 </div>
+<script src="<?= $baseUrl ?>public/js/owner-search.js"></script>
 </body>
 </html>
 

@@ -251,7 +251,8 @@ if (!empty($selectedPhoto)) {
                             ?>
                             <a
                                 class="ms-student-item <?= (int) $studentItem['id'] === $selectedId ? 'active' : '' ?>"
-                                data-search="<?= htmlspecialchars(strtolower($fullName . ' ' . ($studentItem['email'] ?? '') . ' ' . ($studentItem['contact_number'] ?? ''))) ?>"
+                                data-room-number="<?= htmlspecialchars((string) ($studentItem['room_number'] ?? '')) ?>"
+                                data-search="<?= htmlspecialchars(strtolower($fullName . ' ' . ($studentItem['email'] ?? '') . ' ' . ($studentItem['contact_number'] ?? '') . ' room ' . ($studentItem['room_number'] ?? '') . ' ' . ($studentItem['room_type'] ?? ''))) ?>"
                                 href="<?= $baseUrl ?>index.php?action=owner_students&student_id=<?= (int) $studentItem['id'] ?>"
                             >
                                 <?= htmlspecialchars($fullName) ?>

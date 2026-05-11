@@ -149,7 +149,8 @@ $studentContact = $occupantContacts[0] ?? 'contact number';
                         <?php foreach ($singleRooms as $room): ?>
                             <a
                                 class="mr-room-item <?= (int) $room['id'] === $selectedRoomId ? 'active' : '' ?>"
-                                data-search="<?= htmlspecialchars(strtolower(($room['number'] ?? '') . ' single ' . ($room['occupant_names'] ?? '') . ' ' . ($room['occupant_contacts'] ?? ''))) ?>"
+                                data-room-number="<?= htmlspecialchars((string) ($room['number'] ?? '')) ?>"
+                                data-search="<?= htmlspecialchars(strtolower('room ' . ($room['number'] ?? '') . ' single ' . ($room['occupant_names'] ?? '') . ' ' . ($room['occupant_contacts'] ?? ''))) ?>"
                                 href="<?= $baseUrl ?>index.php?action=owner_rooms&room_id=<?= (int) $room['id'] ?>"
                             >
                                 <?= htmlspecialchars((string) ($room['number'] ?? 'Room')) ?>

@@ -89,8 +89,10 @@ class Warden {
                 r.type,
                 r.student1_id,
                 r.student2_id,
-                TRIM(CONCAT(COALESCE(s1.first_name, ''), ' ', COALESCE(s1.last_name, ''))) AS student1_name,
-                TRIM(CONCAT(COALESCE(s2.first_name, ''), ' ', COALESCE(s2.last_name, ''))) AS student2_name
+                TRIM(CONCAT(COALESCE(s1.first_name, ''), ' ', COALESCE(s1.middle_name, ''), ' ', COALESCE(s1.last_name, ''))) AS student1_name,
+                COALESCE(s1.contact_number, '') AS student1_contact,
+                TRIM(CONCAT(COALESCE(s2.first_name, ''), ' ', COALESCE(s2.middle_name, ''), ' ', COALESCE(s2.last_name, ''))) AS student2_name,
+                COALESCE(s2.contact_number, '') AS student2_contact
             FROM rooms r
             LEFT JOIN students s1 ON s1.id = r.student1_id
             LEFT JOIN students s2 ON s2.id = r.student2_id

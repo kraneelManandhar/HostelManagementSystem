@@ -151,7 +151,8 @@ $studentTwoContact = $occupantContacts[1] ?? 'number';
                         <?php foreach ($doubleRooms as $room): ?>
                             <a
                                 class="mr-room-item <?= (int) $room['id'] === $selectedRoomId ? 'active' : '' ?>"
-                                data-search="<?= htmlspecialchars(strtolower(($room['number'] ?? '') . ' double ' . ($room['occupant_names'] ?? '') . ' ' . ($room['occupant_contacts'] ?? ''))) ?>"
+                                data-room-number="<?= htmlspecialchars((string) ($room['number'] ?? '')) ?>"
+                                data-search="<?= htmlspecialchars(strtolower('room ' . ($room['number'] ?? '') . ' double ' . ($room['occupant_names'] ?? '') . ' ' . ($room['occupant_contacts'] ?? ''))) ?>"
                                 href="<?= $baseUrl ?>index.php?action=owner_rooms_double&room_id=<?= (int) $room['id'] ?>"
                             >
                                 <?= htmlspecialchars((string) ($room['number'] ?? 'Room')) ?>
