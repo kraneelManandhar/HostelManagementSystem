@@ -4,6 +4,7 @@ require_once __DIR__ . '/../models/Room.php';
 require_once __DIR__ . '/../models/Fee.php';
 require_once __DIR__ . '/../models/Notice.php';
 require_once __DIR__ . '/../models/Complaint.php';
+require_once __DIR__ . '/../models/Timing.php';
 
 class StudentController {
     private $model;
@@ -65,7 +66,65 @@ class StudentController {
         $complaintModel = new Complaint($this->pdo);
         $complaints     = $complaintModel->allByStudent($student_id);
 
-        return compact('student', 'room', 'fees', 'notices', 'complaints');
+        // Timing
+        $timingModel = new Timing($this->pdo);
+        $timing      = $timingModel->getByStudentId((int) $student_id);
+
+        return compact('student', 'room', 'fees', 'notices', 'complaints', 'timing');
+    }
+
+    public function updateOwnTiming(int $student_id): void {
+        header('Content-Type: application/json');
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            echo json_encode(['success' => false, 'message' => 'Invalid request method.']);
+            exit;
+        }
+
+        $checkInValue = trim((string) ($_POST['check_in'] ?? ''));
+        $checkOutValue = trim((string) ($_POST['check_out'] ?? ''));
+
+        if ($checkInValue === '' && $checkOutValue === '') {
+            echo json_encode(['success' => false, 'message' => 'Please enter at least one timing.']);
+            exit;
+        }
+
+        $checkIn = $checkInValue !== '' ? $this->normalizeDateTime($checkInValue) : null;
+        $checkOut = $checkOutValue !== '' ? $this->normalizeDateTime($checkOutValue) : null;
+
+        if (($checkInValue !== '' && $checkIn === null) || ($checkOutValue !== '' && $checkOut === null)) {
+            echo json_encode(['success' => false, 'message' => 'Please enter a valid date and time.']);
+            exit;
+        }
+
+        if ($checkIn && $checkOut && strtotime($checkIn) < strtotime($checkOut)) {
+            echo json_encode(['success' => false, 'message' => 'Check in cannot be before check out.']);
+            exit;
+        }
+
+        $timingModel = new Timing($this->pdo);
+        $ok = $timingModel->updateForStudent($student_id, $checkIn, $checkOut);
+
+        echo json_encode([
+            'success' => $ok,
+            'message' => $ok ? 'Timing saved successfully.' : 'Could not save timing.',
+            'data' => [
+                'check_in' => $checkIn,
+                'check_out' => $checkOut,
+                'status' => ($checkOut && !$checkIn) ? 'OUT' : 'IN',
+            ],
+        ]);
+        exit;
+    }
+
+    private function normalizeDateTime(string $value): ?string {
+        $timestamp = strtotime($value);
+
+        if ($timestamp === false) {
+            return null;
+        }
+
+        return date('Y-m-d H:i:s', $timestamp);
     }
 
     public function updateProfile(int $student_id): void {
