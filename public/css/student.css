@@ -630,6 +630,119 @@ textarea {
   font-size: 18px;
 }
 
+/* TIMING PAGE */
+.sd-timing-head {
+  background-color: var(--card-bg);
+  border-radius: 12px;
+  padding: 18px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.sd-timing-head h3 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--dark);
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+
+.sd-timing-head p {
+  font-size: 12px;
+  color: var(--subtle);
+  line-height: 1.5;
+}
+
+.sd-timing-status {
+  min-width: 74px;
+  border-radius: 999px;
+  padding: 8px 16px;
+  background: #e9f7ef;
+  color: #16834a;
+  font-size: 12px;
+  font-weight: 800;
+  text-align: center;
+  letter-spacing: 0.08em;
+}
+
+.sd-timing-status.is-out {
+  background: #fff2d1;
+  color: #9a650d;
+}
+
+.sd-timing-card {
+  background: #f3f7fc;
+  border: 1px solid #c6d8eb;
+  border-radius: 12px;
+  padding: 22px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.sd-timing-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.sd-timing-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sd-timing-field span,
+.sd-timing-summary span {
+  color: #3e5368;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.sd-timing-field input {
+  width: 100%;
+  min-height: 46px;
+  padding: 12px 15px;
+  border: 2px solid #000000;
+  border-radius: 10px;
+  background: var(--white);
+  color: var(--dark);
+  font-size: 14px;
+  outline: none;
+}
+
+.sd-timing-field input:focus {
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.15);
+}
+
+.sd-timing-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.sd-timing-summary div {
+  background: var(--white);
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sd-timing-summary strong {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.sd-timing-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
 /* PROFILE PAGE */
 .sd-profile-head {
   display: flex;
@@ -1139,7 +1252,9 @@ textarea {
   }
 
   .sd-profile-head,
-  .sd-profile-grid {
+  .sd-profile-grid,
+  .sd-timing-grid,
+  .sd-timing-summary {
     grid-template-columns: 1fr;
   }
 
@@ -1154,6 +1269,7 @@ textarea {
   }
 
   .sd-welcome-card,
+  .sd-timing-head,
   .sd-form-actions,
   .sd-form-row {
     flex-direction: column;
@@ -1224,6 +1340,10 @@ textarea {
 
   .sd-profile-actions {
     justify-content: stretch;
+  }
+
+  .sd-timing-actions .sd-btn-submit {
+    width: 100%;
   }
 
   .sd-profile-actions .sd-btn-submit {

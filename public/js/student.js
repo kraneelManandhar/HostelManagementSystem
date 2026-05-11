@@ -190,7 +190,83 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // 7. LOGO : switch back to dashboard tab
+  // 7. TIMING FORM
+  const timingForm = document.getElementById("studentTimingForm");
+  if (timingForm) {
+    timingForm.addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const checkInInput = timingForm.querySelector('input[name="check_in"]');
+      const checkOutInput = timingForm.querySelector('input[name="check_out"]');
+      const checkIn = checkInInput?.value || "";
+      const checkOut = checkOutInput?.value || "";
+
+      if (!checkIn && !checkOut) {
+        showStudentToast("Please enter at least one timing.", "error");
+        checkInInput?.focus();
+        return;
+      }
+
+      if (checkIn && checkOut && new Date(checkIn) < new Date(checkOut)) {
+        showStudentToast("Check in cannot be before check out.", "error");
+        checkInInput?.focus();
+        return;
+      }
+
+      const formData = new FormData(timingForm);
+
+      try {
+        const response = await fetch(
+          BASE_URL + "index.php?action=student_timing_update",
+          { method: "POST", body: formData },
+        );
+        const result = await response.json();
+
+        if (!result.success) {
+          showStudentToast(result.message || "Could not save timing.", "error");
+          return;
+        }
+
+        updateTimingSummary(result.data || {});
+        showStudentToast(result.message || "Timing saved successfully.", "success");
+      } catch (error) {
+        console.error("Error:", error);
+        showStudentToast("Server error while saving timing.", "error");
+      }
+    });
+  }
+
+  function updateTimingSummary(data) {
+    const status = document.getElementById("studentTimingStatus");
+    const inText = document.getElementById("studentTimingInText");
+    const outText = document.getElementById("studentTimingOutText");
+
+    if (status && data.status) {
+      status.textContent = data.status;
+      status.classList.toggle("is-out", data.status === "OUT");
+      status.classList.toggle("is-in", data.status !== "OUT");
+    }
+
+    if (inText) inText.textContent = formatTiming(data.check_in);
+    if (outText) outText.textContent = formatTiming(data.check_out);
+  }
+
+  function formatTiming(value) {
+    if (!value) return "Not set";
+
+    const date = new Date(String(value).replace(" ", "T"));
+    if (Number.isNaN(date.getTime())) return "Not set";
+
+    return date.toLocaleString(undefined, {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+    });
+  }
+
+  // 8. LOGO : switch back to dashboard tab
   const logo = document.getElementById("goDashboard");
   if (logo) {
     logo.addEventListener("click", () => switchPage("dashboard"));
@@ -204,7 +280,7 @@ document.addEventListener("DOMContentLoaded", function () {
     showStudentToast(SD_FLASH.message, SD_FLASH.type || "success");
   }
 
-  // 8. HELPERS
+  // 9. HELPERS
   function switchPage(pageKey) {
     const targetPage = document.getElementById(`page-${pageKey}`);
     if (!targetPage) return;

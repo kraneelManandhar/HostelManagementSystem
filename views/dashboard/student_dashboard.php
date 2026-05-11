@@ -18,6 +18,9 @@ $preferredType  = 'single';
 $initialRoomIndex = 0;
 $sdFlash = $_SESSION['sd_flash'] ?? null;
 unset($_SESSION['sd_flash']);
+$timingCheckIn = !empty($timing['check_in']) ? date('Y-m-d\TH:i', strtotime($timing['check_in'])) : '';
+$timingCheckOut = !empty($timing['check_out']) ? date('Y-m-d\TH:i', strtotime($timing['check_out'])) : '';
+$timingStatus = $timing['status'] ?? (!empty($timingCheckOut) ? 'OUT' : 'IN');
 
 if ($showRoomModal) {
     $preferredType  = $student['preferred_room_type'] ?? 'single';
@@ -93,6 +96,9 @@ if ($showRoomModal) {
             </button>
             <button class="sd-nav-btn" data-page="notice">
                 <i class="ph ph-warning"></i> Notice
+            </button>
+            <button class="sd-nav-btn" data-page="timing">
+                <i class="ph ph-clock"></i> Timing
             </button>
             <button class="sd-nav-btn" data-page="profile">
                 <i class="ph ph-user-circle"></i> My Profile
@@ -294,6 +300,51 @@ if ($showRoomModal) {
             <?php else: ?>
                 <p style="font-size:13px;color:#888;padding:12px;">No notices available.</p>
             <?php endif; ?>
+        </div>
+        </div>
+
+        <!-- PAGE: TIMING -->
+        <div class="sd-page" id="page-timing">
+        <div class="sd-blue-panel">
+            <div class="sd-timing-head">
+                <div>
+                    <h3>CHECK IN & CHECK OUT</h3>
+                    <p>Keep your hostel movement timing updated.</p>
+                </div>
+                <span class="sd-timing-status <?= strtolower($timingStatus) === 'out' ? 'is-out' : 'is-in' ?>" id="studentTimingStatus">
+                    <?= htmlspecialchars($timingStatus) ?>
+                </span>
+            </div>
+
+            <form class="sd-timing-card" id="studentTimingForm">
+                <div class="sd-timing-grid">
+                    <label class="sd-timing-field">
+                        <span>Check out</span>
+                        <input type="datetime-local" name="check_out" value="<?= htmlspecialchars($timingCheckOut) ?>">
+                    </label>
+                    <label class="sd-timing-field">
+                        <span>Check in</span>
+                        <input type="datetime-local" name="check_in" value="<?= htmlspecialchars($timingCheckIn) ?>">
+                    </label>
+                </div>
+                <div class="sd-timing-summary">
+                    <div>
+                        <span>Last check out</span>
+                        <strong id="studentTimingOutText">
+                            <?= !empty($timing['check_out']) ? htmlspecialchars(date('F j, Y g:i A', strtotime($timing['check_out']))) : 'Not set' ?>
+                        </strong>
+                    </div>
+                    <div>
+                        <span>Last check in</span>
+                        <strong id="studentTimingInText">
+                            <?= !empty($timing['check_in']) ? htmlspecialchars(date('F j, Y g:i A', strtotime($timing['check_in']))) : 'Not set' ?>
+                        </strong>
+                    </div>
+                </div>
+                <div class="sd-timing-actions">
+                    <button type="submit" class="sd-btn-submit">Save timing</button>
+                </div>
+            </form>
         </div>
         </div>
 

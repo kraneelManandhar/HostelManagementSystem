@@ -240,6 +240,13 @@ switch ($action) {
         $studentController->updateProfile((int) $_SESSION['user_id']);
         break;
 
+    case 'student_timing_update':
+        requireRole('student');
+        $pdo = DB::connect();
+        $studentController = new StudentController($pdo);
+        $studentController->updateOwnTiming((int) $_SESSION['user_id']);
+        break;
+
     case 'warden_dashboard':
         requireRole('warden');
         include 'views/dashboard/wardenDashboard.php';
