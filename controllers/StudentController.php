@@ -76,12 +76,27 @@ class StudentController {
 
         $contactNumber = trim($_POST['contact_number'] ?? '');
         $guardianContact = trim($_POST['guardian_contact'] ?? '');
+        $firstName = trim($_POST['first_name'] ?? '');
+        $lastName = trim($_POST['last_name'] ?? '');
+
+        if ($firstName === '' || $lastName === '') {
+            $_SESSION['sd_flash'] = [
+                'type' => 'error',
+                'message' => 'First name and last name are required.'
+            ];
+            header('Location: ' . BASE_URL . 'index.php?action=student_dashboard&tab=profile');
+            exit;
+        }
 
         if (
             !preg_match('/^\d{10}$/', $contactNumber) ||
             !preg_match('/^\d{10}$/', $guardianContact)
         ) {
-            header('Location: ' . BASE_URL . 'index.php?action=student_dashboard&tab=profile&profile_error=phone');
+            $_SESSION['sd_flash'] = [
+                'type' => 'error',
+                'message' => 'Contact numbers must be exactly 10 digits.'
+            ];
+            header('Location: ' . BASE_URL . 'index.php?action=student_dashboard&tab=profile');
             exit;
         }
 
@@ -95,7 +110,11 @@ class StudentController {
             $mimeType = mime_content_type($_FILES['profile_photo']['tmp_name']);
 
             if (!isset($allowedTypes[$mimeType])) {
-                header('Location: ' . BASE_URL . 'index.php?action=student_dashboard&tab=profile&profile_error=image');
+                $_SESSION['sd_flash'] = [
+                    'type' => 'error',
+                    'message' => 'Please upload a JPG, PNG, or WEBP image.'
+                ];
+                header('Location: ' . BASE_URL . 'index.php?action=student_dashboard&tab=profile');
                 exit;
             }
 
@@ -109,6 +128,9 @@ class StudentController {
         }
 
         $this->model->updateSecondaryInfo($student_id, [
+            'first_name' => $firstName,
+            'middle_name' => trim($_POST['middle_name'] ?? ''),
+            'last_name' => $lastName,
             'contact_number' => $contactNumber,
             'college_name' => trim($_POST['college_name'] ?? ''),
             'permanent_address' => trim($_POST['permanent_address'] ?? ''),
@@ -118,7 +140,11 @@ class StudentController {
             'profile_photo' => $profilePhoto,
         ]);
 
-        header('Location: ' . BASE_URL . 'index.php?action=student_dashboard&tab=profile&profile_updated=1');
+        $_SESSION['sd_flash'] = [
+            'type' => 'success',
+            'message' => 'Profile updated successfully.'
+        ];
+        header('Location: ' . BASE_URL . 'index.php?action=student_dashboard&tab=profile');
         exit;
     }
 }

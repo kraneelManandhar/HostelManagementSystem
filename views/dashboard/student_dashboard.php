@@ -94,6 +94,9 @@ if ($showRoomModal) {
             <button class="sd-nav-btn" data-page="notice">
                 <i class="ph ph-warning"></i> Notice
             </button>
+            <button class="sd-nav-btn" data-page="profile">
+                <i class="ph ph-user-circle"></i> My Profile
+            </button>
         </nav>
 
         <div class="sd-sidebar-spacer"></div>
@@ -291,6 +294,113 @@ if ($showRoomModal) {
             <?php else: ?>
                 <p style="font-size:13px;color:#888;padding:12px;">No notices available.</p>
             <?php endif; ?>
+        </div>
+        </div>
+
+        <!-- PAGE: PROFILE -->
+        <div class="sd-page" id="page-profile">
+        <div class="sd-blue-panel">
+            <div class="sd-profile-head">
+                <div class="sd-profile-photo">
+                    <img src="<?= $src ?>" alt="Student profile photo"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <span class="sd-avatar-fallback" style="display:none;">
+                        <i class="ph-fill ph-user"></i>
+                    </span>
+                </div>
+                <div>
+                    <h2><?= htmlspecialchars(trim(($student['first_name'] ?? '') . ' ' . ($student['last_name'] ?? ''))) ?></h2>
+                    <p><?= htmlspecialchars($student['email'] ?? '') ?></p>
+                </div>
+            </div>
+
+            <form class="sd-profile-form" id="studentProfileForm" method="POST" action="<?= BASE_URL ?>index.php?action=student_profile_update" enctype="multipart/form-data">
+                <div class="sd-profile-section">
+                    <h3>Personal information</h3>
+                    <div class="sd-profile-grid">
+                        <div class="sd-form-group">
+                            <label>First name</label>
+                            <input type="text" name="first_name" value="<?= htmlspecialchars($student['first_name'] ?? '') ?>" required>
+                        </div>
+                        <div class="sd-form-group">
+                            <label>Middle name</label>
+                            <input type="text" name="middle_name" value="<?= htmlspecialchars($student['middle_name'] ?? '') ?>">
+                        </div>
+                        <div class="sd-form-group">
+                            <label>Last name</label>
+                            <input type="text" name="last_name" value="<?= htmlspecialchars($student['last_name'] ?? '') ?>" required>
+                        </div>
+                        <div class="sd-form-group">
+                            <label>Contact number</label>
+                            <input type="tel" name="contact_number" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" value="<?= htmlspecialchars($student['contact_number'] ?? '') ?>" required>
+                        </div>
+                        <div class="sd-form-group">
+                            <label>Email</label>
+                            <input type="email" value="<?= htmlspecialchars($student['email'] ?? '') ?>" readonly>
+                        </div>
+                        <div class="sd-form-group">
+                            <label>Joined date</label>
+                            <input type="text" value="<?= !empty($student['created_at']) ? htmlspecialchars(date('F j, Y', strtotime($student['created_at']))) : '—' ?>" readonly>
+                        </div>
+                        <div class="sd-form-group full">
+                            <label>Permanent address</label>
+                            <textarea name="permanent_address" rows="3" required><?= htmlspecialchars($student['permanent_address'] ?? '') ?></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sd-profile-section">
+                    <h3>Hostel registration details</h3>
+                    <div class="sd-profile-grid">
+                        <div class="sd-form-group">
+                            <label>College name</label>
+                            <input type="text" name="college_name" value="<?= htmlspecialchars($student['college_name'] ?? '') ?>" required>
+                        </div>
+                        <div class="sd-form-group">
+                            <label>Preferred room type</label>
+                            <input type="text" value="<?= htmlspecialchars($student['preferred_room_type'] ?? '—') ?>" readonly>
+                        </div>
+                        <div class="sd-form-group">
+                            <label>Current room</label>
+                            <input type="text" value="<?= htmlspecialchars($room['number'] ?? 'Not assigned') ?>" readonly>
+                        </div>
+                        <div class="sd-form-group">
+                            <label>Room type</label>
+                            <input type="text" value="<?= htmlspecialchars($room['type'] ?? 'Not assigned') ?>" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sd-profile-section">
+                    <h3>Guardian details</h3>
+                    <div class="sd-profile-grid">
+                        <div class="sd-form-group">
+                            <label>Guardian name</label>
+                            <input type="text" name="guardian_name" value="<?= htmlspecialchars($student['guardian_name'] ?? '') ?>" required>
+                        </div>
+                        <div class="sd-form-group">
+                            <label>Relationship</label>
+                            <input type="text" name="guardian_relationship" value="<?= htmlspecialchars($student['guardian_relationship'] ?? '') ?>" required>
+                        </div>
+                        <div class="sd-form-group">
+                            <label>Guardian contact</label>
+                            <input type="tel" name="guardian_contact" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" value="<?= htmlspecialchars($student['guardian_contact'] ?? '') ?>" required>
+                        </div>
+                        <div class="sd-form-group">
+                            <label>Profile photo</label>
+                            <label class="sd-file-field">
+                                <i class="ph ph-upload-simple"></i>
+                                <span>Upload new photo</span>
+                                <input type="file" name="profile_photo" accept="image/jpeg,image/png,image/webp">
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sd-profile-actions">
+                    <button type="submit" class="sd-btn-submit">Save profile</button>
+                </div>
+            </form>
         </div>
         </div>
 

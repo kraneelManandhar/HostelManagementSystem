@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 05, 2026 at 08:31 PM
+-- Generation Time: May 11, 2026 at 05:02 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -57,7 +57,8 @@ CREATE TABLE `complaints` (
 INSERT INTO `complaints` (`id`, `student_id`, `room_id`, `title`, `description`, `status`, `created_at`) VALUES
 (19, 22, 9, 'Unhygienic Bathroom', 'Bathroom hygiene is not maintained in a decent manner.', 'Pending', '2026-05-05 17:08:34'),
 (20, 19, 1, 'Food Quality Degraded', 'The food quality has degraded since past few days.\r\nWe are not having a balanced diet.', 'Pending', '2026-05-05 17:11:14'),
-(21, 24, 2, 'Unhygienic Bathroom', 'Sanitation of Bathroom is not maintained for several days.', 'Pending', '2026-05-05 18:18:02');
+(21, 24, 2, 'Unhygienic Bathroom', 'Sanitation of Bathroom is not maintained for several days.', 'Pending', '2026-05-05 18:18:02'),
+(35, 39, 5, 'Unhygienic bathroom.', 'Bathroom cleaning is not maintained for past few days.', 'Pending', '2026-05-10 18:44:30');
 
 -- --------------------------------------------------------
 
@@ -90,7 +91,8 @@ INSERT INTO `fees` (`id`, `student_id`, `total`, `paid`, `status`) VALUES
 (15, 19, 0.00, 0.00, 'Pending'),
 (16, 21, 0.00, 0.00, 'Pending'),
 (17, 22, 0.00, 0.00, 'Pending'),
-(19, 24, 0.00, 0.00, 'Pending');
+(19, 24, 0.00, 0.00, 'Pending'),
+(34, 39, 0.00, 0.00, 'Pending');
 
 -- --------------------------------------------------------
 
@@ -193,7 +195,7 @@ INSERT INTO `rooms` (`id`, `number`, `type`, `student1_id`, `student2_id`) VALUE
 (2, 'A2', 'single', 24, NULL),
 (3, 'A3', 'single', NULL, NULL),
 (4, 'A4', 'single', NULL, NULL),
-(5, 'B1', 'single', NULL, NULL),
+(5, 'B1', 'single', 39, NULL),
 (6, 'B2', 'single', NULL, NULL),
 (7, 'B3', 'single', NULL, NULL),
 (8, 'B4', 'single', NULL, NULL),
@@ -249,7 +251,8 @@ INSERT INTO `students` (`id`, `first_name`, `middle_name`, `last_name`, `contact
 (19, 'Shaily', 'Kumari', 'Nepal', '9723415678', '2006-08-17', 'np03cs4a240113@heraldcollege.edu.np', '$2y$10$7XALl5MjQAruuv.zI1JnMu2CYJQLxcj/FAZlQ9YLEi.T6v8vHFpRS', '69f9ffd3adb8a_725383609.png', 'Sankar Dev Campus', 'Jhapa', '2026-05-05', 'Shiv Nepal', 'Parent', '9756142367', 'single', 1, '2026-05-05 14:34:16'),
 (21, 'Adishree', '-', 'Ghaju', '9887654321', '2007-02-16', 'adishree700@gmail.com', '$2y$10$IXdeMbgWtPtbNieOMJRune73fvJyDFycHxA5FpTSm36FAtFdkL7qa', '69fa225b60c10_311297119.png', 'ABCD College', 'Bhaktapur', '2026-05-05', 'Dinesh Ghaju', 'Parent', '9887654321', 'double', 9, '2026-05-05 17:01:31'),
 (22, 'Abibi', '-', 'Thapa', '9898754321', '2006-03-05', 'abibighaju@gmail.com', '$2y$10$i3I1d7pTsrkCld6GshJS7.XF0G6x6tYdvkgHHKQExsZIrDyKvBJ5O', '69fa237040f5e_279561916.png', 'XYZ College', 'Bhaktapur', '2026-05-05', 'Anita Thapa', 'Parent', '98856342167', 'double', 9, '2026-05-05 17:06:08'),
-(24, 'Abibsha', 'Rani', 'Ghaju', '9841123463', '2006-03-19', 'abibshag@gmail.com', '$2y$10$5xz9ovpGcK3oji3zQVHrbOP0RqokEW1FI7s0/MA24q16zelinu/eS', '69fa319d6a17e_985648665.png', 'Global College', 'Bhaktapur', '2026-05-05', 'Abibsha Ghaju', 'Parent', '9745362712', 'single', 2, '2026-05-05 18:06:34');
+(24, 'Abibsha', 'Rani', 'Ghaju', '9841123463', '2006-03-19', 'abibshag@gmail.com', '$2y$10$5xz9ovpGcK3oji3zQVHrbOP0RqokEW1FI7s0/MA24q16zelinu/eS', '69fa319d6a17e_985648665.png', 'Global College', 'Madhyapur Thimi', '2026-05-05', 'Srijana Ghaju', 'Parent', '9745362712', 'single', 2, '2026-05-05 18:06:34'),
+(39, 'Aayusha', NULL, 'Bogati', '9743289512', '2005-09-07', 'ayusha@gmail.com', '$2y$10$LR94q3lSYumb8qJOvh7PYe8iaGzTJ6QKaYIwNKrb2imWoIePp8.NO', '6a00c45e035cc_961626982.png', 'Herald College', 'Sundarijal', '2026-05-10', 'Sita Bogati', 'Parent', '9867231462', 'single', 5, '2026-05-10 17:46:16');
 
 --
 -- Triggers `students`
@@ -398,19 +401,19 @@ ALTER TABLE `cleaning`
 -- AUTO_INCREMENT for table `complaints`
 --
 ALTER TABLE `complaints`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 
 --
 -- AUTO_INCREMENT for table `fees`
 --
 ALTER TABLE `fees`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
 
 --
 -- AUTO_INCREMENT for table `food`
 --
 ALTER TABLE `food`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `laundry`
@@ -440,7 +443,7 @@ ALTER TABLE `rooms`
 -- AUTO_INCREMENT for table `students`
 --
 ALTER TABLE `students`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
 
 --
 -- AUTO_INCREMENT for table `timing`

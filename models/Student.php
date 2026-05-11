@@ -98,7 +98,10 @@ class Student {
 
     public function updateSecondaryInfo(int $id, array $data): bool {
         $sql = "UPDATE students
-                SET contact_number = :contact_number,
+                SET first_name = :first_name,
+                    middle_name = :middle_name,
+                    last_name = :last_name,
+                    contact_number = :contact_number,
                     college_name = :college_name,
                     permanent_address = :permanent_address,
                     guardian_name = :guardian_name,
@@ -109,6 +112,9 @@ class Student {
 
         $stmt = $this->conn->prepare($sql);
         return $stmt->execute([
+            ':first_name' => $data['first_name'] ?? '',
+            ':middle_name' => !empty($data['middle_name']) ? $data['middle_name'] : null,
+            ':last_name' => $data['last_name'] ?? '',
             ':contact_number' => $data['contact_number'] ?? '',
             ':college_name' => $data['college_name'] ?? '',
             ':permanent_address' => $data['permanent_address'] ?? '',
