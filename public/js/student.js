@@ -150,7 +150,47 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // 6. LOGO : switch back to dashboard tab
+  // 6. PROFILE FORM VALIDATION
+  const profileForm = document.getElementById("studentProfileForm");
+  if (profileForm) {
+    profileForm.addEventListener("submit", function (e) {
+      const firstName = profileForm
+        .querySelector('input[name="first_name"]')
+        ?.value.trim();
+      const lastName = profileForm
+        .querySelector('input[name="last_name"]')
+        ?.value.trim();
+      const contact = profileForm
+        .querySelector('input[name="contact_number"]')
+        ?.value.trim();
+      const guardianContact = profileForm
+        .querySelector('input[name="guardian_contact"]')
+        ?.value.trim();
+      const photo = profileForm.querySelector('input[name="profile_photo"]');
+
+      if (!firstName || !lastName) {
+        e.preventDefault();
+        showStudentToast("First name and last name are required.", "error");
+        return;
+      }
+
+      if (!/^\d{10}$/.test(contact) || !/^\d{10}$/.test(guardianContact)) {
+        e.preventDefault();
+        showStudentToast("Contact numbers must be exactly 10 digits.", "error");
+        return;
+      }
+
+      if (photo?.files?.length) {
+        const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+        if (!allowedTypes.includes(photo.files[0].type)) {
+          e.preventDefault();
+          showStudentToast("Please upload a JPG, PNG, or WEBP image.", "error");
+        }
+      }
+    });
+  }
+
+  // 7. LOGO : switch back to dashboard tab
   const logo = document.getElementById("goDashboard");
   if (logo) {
     logo.addEventListener("click", () => switchPage("dashboard"));
@@ -164,7 +204,7 @@ document.addEventListener("DOMContentLoaded", function () {
     showStudentToast(SD_FLASH.message, SD_FLASH.type || "success");
   }
 
-  // 7. HELPERS
+  // 8. HELPERS
   function switchPage(pageKey) {
     const targetPage = document.getElementById(`page-${pageKey}`);
     if (!targetPage) return;
