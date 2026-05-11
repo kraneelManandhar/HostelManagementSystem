@@ -4,7 +4,10 @@
     <div class="registration-card">
         <h2>Registration Form</h2>
         <?php if (isset($_GET['error']) && $_GET['error'] === 'phone'): ?>
-            <p class="error-msg">Contact numbers must contain exactly 10 digits.</p>
+            <p class="error-msg">Contact numbers must start with 98 or 97 and contain exactly 10 digits.</p>
+        <?php endif; ?>
+        <?php if (isset($_GET['error']) && $_GET['error'] === 'invalid_token'): ?>
+            <p class="error-msg">Invalid or expired verification link. Please register again.</p>
         <?php endif; ?>
 
         <!-- FIXED: Use BASE_URL instead of relative path -->
@@ -32,7 +35,7 @@
         </div>
         <div>
             <label>Contact number:</label>
-            <input type="tel" name="contact_number" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" title="Enter exactly 10 digits" required>
+            <input type="tel" name="contact_number" inputmode="numeric" pattern="(98|97)[0-9]{8}" maxlength="10" title="Enter a 10-digit number starting with 98 or 97" required>
         </div>
         <div class="full-row">
             <label>Email address:</label>
@@ -83,7 +86,7 @@
         </div>
         <div>
             <label>Contact number:</label>
-            <input type="tel" name="guardian_contact" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" title="Enter exactly 10 digits" required>
+            <input type="tel" name="guardian_contact" inputmode="numeric" pattern="(98|97)[0-9]{8}" maxlength="10" title="Enter a 10-digit number starting with 98 or 97" required>
         </div>
     </div>
 </div>

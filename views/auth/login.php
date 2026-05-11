@@ -1,4 +1,7 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 require_once __DIR__ . '/../../config/db.php';
 require_once __DIR__ . '/../../controllers/AuthController.php';
 
@@ -28,9 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 
-<?php include(__DIR__ . '/../layout/header.php'); ?>
-
-<main class="login-page">
+<main class="login-page" style="background: radial-gradient(circle at center, #ffffff 0%, #a5c1e5 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center;">
     <div class="login-card">
         
         <div class="login-logo">
@@ -47,6 +48,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php if (isset($_GET['registered']) && $_GET['registered'] === 'success'): ?>
             <p class="login-success">Registration successful! Please login.</p>
         <?php endif; ?>
+
+        <link rel="stylesheet" href="<?= BASE_URL ?>public/css/style.css?v=2">
 
         <!-- FIXED: Added hidden action field -->
         <form method="POST" action="<?= BASE_URL ?>index.php?action=login">
@@ -83,5 +86,3 @@ function togglePassword(id) {
     input.type = input.type === 'password' ? 'text' : 'password';
 }
 </script>
-
-<?php include(__DIR__ . '/../layout/footer.php'); ?>

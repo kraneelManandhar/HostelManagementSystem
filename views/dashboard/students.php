@@ -217,7 +217,7 @@ if (!empty($selectedPhoto)) {
                     <i class="ph ph-student"></i>
                     <span>Students</span>
                 </a>
-                <a class="ms-nav-btn" href="<?= $baseUrl ?>index.php?action=owner_rooms_single"><i class="ph ph-bed"></i><span>Rooms</span></a>
+                <a class="ms-nav-btn" href="<?= $baseUrl ?>index.php?action=owner_rooms"><i class="ph ph-bed"></i><span>Rooms</span></a>
                 <a class="ms-nav-btn" href="<?= $baseUrl ?>index.php?action=owner_fees"><i class="ph ph-money"></i><span>Fees</span></a>
                 <a class="ms-nav-btn" href="<?= $baseUrl ?>index.php?action=owner_complaints"><i class="ph ph-megaphone"></i><span>Complaints</span></a>
                 <a class="ms-nav-btn" href="<?= $baseUrl ?>index.php?action=owner_notices"><i class="ph ph-warning"></i><span>Notice</span></a>
@@ -266,10 +266,7 @@ if (!empty($selectedPhoto)) {
                             <i class="ph ph-magnifying-glass"></i>
                             <input type="text" placeholder="Search">
                         </div>
-                        <form method="get" action="<?= $baseUrl ?>index.php">
-                            <input type="hidden" name="action" value="owner_students">
-                            <button class="ms-action-btn" type="submit">REGISTER NOW</button>
-                        </form>
+                        <a class="ms-action-btn" href="<?= $baseUrl ?>index.php?action=owner_students">REGISTER NOW</a>
                     </div>
 
                     <form method="post" enctype="multipart/form-data">
