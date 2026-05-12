@@ -1145,6 +1145,18 @@
             color: #2b4a38;
             cursor: pointer;
         }
+        .mc-status-select.pending {
+            background: #d99aa1;
+            color: #631827;
+        }
+        .mc-status-select.in-progress {
+            background: #f7da8b;
+            color: #7c5900;
+        }
+        .mc-status-select.resolved {
+            background: #c9f0dc;
+            color: #1d4f2b;
+        }
         .mc-empty {
             text-align: center;
             padding: 28px 14px;

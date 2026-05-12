@@ -388,7 +388,64 @@ body {
 /* ===== STUDENTS TABLE ===== */
 .students-header,
 .students-row {
-    grid-template-columns: .7fr 1.2fr 1.2fr 1fr .8fr;
+    grid-template-columns: .7fr 1.25fr minmax(320px, 2.2fr) 1fr .8fr;
+    min-width: 1040px;
+}
+
+.wd-students-table {
+    max-width: 1180px;
+}
+
+.wd-students-toolbar {
+    max-width: 1180px;
+}
+
+.wd-students-search {
+    flex: 1;
+    width: 100%;
+    max-width: 520px;
+    position: relative;
+    border-radius: 999px;
+    background: #f1f3f8;
+    padding: 0;
+}
+
+.wd-students-search i {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #8b95a5;
+    font-size: 16px;
+    pointer-events: none;
+}
+
+.wd-students-search input {
+    width: 100%;
+    min-height: 46px;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    padding: 13px 18px 13px 42px;
+    font-size: 14px;
+    color: #344054;
+}
+
+.wd-students-search input:focus {
+    box-shadow: 0 0 0 3px rgba(6, 45, 87, 0.15);
+}
+
+.wd-students-table .cell {
+    min-height: 46px;
+    height: auto;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    white-space: normal;
+}
+
+.wd-email-cell {
+    font-size: 14px;
+    line-height: 1.35;
 }
 
 /* ===== TIMING TABLE ===== */
@@ -955,6 +1012,25 @@ body {
     background: var(--wd-amber) !important;
     color: #111 !important;
     font-weight: 700 !important;
+}
+
+.wd-students-table {
+    max-width: 1180px !important;
+}
+
+.wd-students-toolbar {
+    max-width: 1180px !important;
+}
+
+.wd-students-search {
+    background: #f1f3f8 !important;
+    box-shadow: none !important;
+}
+
+.wd-students-table .students-header,
+.wd-students-table .students-row {
+    grid-template-columns: .7fr 1.25fr minmax(320px, 2.2fr) 1fr .8fr !important;
+    min-width: 1040px !important;
 }
 
 @media (max-width: 1100px) {
