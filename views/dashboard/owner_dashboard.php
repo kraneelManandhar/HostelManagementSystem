@@ -41,6 +41,8 @@ $occupiedRooms = (int) $pdo->query("
 ")->fetchColumn();
 $pendingComplaints = (int) $pdo->query("SELECT COUNT(*) FROM complaints WHERE LOWER(status) = 'pending'")->fetchColumn();
 $unpaidFees = (int) $pdo->query("SELECT COUNT(*) FROM fees WHERE LOWER(status) <> 'paid' OR status IS NULL")->fetchColumn();
+$recentNotices = array_slice($noticeModel->all(), 0, 5);
+$recentComplaints = array_slice($complaintModel->all(), 0, 5);
 
 ?>
 <!DOCTYPE html>
@@ -108,29 +110,94 @@ $unpaidFees = (int) $pdo->query("SELECT COUNT(*) FROM fees WHERE LOWER(status) <
             <div class="md-title-bar">DASHBOARD</div>
 
             <section class="md-grid">
-                <div class="md-card">
+                <a class="md-card" href="<?= $baseUrl ?>index.php?action=owner_students">
                     <div class="md-card-title">Students</div>
                     <div class="md-card-badge"><?= $totalStudents ?></div>
-                </div>
+                </a>
 
-                <div class="md-card">
+                <a class="md-card" href="<?= $baseUrl ?>index.php?action=owner_rooms">
                     <div class="md-card-title">Rooms</div>
                     <div class="md-card-badge"><?= $totalRooms ?></div>
-                </div>
+                </a>
 
-                <div class="md-card">
+                <a class="md-card" href="<?= $baseUrl ?>index.php?action=owner_rooms">
                     <div class="md-card-title">Occupied Rooms</div>
                     <div class="md-card-badge"><?= $occupiedRooms ?></div>
-                </div>
+                </a>
 
-                <div class="md-card">
+                <a class="md-card" href="<?= $baseUrl ?>index.php?action=owner_complaints">
                     <div class="md-card-title">Complaints</div>
                     <div class="md-card-badge"><?= $pendingComplaints ?></div>
-                </div>
+                </a>
 
-                <div class="md-card">
+                <a class="md-card" href="<?= $baseUrl ?>index.php?action=owner_fees">
                     <div class="md-card-title">Fees</div>
                     <div class="md-card-badge"><?= $unpaidFees ?></div>
+                </a>
+            </section>
+
+            <section class="md-dashboard-panels">
+                <div class="md-panel">
+                    <div class="md-panel-head">
+                        <h2>Notices</h2>
+                        <a href="<?= $baseUrl ?>index.php?action=owner_notices">View all</a>
+                    </div>
+
+                    <?php if (empty($recentNotices)): ?>
+                        <div class="md-empty">No notices available.</div>
+                    <?php else: ?>
+                        <div class="md-list">
+                            <?php foreach ($recentNotices as $notice): ?>
+                                <article class="md-list-item">
+                                    <div class="md-item-top">
+                                        <h3><?= htmlspecialchars((string) ($notice['title'] ?? 'Untitled notice')) ?></h3>
+                                        <span><?= htmlspecialchars((string) ($notice['date'] ?? '')) ?></span>
+                                    </div>
+                                    <p><?= htmlspecialchars((string) ($notice['description'] ?? '')) ?></p>
+                                </article>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+
+                <div class="md-panel">
+                    <div class="md-panel-head">
+                        <h2>Complaints</h2>
+                        <a href="<?= $baseUrl ?>index.php?action=owner_complaints">View all</a>
+                    </div>
+
+                    <?php if (empty($recentComplaints)): ?>
+                        <div class="md-empty">No complaints found.</div>
+                    <?php else: ?>
+                        <div class="md-list">
+                            <?php foreach ($recentComplaints as $complaint): ?>
+                                <?php
+                                $studentName = trim(
+                                    ($complaint['first_name'] ?? '') . ' ' .
+                                    ($complaint['middle_name'] ?? '') . ' ' .
+                                    ($complaint['last_name'] ?? '')
+                                );
+                                if ($studentName === '') {
+                                    $studentName = 'N/A';
+                                }
+                                $status = (string) ($complaint['status'] ?? 'Pending');
+                                ?>
+                                <article class="md-list-item">
+                                    <div class="md-item-top">
+                                        <h3><?= htmlspecialchars((string) ($complaint['title'] ?? 'Complaint')) ?></h3>
+                                        <span class="md-status"><?= htmlspecialchars($status) ?></span>
+                                    </div>
+                                    <p><?= htmlspecialchars((string) ($complaint['description'] ?? '')) ?></p>
+                                    <div class="md-item-meta">
+                                        <?= htmlspecialchars($studentName) ?>
+                                        <?php if (!empty($complaint['room_number'])): ?>
+                                            <span>Room <?= htmlspecialchars((string) $complaint['room_number']) ?></span>
+                                        <?php endif; ?>
+                                    </div>
+                                </article>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </section>
         </main>

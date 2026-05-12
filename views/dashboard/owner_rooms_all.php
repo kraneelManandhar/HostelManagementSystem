@@ -24,8 +24,10 @@ $stmt = $pdo->query("
         r.id,
         r.number,
         r.type,
+        s1.id AS student1_id,
         COALESCE(CONCAT(s1.first_name, ' ', COALESCE(s1.middle_name, ''), ' ', s1.last_name), 'Unassigned') AS student1_name,
         COALESCE(s1.contact_number, '-') AS student1_contact,
+        s2.id AS student2_id,
         CASE WHEN r.type = 'single' THEN '-' ELSE COALESCE(CONCAT(s2.first_name, ' ', COALESCE(s2.middle_name, ''), ' ', s2.last_name), 'Unassigned') END AS student2_name,
         CASE WHEN r.type = 'single' THEN '-' ELSE COALESCE(s2.contact_number, '-') END AS student2_contact
     FROM rooms r
@@ -113,9 +115,9 @@ if ($managerName === '') {
                             >
                                 <td><?= htmlspecialchars((string) ($room['number'] ?? '')) ?></td>
                                 <td><?= htmlspecialchars(ucfirst((string) ($room['type'] ?? ''))) ?></td>
-                                <td><?= htmlspecialchars((string) ($room['student1_name'] ?? 'Unassigned')) ?></td>
+                                <td><?= htmlspecialchars((string) ($room['student1_name'] ?? 'Unassigned')) ?><div style="font-size:11px;color:#667085;">#<?= (int) ($room['student1_id'] ?? 0) ?></div></td>
                                 <td><?= htmlspecialchars((string) ($room['student1_contact'] ?? '-')) ?></td>
-                                <td><?= htmlspecialchars((string) ($room['student2_name'] ?? '-')) ?></td>
+                                <td><?= htmlspecialchars((string) ($room['student2_name'] ?? '-')) ?><div style="font-size:11px;color:#667085;">#<?= (int) ($room['student2_id'] ?? 0) ?></div></td>
                                 <td><?= htmlspecialchars((string) ($room['student2_contact'] ?? '-')) ?></td>
                             </tr>
                             <?php endforeach; ?>
@@ -129,6 +131,6 @@ if ($managerName === '') {
 <script>
     window.BASE_URL = <?= json_encode($baseUrl) ?>;
 </script>
-<script src="<?= $baseUrl ?>public/js/owner-search.js"></script>
+<script src="<?= $baseUrl ?>public/js/owner-search.js?v=4"></script>
 </body>
 </html>

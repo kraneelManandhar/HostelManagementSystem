@@ -96,6 +96,7 @@ if ($wardenName === '') {
 
             <div class="table-box">
                 <div class="table-header students-header">
+                    <span>Student ID</span>
                     <span>Student's name</span>
                     <span>Email</span>
                     <span>Contact</span>
@@ -106,9 +107,9 @@ if ($wardenName === '') {
                 <div
                     class="row students-row searchable-row"
                     data-room-number="<?= htmlspecialchars((string) ($s['room_number'] ?? '')) ?>"
-                    data-search="<?= htmlspecialchars(strtolower(($s['name'] ?? '') . ' ' . ($s['email'] ?? '') . ' ' . ($s['contact_number'] ?? '') . ' room ' . ($s['room_number'] ?? ''))) ?>"
+                    data-search="<?= htmlspecialchars(strtolower('id ' . (int) ($s['id'] ?? 0) . ' ' . ($s['name'] ?? '') . ' ' . ($s['email'] ?? '') . ' ' . ($s['contact_number'] ?? '') . ' room ' . ($s['room_number'] ?? ''))) ?>"
                 >
-
+                    <div class="cell">#<?= (int) ($s['id'] ?? 0) ?></div>
                     <div class="cell">
                         <?= htmlspecialchars($s['name']) ?>
                     </div>

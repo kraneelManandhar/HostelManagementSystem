@@ -87,11 +87,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web"></script>
 <script>
 function goBack() {
-    if (window.history.length > 1) {
-        window.history.back();
-        return;
-    }
-
     window.location.href = "<?= BASE_URL ?>index.php?action=home";
 }
 

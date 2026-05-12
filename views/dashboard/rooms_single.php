@@ -93,6 +93,7 @@ if (!empty($selectedRoom['occupant_contacts'])) {
 
 $studentName = $occupantNames[0] ?? 'students name';
 $studentContact = $occupantContacts[0] ?? 'contact number';
+$studentId = (int) ($selectedRoom['student1_id'] ?? 0);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -164,8 +165,9 @@ $studentContact = $occupantContacts[0] ?? 'contact number';
                     <div class="mr-pill small">Single sitter room</div>
 
                     <div class="mr-student-box">
-                        <div class="mr-student-name"><?= htmlspecialchars($studentName) ?></div>
-                        <div class="mr-student-contact"><?= htmlspecialchars($studentContact) ?></div>
+                <div class="mr-student-name"><?= htmlspecialchars($studentName) ?></div>
+                <div style="font-size:11px;color:#667085;margin-top:4px;">#<?= $studentId ?></div>
+                <div class="mr-student-contact"><?= htmlspecialchars($studentContact) ?></div>
                     </div>
 
                     <button class="mr-save-btn" type="button">Save</button>
@@ -174,7 +176,7 @@ $studentContact = $occupantContacts[0] ?? 'contact number';
         </main>
     </div>
 </div>
-<script src="<?= $baseUrl ?>public/js/owner-search.js"></script>
+<script src="<?= $baseUrl ?>public/js/owner-search.js?v=4"></script>
 </body>
 </html>
 

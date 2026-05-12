@@ -84,6 +84,7 @@ if ($showRoomModal) {
                 <?= htmlspecialchars($student['first_name'] ?? '') ?>
                 <?= htmlspecialchars($student['last_name']  ?? '') ?>
             </div>
+            <div class="sd-student-role" style="margin-top:4px;">ID #<?= (int) ($student['id'] ?? 0) ?></div>
             <div class="sd-student-role">STUDENT</div>
         </div>
 
@@ -120,6 +121,7 @@ if ($showRoomModal) {
             <div>
                 <h1>WELCOME, <?= strtoupper(htmlspecialchars($student['first_name'] ?? '')) ?></h1>
                 <p>Feel like home</p>
+                <div style="margin-top:8px;font-size:12px;color:#667085;">Student ID #<?= (int) ($student['id'] ?? 0) ?></div>
             </div>
             <div class="sd-joined-badge">
                 Joined <?= htmlspecialchars(date("F j, Y", strtotime($student['created_at']))) ?>
@@ -134,6 +136,10 @@ if ($showRoomModal) {
             <div class="sd-info-card">
                 <h3>Student details</h3>
                 <div class="sd-info-grid sd-cols-3">
+                    <div class="sd-info-field">
+                        <label>Student ID</label>
+                        <span>#<?= (int) ($student['id'] ?? 0) ?></span>
+                    </div>
                     <div class="sd-info-field">
                         <label>First name</label>
                         <span><?= htmlspecialchars($student['first_name'] ?? '') ?></span>

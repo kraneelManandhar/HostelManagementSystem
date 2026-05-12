@@ -18,6 +18,11 @@
     return terms.every((term) => haystack.includes(term));
   }
 
+  function setVisible(element, isVisible) {
+    element.hidden = !isVisible;
+    element.style.display = isVisible ? '' : 'none';
+  }
+
   function searchableText(item) {
     const controlText = Array.from(item.querySelectorAll('input, select, textarea'))
       .filter((control) => control.type !== 'hidden')
@@ -72,7 +77,7 @@
 
         items.forEach((item) => {
           const isMatch = matches(item, terms);
-          item.hidden = !isMatch;
+          setVisible(item, isMatch);
           if (isMatch) visibleCount += 1;
         });
 
@@ -91,7 +96,7 @@
     });
   }
 
-  function bindFeeSearch() {
+  function bindTableOrColumnSearch() {
     document.querySelectorAll('.mf-search input').forEach((field) => {
       const scope = getScope(field);
       const table = scope.querySelector('.mf-table');
@@ -107,7 +112,7 @@
 
           rows.forEach((row) => {
             const isMatch = matches(row, terms);
-            row.hidden = !isMatch;
+            setVisible(row, isMatch);
             if (isMatch) visibleCount += 1;
           });
 
@@ -139,7 +144,7 @@
           const isMatch = terms.length === 0 || terms.every((term) => haystack.includes(term));
 
           rowItems.forEach((item) => {
-            item.hidden = !isMatch;
+            setVisible(item, isMatch);
           });
 
           if (isMatch) visibleCount += 1;
@@ -160,5 +165,5 @@
   bindSimpleSearch('.mc-search input', '.mc-row');
   bindSimpleSearch('.mn-search input', '.mn-card.searchable-owner-row');
   bindSimpleSearch('.sf-search input', '.sf-row');
-  bindFeeSearch();
+  bindTableOrColumnSearch();
 })();

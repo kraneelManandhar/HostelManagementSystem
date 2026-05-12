@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@500;700&display=swap');
 
 /* Owner dashboard shared styles. Extracted from the owner pages so the section keeps one consistent UI. */
 
@@ -139,6 +139,21 @@
             justify-content: center;
             align-items: center;
             position: relative;
+            color: inherit;
+            text-decoration: none;
+            cursor: pointer;
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        .md-card:hover,
+        .md-card:focus-visible {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 22px rgba(8, 45, 89, 0.12);
+        }
+
+        .md-card:focus-visible {
+            outline: 3px solid rgba(232, 184, 75, 0.75);
+            outline-offset: 3px;
         }
 
         .md-card-title {
@@ -161,6 +176,117 @@
             color: #222;
         }
 
+        .md-dashboard-panels {
+            width: 100%;
+            max-width: 920px;
+            margin: 28px auto 0;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .md-panel {
+            background: #e8f0ff;
+            border-radius: 18px;
+            padding: 18px;
+            min-width: 0;
+        }
+
+        .md-panel-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+
+        .md-panel-head h2 {
+            margin: 0;
+            color: #111827;
+            font-size: 19px;
+            font-weight: 600;
+        }
+
+        .md-panel-head a {
+            flex: 0 0 auto;
+            border-radius: 999px;
+            background: #ffc425;
+            color: #1a1a1a;
+            padding: 8px 14px;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .md-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .md-list-item {
+            background: #fff;
+            border-radius: 12px;
+            padding: 13px 14px;
+        }
+
+        .md-item-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .md-item-top h3 {
+            margin: 0;
+            color: #111827;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .md-item-top span,
+        .md-item-meta {
+            color: #667085;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .md-list-item p {
+            margin: 0;
+            color: #344054;
+            font-size: 13px;
+            line-height: 1.45;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .md-item-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 9px;
+        }
+
+        .md-status {
+            border-radius: 999px;
+            background: #f1f5f9;
+            color: #1f2937 !important;
+            padding: 4px 9px;
+            white-space: nowrap;
+        }
+
+        .md-empty {
+            border-radius: 12px;
+            background: #fff;
+            color: #667085;
+            padding: 18px;
+            font-size: 13px;
+            text-align: center;
+        }
+
         @media (max-width: 900px) {
             .md-body-row {
                 flex-direction: column;
@@ -170,7 +296,8 @@
                 width: 100%;
             }
 
-            .md-grid {
+            .md-grid,
+            .md-dashboard-panels {
                 grid-template-columns: 1fr;
             }
         }
@@ -641,6 +768,12 @@
         .ms-section {
             padding: 16px;
         }
+        .ms-view-fieldset {
+            border: 0;
+            margin: 0;
+            padding: 0;
+            min-width: 0;
+        }
         .ms-grid-3,
         .ms-grid-2 {
             display: grid;
@@ -702,6 +835,24 @@
             width: 100%;
             font-size: 11px;
         }
+        .ms-view-fieldset:disabled input,
+        .ms-view-fieldset:disabled select {
+            color: #4b5563;
+            cursor: default;
+            opacity: 1;
+        }
+        .ms-view-fieldset:disabled input[type="file"] {
+            color: #8a94a6;
+        }
+        .ms-view-fieldset:disabled .ms-radio-pill,
+        .ms-view-fieldset:disabled .ms-photo-box {
+            opacity: 0.78;
+        }
+        .ms-save-btn:disabled,
+        .ms-edit-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.58;
+        }
         .ms-room-panel {
             padding: 12px 16px;
         }
@@ -717,6 +868,109 @@
             background: #f2f5fb;
             border-radius: 999px;
             padding: 10px 16px;
+            font-size: 13px;
+        }
+        .ms-change-room-btn {
+            margin-top: 14px;
+            border: 0;
+            border-radius: 999px;
+            background: #082d59;
+            color: #fff;
+            padding: 10px 18px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .ms-view-fieldset:disabled .ms-change-room-btn {
+            cursor: not-allowed;
+            opacity: 0.58;
+        }
+        .ms-room-picker {
+            margin-top: 14px;
+            border-radius: 14px;
+            background: #f8fafc;
+            padding: 14px;
+        }
+        .ms-picker-title {
+            margin-bottom: 10px;
+            color: #082d59;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .ms-room-choice-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+        .ms-room-choice {
+            border: 1px solid #d8e2f0;
+            border-radius: 12px;
+            background: #fff;
+            padding: 12px;
+        }
+        .ms-room-choice.current {
+            border-color: #e8b84b;
+        }
+        .ms-room-choice.selected {
+            border-color: #082d59;
+            box-shadow: 0 0 0 3px rgba(8, 45, 89, 0.1);
+        }
+        .ms-room-choice.is-full {
+            background: #f5f6f8;
+        }
+        .ms-room-choice-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .ms-room-choice-head small {
+            border-radius: 999px;
+            background: #eef2f7;
+            color: #667085;
+            padding: 4px 8px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        .ms-bed-options {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+        }
+        .ms-bed-option {
+            min-height: 42px;
+            border: 0;
+            border-radius: 10px;
+            background: #e8f0ff;
+            color: #1f2937;
+            padding: 8px 10px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .ms-bed-option small {
+            display: block;
+            margin-top: 3px;
+            color: #8a94a6;
+            font-size: 10px;
+            line-height: 1.2;
+        }
+        .ms-bed-option.selected {
+            background: #082d59;
+            color: #fff;
+        }
+        .ms-bed-option:disabled {
+            background: #eef0f3;
+            color: #98a2b3;
+            cursor: not-allowed;
+        }
+        .ms-room-empty {
+            border-radius: 12px;
+            background: #fff;
+            color: #667085;
+            padding: 16px;
+            text-align: center;
             font-size: 13px;
         }
         .ms-footer-actions {
@@ -765,6 +1019,7 @@
             .ms-toolbar,
             .ms-grid-2,
             .ms-room-options,
+            .ms-room-choice-grid,
             .ms-footer-actions {
                 grid-template-columns: 1fr;
                 flex-direction: column;
@@ -980,6 +1235,49 @@
             grid-template-columns: 1.2fr 1fr 1fr;
             gap: 18px;
         }
+        table.mf-table {
+            display: table;
+            width: 100%;
+            min-width: 860px;
+            border-collapse: separate;
+            border-spacing: 0 10px;
+        }
+        table.mf-table thead th {
+            background: #e8b84b;
+            color: #1a1a1a;
+            padding: 11px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            text-align: center;
+        }
+        table.mf-table thead th:first-child {
+            border-radius: 999px 0 0 999px;
+        }
+        table.mf-table thead th:last-child {
+            border-radius: 0 999px 999px 0;
+        }
+        table.mf-table tbody tr {
+            background: #fff;
+        }
+        table.mf-table tbody td {
+            background: #fff;
+            color: #344054;
+            padding: 12px;
+            font-size: 13px;
+            text-align: center;
+            vertical-align: middle;
+        }
+        table.mf-table tbody td:first-child {
+            border-radius: 999px 0 0 999px;
+            font-weight: 600;
+            color: #111827;
+        }
+        table.mf-table tbody td:last-child {
+            border-radius: 0 999px 999px 0;
+        }
+        table.mf-table tbody tr:hover td {
+            background: #f8fafc;
+        }
         .mf-column {
             background: #fff;
             border-radius: 18px;
@@ -1031,9 +1329,167 @@
             color: #5b6470;
             font-size: 14px;
         }
+        .mf-fees-toolbar {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 14px;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+        .mf-add-fee-btn,
+        .mf-save-fee-btn,
+        .mf-cancel-btn {
+            border: 0;
+            border-radius: 999px;
+            min-height: 42px;
+            padding: 10px 18px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            color: #111;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .mf-add-fee-btn,
+        .mf-save-fee-btn {
+            background: #ffc425;
+        }
+        .mf-cancel-btn {
+            background: #fff;
+        }
+        .mf-fee-form-panel {
+            background: #e8f0ff;
+            border-radius: 18px;
+            padding: 18px;
+            margin-bottom: 18px;
+        }
+        .mf-form-title {
+            margin-bottom: 14px;
+            color: #082d59;
+            font-size: 15px;
+            font-weight: 700;
+        }
+        .mf-fee-form {
+            display: grid;
+            grid-template-columns: 1.4fr repeat(3, minmax(130px, 1fr)) auto;
+            gap: 12px;
+            align-items: end;
+        }
+        .mf-form-field span {
+            display: block;
+            margin: 0 0 6px 4px;
+            color: #344054;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .mf-form-field input,
+        .mf-form-field select {
+            width: 100%;
+            min-height: 42px;
+            border: 0;
+            border-radius: 999px;
+            background: #fff;
+            padding: 10px 14px;
+            font: inherit;
+            font-size: 13px;
+            outline: 0;
+        }
+        .mf-form-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .mf-fees-table {
+            width: 100%;
+            min-width: 860px;
+            border-collapse: separate;
+            border-spacing: 10px 10px;
+        }
+        .mf-fees-table th {
+            background: #ffc425;
+            border-radius: 999px;
+            color: #111;
+            padding: 10px 12px;
+            font-size: 13px;
+            font-weight: 500;
+            text-align: center;
+        }
+        .mf-fees-table td {
+            padding: 0;
+            text-align: center;
+            vertical-align: middle;
+        }
+        .mf-fee-cell {
+            min-height: 34px;
+            border-radius: 999px;
+            background: #e2ecf8;
+            color: #111;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+        .mf-status-form {
+            margin: 0;
+        }
+        .mf-status-select {
+            width: 100%;
+            min-width: 104px;
+            min-height: 34px;
+            border: 0;
+            border-radius: 999px;
+            padding: 8px 32px 8px 14px;
+            color: #111;
+            font: inherit;
+            font-size: 13px;
+            outline: 0;
+            cursor: pointer;
+        }
+        .mf-status-select.paid {
+            background: #c9f0dc;
+        }
+        .mf-status-select.pending {
+            background: #d99aa1;
+        }
+        .mf-actions {
+            min-height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .mf-actions form {
+            margin: 0;
+        }
+        .mf-icon-btn {
+            border: 0;
+            background: transparent;
+            color: #111;
+            padding: 4px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 21px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .mf-icon-btn.danger {
+            color: #ef233c;
+        }
         @media (max-width: 1000px) {
             .mf-table {
                 grid-template-columns: 1fr;
+            }
+            .mf-fee-form,
+            .mf-fees-toolbar {
+                grid-template-columns: 1fr;
+            }
+            .mf-form-actions {
+                justify-content: flex-start;
             }
         }
         @media (max-width: 900px) {
@@ -1588,9 +2044,23 @@ body {
 .mf-sidebar-logo img,
 .mn-sidebar-logo img,
 .sf-sidebar-logo img {
-    width: 52px !important;
-    height: 52px !important;
+    width: 72px !important;
+    height: 72px !important;
     object-fit: contain;
+    filter: brightness(0) invert(1) contrast(0.82) !important;
+    opacity: 0.82;
+    flex-shrink: 0;
+}
+
+.md-sidebar-logo,
+.mr-sidebar-logo,
+.ms-sidebar-logo,
+.mc-sidebar-logo,
+.mf-sidebar-logo,
+.mn-sidebar-logo,
+.sf-sidebar-logo {
+    gap: 14px !important;
+    padding: 4px 2px 6px !important;
 }
 
 .md-sidebar-logo span,
@@ -1600,8 +2070,14 @@ body {
 .mf-sidebar-logo span,
 .mn-sidebar-logo span,
 .sf-sidebar-logo span {
-    font-size: 15px;
-    font-weight: 600;
+    color: #fff;
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.45);
 }
 
 .md-sidebar-nav,
@@ -1887,4 +2363,160 @@ body {
     .ms-photo-box {
         grid-column: auto !important;
     }
+}
+
+/* Final owner UI alignment with the student dashboard */
+.md-profile-name,
+.mr-profile-name,
+.ms-profile-name,
+.mc-profile-name,
+.mf-profile-name,
+.mn-profile-name,
+.sf-profile-name {
+    color: #fff !important;
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0 !important;
+    margin-bottom: 4px !important;
+    text-transform: none !important;
+}
+
+.md-profile-role,
+.mr-profile-role,
+.ms-profile-role,
+.mc-profile-role,
+.mf-profile-role,
+.mn-profile-role,
+.sf-profile-role {
+    color: var(--app-light-blue, #aac4e0) !important;
+    font-size: 10px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.12em !important;
+    text-transform: uppercase !important;
+}
+
+.md-nav-btn,
+.mr-nav-btn,
+.ms-nav-btn,
+.mc-nav-btn,
+.mf-nav-btn,
+.mn-nav-btn,
+.sf-nav-btn,
+.md-signout-btn,
+.mr-signout-btn,
+.ms-signout-btn,
+.mc-signout-btn,
+.mf-signout-btn,
+.mn-signout-btn,
+.sf-signout-btn {
+    font-weight: 500 !important;
+    transition: background-color 0.2s, color 0.2s !important;
+}
+
+.md-nav-btn:hover,
+.mr-nav-btn:hover,
+.ms-nav-btn:hover,
+.mc-nav-btn:hover,
+.mf-nav-btn:hover,
+.mn-nav-btn:hover,
+.sf-nav-btn:hover,
+.md-signout-btn:hover,
+.mr-signout-btn:hover,
+.ms-signout-btn:hover,
+.mc-signout-btn:hover,
+.mf-signout-btn:hover,
+.mn-signout-btn:hover,
+.sf-signout-btn:hover {
+    background: #e0e0e0 !important;
+}
+
+.md-nav-btn.active:hover,
+.mr-nav-btn.active:hover,
+.ms-nav-btn.active:hover,
+.mc-nav-btn.active:hover,
+.mf-nav-btn.active:hover,
+.mn-nav-btn.active:hover,
+.sf-nav-btn.active:hover {
+    background: var(--app-black) !important;
+}
+
+.md-title-bar,
+.mr-title-bar,
+.ms-title-bar,
+.mc-title-bar,
+.mf-title-bar,
+.mn-title-bar,
+.sf-title-bar {
+    color: #fff !important;
+    font-weight: 700 !important;
+    letter-spacing: 0 !important;
+    text-transform: uppercase !important;
+}
+
+.md-card,
+.mr-room-list,
+.mr-room-panel,
+.ms-list-panel,
+.ms-section,
+.ms-room-panel,
+.mc-panel,
+.mf-panel,
+.mn-panel,
+.sf-form,
+.sf-row,
+.md-panel {
+    box-shadow: none !important;
+}
+
+.md-card,
+.md-panel,
+.mn-card,
+.mc-row,
+.sf-row,
+.mr-room-item,
+.ms-student-item {
+    transition: background-color 0.2s, color 0.2s, transform 0.2s !important;
+}
+
+.md-card:hover,
+.mn-card:hover,
+.mc-row:hover,
+.sf-row:hover,
+.mr-room-item:hover,
+.ms-student-item:hover {
+    transform: translateY(-1px);
+}
+
+.mr-search,
+.ms-search,
+.mc-search,
+.mf-search,
+.mn-search,
+.sf-search {
+    background: transparent !important;
+}
+
+.mr-search input,
+.ms-search input,
+.mc-search input,
+.mf-search input,
+.mn-search input,
+.sf-search input,
+.mc-filter select {
+    border-radius: 999px !important;
+    box-shadow: none !important;
+    color: #222 !important;
+}
+
+.ms-action-btn,
+.mn-open-btn,
+.mn-submit-btn,
+.sf-btn-add,
+.ms-save-btn,
+.mr-save-btn {
+    background: var(--app-amber) !important;
+    border-radius: 999px !important;
+    color: #111 !important;
+    font-weight: 700 !important;
+    text-decoration: none !important;
 }

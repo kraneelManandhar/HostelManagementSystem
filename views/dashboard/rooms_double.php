@@ -95,6 +95,8 @@ $studentOneName = $occupantNames[0] ?? 'students name';
 $studentOneContact = $occupantContacts[0] ?? 'number';
 $studentTwoName = $occupantNames[1] ?? 'students name';
 $studentTwoContact = $occupantContacts[1] ?? 'number';
+$studentOneId = (int) ($selectedRoom['student1_id'] ?? 0);
+$studentTwoId = (int) ($selectedRoom['student2_id'] ?? 0);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -168,10 +170,12 @@ $studentTwoContact = $occupantContacts[1] ?? 'number';
                     <div class="mr-occupants">
                         <div class="mr-occupant">
                             <div class="mr-student-name"><?= htmlspecialchars($studentOneName) ?></div>
+                            <div style="font-size:11px;color:#667085;margin-top:4px;">#<?= $studentOneId ?></div>
                             <div class="mr-student-contact"><?= htmlspecialchars($studentOneContact) ?></div>
                         </div>
                         <div class="mr-occupant">
                             <div class="mr-student-name"><?= htmlspecialchars($studentTwoName) ?></div>
+                            <div style="font-size:11px;color:#667085;margin-top:4px;">#<?= $studentTwoId ?></div>
                             <div class="mr-student-contact"><?= htmlspecialchars($studentTwoContact) ?></div>
                         </div>
                     </div>
@@ -182,7 +186,7 @@ $studentTwoContact = $occupantContacts[1] ?? 'number';
         </main>
     </div>
 </div>
-<script src="<?= $baseUrl ?>public/js/owner-search.js"></script>
+<script src="<?= $baseUrl ?>public/js/owner-search.js?v=4"></script>
 </body>
 </html>
 

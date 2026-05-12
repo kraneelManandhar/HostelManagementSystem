@@ -15,9 +15,91 @@ if (
 
 require_once __DIR__ . '/../../config/db.php';
 require_once __DIR__ . '/../../models/Student.php';
+require_once __DIR__ . '/../../models/Room.php';
 
 $pdo = DB::connect();
 $studentModel = new Student($pdo);
+
+function ownerAssignStudentRoom(PDO $pdo, int $studentId, int $roomId, string $bedSlot): bool
+{
+    if ($studentId <= 0 || $roomId <= 0 || !in_array($bedSlot, ['student1', 'student2'], true)) {
+        return false;
+    }
+
+    $pdo->beginTransaction();
+
+    try {
+        $roomStmt = $pdo->prepare("SELECT id, type, student1_id, student2_id FROM rooms WHERE id = ? FOR UPDATE");
+        $roomStmt->execute([$roomId]);
+        $room = $roomStmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$room) {
+            $pdo->rollBack();
+            return false;
+        }
+
+        if (($room['type'] ?? '') === 'single' && $bedSlot !== 'student1') {
+            $pdo->rollBack();
+            return false;
+        }
+
+        $targetColumn = $bedSlot . '_id';
+        $targetOccupant = (int) ($room[$targetColumn] ?? 0);
+
+        if ($targetOccupant !== 0 && $targetOccupant !== $studentId) {
+            $pdo->rollBack();
+            return false;
+        }
+
+        $clearRooms = $pdo->prepare("
+            UPDATE rooms
+            SET student1_id = CASE WHEN student1_id = ? THEN NULL ELSE student1_id END,
+                student2_id = CASE WHEN student2_id = ? THEN NULL ELSE student2_id END
+        ");
+        $clearRooms->execute([$studentId, $studentId]);
+
+        $assignRoom = $pdo->prepare("UPDATE rooms SET {$targetColumn} = ? WHERE id = ?");
+        $assignRoom->execute([$studentId, $roomId]);
+
+        $assignStudent = $pdo->prepare("UPDATE students SET room_id = ?, preferred_room_type = ? WHERE id = ?");
+        $assignStudent->execute([$roomId, $room['type'], $studentId]);
+
+        $pdo->commit();
+        return true;
+    } catch (Throwable $e) {
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
+        return false;
+    }
+}
+
+function ownerRoomsForPicker(PDO $pdo): array
+{
+    $stmt = $pdo->query("
+        SELECT
+            r.*,
+            s1.id AS student1_id,
+            TRIM(CONCAT(COALESCE(s1.first_name, ''), ' ', COALESCE(s1.middle_name, ''), ' ', COALESCE(s1.last_name, ''))) AS student1_name,
+            s2.id AS student2_id,
+            TRIM(CONCAT(COALESCE(s2.first_name, ''), ' ', COALESCE(s2.middle_name, ''), ' ', COALESCE(s2.last_name, ''))) AS student2_name
+        FROM rooms r
+        LEFT JOIN students s1 ON s1.id = r.student1_id
+        LEFT JOIN students s2 ON s2.id = r.student2_id
+        ORDER BY r.type ASC, r.number ASC
+    ");
+
+    $rooms = ['double' => [], 'single' => []];
+    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $room) {
+        $type = $room['type'] ?? 'double';
+        if (!isset($rooms[$type])) {
+            $rooms[$type] = [];
+        }
+        $rooms[$type][] = $room;
+    }
+
+    return $rooms;
+}
 
 function ownerRedirect(string $baseUrl, ?int $selectedId = null, string $msg = ''): void
 {
@@ -88,6 +170,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($formAction === 'edit') {
         $currentPhoto = $_POST['current_photo'] ?? null;
+        $changeRoom = ($_POST['change_room'] ?? '') === '1';
+        $newRoomId = (int) ($_POST['new_room_id'] ?? 0);
+        $newBedSlot = trim($_POST['new_bed_slot'] ?? '');
 
         if (!empty($_FILES['profile_photo']['name'])) {
             $uploadDir = __DIR__ . '/../../public/uploads/';
@@ -137,6 +222,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ':id' => $studentId,
         ]);
 
+        if ($changeRoom && $newRoomId > 0 && $newBedSlot !== '') {
+            ownerAssignStudentRoom($pdo, $studentId, $newRoomId, $newBedSlot);
+        }
+
         ownerRedirect($baseUrl, $studentId);
     }
 
@@ -171,6 +260,7 @@ if ($managerName === '') {
 }
 
 $msg = $_GET['msg'] ?? '';
+$roomsByType = ownerRoomsForPicker($pdo);
 
 $selectedPhoto = $selectedStudent['profile_photo'] ?? '';
 if (!empty($selectedPhoto)) {
@@ -252,10 +342,11 @@ if (!empty($selectedPhoto)) {
                             <a
                                 class="ms-student-item <?= (int) $studentItem['id'] === $selectedId ? 'active' : '' ?>"
                                 data-room-number="<?= htmlspecialchars((string) ($studentItem['room_number'] ?? '')) ?>"
-                                data-search="<?= htmlspecialchars(strtolower($fullName . ' ' . ($studentItem['email'] ?? '') . ' ' . ($studentItem['contact_number'] ?? '') . ' room ' . ($studentItem['room_number'] ?? '') . ' ' . ($studentItem['room_type'] ?? ''))) ?>"
+                                data-search="<?= htmlspecialchars(strtolower($fullName . ' id ' . (int) $studentItem['id'] . ' ' . ($studentItem['email'] ?? '') . ' ' . ($studentItem['contact_number'] ?? '') . ' room ' . ($studentItem['room_number'] ?? '') . ' ' . ($studentItem['room_type'] ?? ''))) ?>"
                                 href="<?= $baseUrl ?>index.php?action=owner_students&student_id=<?= (int) $studentItem['id'] ?>"
                             >
                                 <?= htmlspecialchars($fullName) ?>
+                                <small style="display:block;color:#667085;font-size:11px;margin-top:2px;">ID #<?= (int) $studentItem['id'] ?></small>
                             </a>
                         <?php endforeach; ?>
                     </div>
@@ -267,109 +358,194 @@ if (!empty($selectedPhoto)) {
                             <i class="ph ph-magnifying-glass"></i>
                             <input type="text" placeholder="Search">
                         </div>
-                        <a class="ms-action-btn" href="<?= $baseUrl ?>index.php?action=owner_students">REGISTER NOW</a>
+                        <a class="ms-action-btn" href="<?= $baseUrl ?>index.php?action=register">REGISTER NOW</a>
                     </div>
 
-                    <form method="post" enctype="multipart/form-data">
+                    <form class="ms-student-form" method="post" enctype="multipart/form-data">
                         <input type="hidden" name="student_id" value="<?= (int) ($selectedStudent['id'] ?? 0) ?>">
                         <input type="hidden" name="current_photo" value="<?= htmlspecialchars($selectedStudent['profile_photo'] ?? '') ?>">
 
-                        <section class="ms-section">
-                            <div class="ms-grid-3">
-                                <div class="ms-field">
-                                    <label>First name</label>
-                                    <input type="text" name="first_name" value="<?= htmlspecialchars($selectedStudent['first_name'] ?? '') ?>" required>
-                                </div>
-                                <div class="ms-field">
-                                    <label>Middle name</label>
-                                    <input type="text" name="middle_name" value="<?= htmlspecialchars($selectedStudent['middle_name'] ?? '') ?>">
-                                </div>
-                                <div class="ms-field">
-                                    <label>Last name</label>
-                                    <input type="text" name="last_name" value="<?= htmlspecialchars($selectedStudent['last_name'] ?? '') ?>" required>
-                                </div>
-                                <div class="ms-photo-box">
-                                    <div class="ms-photo-label">Passport size photo</div>
-                                    <div class="ms-photo-preview">
-                                        <?php if ($selectedPhotoSrc): ?>
-                                            <img src="<?= $selectedPhotoSrc ?>" alt="Student photo">
-                                        <?php else: ?>
-                                            <i class="ph ph-image"></i>
-                                        <?php endif; ?>
+                        <fieldset class="ms-view-fieldset" disabled>
+                            <section class="ms-section">
+                                <div class="ms-grid-3">
+                                    <div class="ms-field">
+                                        <label>First name</label>
+                                        <input type="text" name="first_name" value="<?= htmlspecialchars($selectedStudent['first_name'] ?? '') ?>" required>
                                     </div>
-                                    <input type="file" name="profile_photo" accept="image/*">
+                                    <div class="ms-field">
+                                        <label>Middle name</label>
+                                        <input type="text" name="middle_name" value="<?= htmlspecialchars($selectedStudent['middle_name'] ?? '') ?>">
+                                    </div>
+                                    <div class="ms-field">
+                                        <label>Last name</label>
+                                        <input type="text" name="last_name" value="<?= htmlspecialchars($selectedStudent['last_name'] ?? '') ?>" required>
+                                    </div>
+                                    <div class="ms-photo-box">
+                                        <div class="ms-photo-label">Passport size photo</div>
+                                        <div class="ms-photo-preview">
+                                            <?php if ($selectedPhotoSrc): ?>
+                                                <img src="<?= $selectedPhotoSrc ?>" alt="Student photo">
+                                            <?php else: ?>
+                                                <i class="ph ph-image"></i>
+                                            <?php endif; ?>
+                                        </div>
+                                        <input type="file" name="profile_photo" accept="image/*">
+                                    </div>
+                                    <div class="ms-field">
+                                        <label>Date of birth</label>
+                                        <input type="date" name="date_of_birth" value="<?= htmlspecialchars($selectedStudent['date_of_birth'] ?? '') ?>">
+                                    </div>
+                                    <div class="ms-field">
+                                        <label>Contact number</label>
+                                        <input type="tel" name="contact_number" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" title="Enter exactly 10 digits" value="<?= htmlspecialchars($selectedStudent['contact_number'] ?? '') ?>">
+                                    </div>
+                                    <div class="ms-field full">
+                                        <label>Email address</label>
+                                        <input type="email" name="email" value="<?= htmlspecialchars($selectedStudent['email'] ?? '') ?>" required>
+                                    </div>
+                                    <div class="ms-field">
+                                        <label>Student ID</label>
+                                        <input type="text" value="#<?= (int) ($selectedStudent['id'] ?? 0) ?>" readonly>
+                                    </div>
                                 </div>
-                                <div class="ms-field">
-                                    <label>Date of birth</label>
-                                    <input type="date" name="date_of_birth" value="<?= htmlspecialchars($selectedStudent['date_of_birth'] ?? '') ?>">
-                                </div>
-                                <div class="ms-field">
-                                    <label>Contact number</label>
-                                    <input type="tel" name="contact_number" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" title="Enter exactly 10 digits" value="<?= htmlspecialchars($selectedStudent['contact_number'] ?? '') ?>">
-                                </div>
-                                <div class="ms-field full">
-                                    <label>Email address</label>
-                                    <input type="email" name="email" value="<?= htmlspecialchars($selectedStudent['email'] ?? '') ?>" required>
-                                </div>
-                            </div>
-                        </section>
+                            </section>
 
-                        <section class="ms-section">
-                            <div class="ms-grid-2">
-                                <div class="ms-field">
-                                    <label>College name</label>
-                                    <input type="text" name="college_name" value="<?= htmlspecialchars($selectedStudent['college_name'] ?? '') ?>">
+                            <section class="ms-section">
+                                <div class="ms-grid-2">
+                                    <div class="ms-field">
+                                        <label>College name</label>
+                                        <input type="text" name="college_name" value="<?= htmlspecialchars($selectedStudent['college_name'] ?? '') ?>">
+                                    </div>
+                                    <div class="ms-field">
+                                        <label>Permanent address</label>
+                                        <input type="text" name="permanent_address" value="<?= htmlspecialchars($selectedStudent['permanent_address'] ?? '') ?>">
+                                    </div>
+                                    <div class="ms-field">
+                                        <label>Date of joining</label>
+                                        <input type="date" name="date_of_joining" value="<?= htmlspecialchars($selectedStudent['date_of_joining'] ?? '') ?>">
+                                    </div>
                                 </div>
-                                <div class="ms-field">
-                                    <label>Permanent address</label>
-                                    <input type="text" name="permanent_address" value="<?= htmlspecialchars($selectedStudent['permanent_address'] ?? '') ?>">
-                                </div>
-                                <div class="ms-field">
-                                    <label>Date of joining</label>
-                                    <input type="date" name="date_of_joining" value="<?= htmlspecialchars($selectedStudent['date_of_joining'] ?? '') ?>">
-                                </div>
-                            </div>
-                        </section>
+                            </section>
 
-                        <section class="ms-section">
-                            <div class="ms-grid-2">
-                                <div class="ms-field">
-                                    <label>Relationship</label>
-                                    <input type="text" name="guardian_relationship" value="<?= htmlspecialchars($selectedStudent['guardian_relationship'] ?? '') ?>">
+                            <section class="ms-section">
+                                <div class="ms-grid-2">
+                                    <div class="ms-field">
+                                        <label>Relationship</label>
+                                        <input type="text" name="guardian_relationship" value="<?= htmlspecialchars($selectedStudent['guardian_relationship'] ?? '') ?>">
+                                    </div>
+                                    <div class="ms-field">
+                                        <label>Guardian full name</label>
+                                        <input type="text" name="guardian_name" value="<?= htmlspecialchars($selectedStudent['guardian_name'] ?? '') ?>">
+                                    </div>
+                                    <div class="ms-field">
+                                        <label>Contact number</label>
+                                        <input type="tel" name="guardian_contact" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" title="Enter exactly 10 digits" value="<?= htmlspecialchars($selectedStudent['guardian_contact'] ?? '') ?>">
+                                    </div>
                                 </div>
-                                <div class="ms-field">
-                                    <label>Guardian full name</label>
-                                    <input type="text" name="guardian_name" value="<?= htmlspecialchars($selectedStudent['guardian_name'] ?? '') ?>">
-                                </div>
-                                <div class="ms-field">
-                                    <label>Contact number</label>
-                                    <input type="tel" name="guardian_contact" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" title="Enter exactly 10 digits" value="<?= htmlspecialchars($selectedStudent['guardian_contact'] ?? '') ?>">
-                                </div>
-                            </div>
-                        </section>
+                            </section>
 
-                        <section class="ms-room-panel">
-                            <?php $roomType = $selectedStudent['preferred_room_type'] ?? 'double'; ?>
-                            <div class="ms-room-options">
-                                <label class="ms-radio-pill">
-                                    <input type="radio" name="preferred_room_type" value="double" <?= $roomType === 'double' ? 'checked' : '' ?>>
-                                    <span>Double sitter</span>
-                                </label>
-                                <label class="ms-radio-pill">
-                                    <input type="radio" name="preferred_room_type" value="single" <?= $roomType === 'single' ? 'checked' : '' ?>>
-                                    <span>Single sitter</span>
-                                </label>
-                            </div>
-                        </section>
+                            <section class="ms-room-panel">
+                                <?php $roomType = $selectedStudent['preferred_room_type'] ?? 'double'; ?>
+                                <?php $currentRoomId = (int) ($selectedStudent['room_id'] ?? 0); ?>
+                                <?php $currentStudentId = (int) ($selectedStudent['id'] ?? 0); ?>
+                                <div class="ms-room-options">
+                                    <label class="ms-radio-pill">
+                                        <input type="radio" name="preferred_room_type" value="double" <?= $roomType === 'double' ? 'checked' : '' ?>>
+                                        <span>Double sitter</span>
+                                    </label>
+                                    <label class="ms-radio-pill">
+                                        <input type="radio" name="preferred_room_type" value="single" <?= $roomType === 'single' ? 'checked' : '' ?>>
+                                        <span>Single sitter</span>
+                                    </label>
+                                </div>
+
+                                <input type="hidden" name="change_room" value="0" id="msChangeRoomInput">
+                                <input type="hidden" name="new_room_id" value="" id="msNewRoomInput">
+                                <input type="hidden" name="new_bed_slot" value="" id="msNewBedInput">
+
+                                <button class="ms-change-room-btn" type="button" id="msChangeRoomBtn">
+                                    Change room
+                                </button>
+
+                                <div class="ms-room-picker" id="msRoomPicker" hidden>
+                                    <div class="ms-picker-title">Select room</div>
+
+                                    <?php foreach (['double' => 'Double sitter', 'single' => 'Single sitter'] as $type => $label): ?>
+                                        <div class="ms-room-picker-pane" data-room-type="<?= htmlspecialchars($type) ?>" <?= $type === $roomType ? '' : 'hidden' ?>>
+                                            <?php if (empty($roomsByType[$type])): ?>
+                                                <div class="ms-room-empty">No <?= htmlspecialchars(strtolower($label)) ?> rooms found.</div>
+                                            <?php else: ?>
+                                                <div class="ms-room-choice-grid">
+                                                    <?php foreach ($roomsByType[$type] as $roomOption): ?>
+                                                        <?php
+                                                        $roomId = (int) $roomOption['id'];
+                                                        $student1Id = (int) ($roomOption['student1_id'] ?? 0);
+                                                        $student2Id = (int) ($roomOption['student2_id'] ?? 0);
+                                                        $student1Available = $student1Id === 0 || $student1Id === $currentStudentId;
+                                                        $student2Available = $type === 'double' && ($student2Id === 0 || $student2Id === $currentStudentId);
+                                                        $roomAvailable = $student1Available || $student2Available;
+                                                        ?>
+                                                        <div
+                                                            class="ms-room-choice <?= $roomId === $currentRoomId ? 'current' : '' ?> <?= $roomAvailable ? '' : 'is-full' ?>"
+                                                            data-room-id="<?= $roomId ?>"
+                                                            data-room-number="<?= htmlspecialchars((string) ($roomOption['number'] ?? '')) ?>"
+                                                        >
+                                                            <div class="ms-room-choice-head">
+                                                                <span>Room <?= htmlspecialchars((string) ($roomOption['number'] ?? '')) ?></span>
+                                                                <?php if ($roomId === $currentRoomId): ?>
+                                                                    <small>Current</small>
+                                                                <?php elseif (!$roomAvailable): ?>
+                                                                    <small>Full</small>
+                                                                <?php endif; ?>
+                                                            </div>
+
+                                                            <div class="ms-bed-options">
+                                                                <button
+                                                                    type="button"
+                                                                    class="ms-bed-option"
+                                                                    data-room-id="<?= $roomId ?>"
+                                                                    data-bed-slot="student1"
+                                                                    <?= $student1Available ? '' : 'disabled' ?>
+                                                                >
+                                                                    Bed 1
+                                                                    <?php if (!$student1Available && !empty($roomOption['student1_name'])): ?>
+                                                                        <small>#<?= (int) ($roomOption['student1_id'] ?? 0) ?> <?= htmlspecialchars((string) $roomOption['student1_name']) ?></small>
+                                                                    <?php endif; ?>
+                                                                </button>
+
+                                                                <?php if ($type === 'double'): ?>
+                                                                    <button
+                                                                        type="button"
+                                                                        class="ms-bed-option"
+                                                                        data-room-id="<?= $roomId ?>"
+                                                                        data-bed-slot="student2"
+                                                                        <?= $student2Available ? '' : 'disabled' ?>
+                                                                    >
+                                                                        Bed 2
+                                                                        <?php if (!$student2Available && !empty($roomOption['student2_name'])): ?>
+                                                                            <small>#<?= (int) ($roomOption['student2_id'] ?? 0) ?> <?= htmlspecialchars((string) $roomOption['student2_name']) ?></small>
+                                                                        <?php endif; ?>
+                                                                    </button>
+                                                                <?php endif; ?>
+                                                            </div>
+                                                        </div>
+                                                    <?php endforeach; ?>
+                                                </div>
+                                            <?php endif; ?>
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
+                            </section>
+                        </fieldset>
 
                         <div class="ms-footer-actions">
                             <button class="ms-delete-btn" type="submit" name="form_action" value="delete" <?= $selectedId ? '' : 'disabled' ?>>
                                 <i class="ph ph-trash"></i> DELETE RECORDS
                             </button>
-                            <button class="ms-edit-btn" type="submit" name="form_action" value="edit" <?= $selectedId ? '' : 'disabled' ?>>
+                            <button class="ms-edit-btn" type="button" data-edit-student <?= $selectedId ? '' : 'disabled' ?>>
                                 EDIT
                             </button>
-                            <button class="ms-save-btn" type="submit" name="form_action" value="<?= $selectedId ? 'edit' : 'add' ?>">
+                            <button class="ms-save-btn" type="submit" name="form_action" value="<?= $selectedId ? 'edit' : 'add' ?>" disabled>
                                 SAVE CHANGES
                             </button>
                         </div>
@@ -379,7 +555,92 @@ if (!empty($selectedPhoto)) {
         </main>
     </div>
 </div>
-<script src="<?= $baseUrl ?>public/js/owner-search.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.querySelector('.ms-student-form');
+    if (!form) return;
+
+    const fieldset = form.querySelector('.ms-view-fieldset');
+    const editButton = form.querySelector('[data-edit-student]');
+    const saveButton = form.querySelector('.ms-save-btn');
+    const changeRoomButton = form.querySelector('#msChangeRoomBtn');
+    const roomPicker = form.querySelector('#msRoomPicker');
+    const changeRoomInput = form.querySelector('#msChangeRoomInput');
+    const newRoomInput = form.querySelector('#msNewRoomInput');
+    const newBedInput = form.querySelector('#msNewBedInput');
+
+    if (!fieldset || !editButton || !saveButton) return;
+
+    function openRoomPicker() {
+        if (!roomPicker || !changeRoomInput) return;
+        roomPicker.hidden = false;
+        changeRoomInput.value = '1';
+        syncRoomTypePane();
+    }
+
+    function resetRoomSelection() {
+        if (newRoomInput) newRoomInput.value = '';
+        if (newBedInput) newBedInput.value = '';
+        form.querySelectorAll('.ms-bed-option.selected').forEach(function (button) {
+            button.classList.remove('selected');
+        });
+        form.querySelectorAll('.ms-room-choice.selected').forEach(function (room) {
+            room.classList.remove('selected');
+        });
+    }
+
+    function syncRoomTypePane() {
+        const selectedType = form.querySelector('input[name="preferred_room_type"]:checked')?.value || 'double';
+
+        form.querySelectorAll('.ms-room-picker-pane').forEach(function (pane) {
+            pane.hidden = pane.dataset.roomType !== selectedType;
+        });
+    }
+
+    editButton.addEventListener('click', function () {
+        fieldset.disabled = false;
+        form.classList.add('is-editing');
+        saveButton.disabled = false;
+        editButton.disabled = true;
+
+        const firstField = fieldset.querySelector('input:not([type="file"]), select, textarea');
+        if (firstField) {
+            firstField.focus();
+        }
+    });
+
+    if (changeRoomButton) {
+        changeRoomButton.addEventListener('click', openRoomPicker);
+    }
+
+    form.querySelectorAll('input[name="preferred_room_type"]').forEach(function (radio) {
+        radio.addEventListener('change', function () {
+            if (fieldset.disabled) return;
+            resetRoomSelection();
+            openRoomPicker();
+        });
+    });
+
+    form.querySelectorAll('.ms-bed-option').forEach(function (button) {
+        button.addEventListener('click', function () {
+            if (fieldset.disabled || button.disabled) return;
+
+            resetRoomSelection();
+            button.classList.add('selected');
+
+            const room = button.closest('.ms-room-choice');
+            if (room) {
+                room.classList.add('selected');
+            }
+
+            if (newRoomInput) newRoomInput.value = button.dataset.roomId || '';
+            if (newBedInput) newBedInput.value = button.dataset.bedSlot || '';
+            if (changeRoomInput) changeRoomInput.value = '1';
+        });
+    });
+});
+</script>
+<script src="<?= $baseUrl ?>public/js/owner-search.js?v=3"></script>
 </body>
 </html>
 

@@ -58,9 +58,6 @@ if (isset($_SESSION['logged_in']) && in_array($action, $publicPages, true)) {
         case 'warden':
             header('Location: ' . BASE_URL . 'index.php?action=warden_dashboard');
             exit;
-        case 'admin':
-            header('Location: ' . BASE_URL . 'index.php?action=admin_dashboard');
-            exit;
         default:
             header('Location: ' . BASE_URL . 'index.php?action=student_dashboard');
             exit;
@@ -387,11 +384,6 @@ switch ($action) {
     case 'owner_dashboard':
         requireRole('owner');
         include 'views/dashboard/owner_dashboard.php';
-        break;
-
-    case 'admin_dashboard':
-        requireRole('admin');
-        include 'views/dashboard/admin_dashboard.php';
         break;
 
     case 'owner_students':
