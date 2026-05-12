@@ -84,18 +84,55 @@ switch ($action) {
                 exit;
             }
 
+            $email = strtolower(trim($_POST['email'] ?? ''));
+            if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                header('Location: ' . BASE_URL . 'index.php?action=register&error=email_invalid');
+                exit;
+            }
+
+            $studentModel = new Student(DB::connect());
+            $userModel = new User(DB::connect());
+            if ($email !== '' && ($studentModel->findByEmail($email) || $userModel->findByEmail($email))) {
+                header('Location: ' . BASE_URL . 'index.php?action=register&error=email');
+                exit;
+            }
+
             $_POST['contact_number'] = $contactNumber;
             $_POST['guardian_contact'] = $guardianContact;
+            $_POST['email'] = $email;
             $_SESSION['reg_data'] = $_POST;
 
-            if (!empty($_FILES['profile_photo']['name'])) {
+            if (
+                isset($_FILES['profile_photo']) &&
+                $_FILES['profile_photo']['error'] !== UPLOAD_ERR_NO_FILE
+            ) {
+                if (
+                    $_FILES['profile_photo']['error'] !== UPLOAD_ERR_OK ||
+                    !is_uploaded_file($_FILES['profile_photo']['tmp_name'])
+                ) {
+                    header('Location: ' . BASE_URL . 'index.php?action=register&error=photo');
+                    exit;
+                }
+
+                $allowedTypes = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp'];
+                $mimeType = mime_content_type($_FILES['profile_photo']['tmp_name']);
+
+                if (!isset($allowedTypes[$mimeType])) {
+                    header('Location: ' . BASE_URL . 'index.php?action=register&error=photo');
+                    exit;
+                }
+
                 $uploadDir = __DIR__ . '/public/uploads/';
                 if (!is_dir($uploadDir)) {
                     mkdir($uploadDir, 0755, true);
                 }
-                $ext      = pathinfo($_FILES['profile_photo']['name'], PATHINFO_EXTENSION);
-                $filename = uniqid() . '_' . rand(100000000, 999999999) . '.' . $ext;
-                move_uploaded_file($_FILES['profile_photo']['tmp_name'], $uploadDir . $filename);
+
+                $filename = uniqid('student_', true) . '.' . $allowedTypes[$mimeType];
+                if (!move_uploaded_file($_FILES['profile_photo']['tmp_name'], $uploadDir . $filename)) {
+                    header('Location: ' . BASE_URL . 'index.php?action=register&error=photo');
+                    exit;
+                }
+
                 $_SESSION['reg_data']['profile_photo'] = $filename;
             }
 
@@ -170,8 +207,27 @@ switch ($action) {
             $data['password'] = password_hash($password, PASSWORD_DEFAULT);
 
             $pdo               = DB::connect();
+            $studentModel      = new Student($pdo);
+            $userModel         = new User($pdo);
+            $email             = strtolower(trim($data['email'] ?? ''));
+
+            if ($email === '' || $studentModel->findByEmail($email) || $userModel->findByEmail($email)) {
+                header('Location: ' . BASE_URL . 'index.php?action=register&error=email');
+                exit;
+            }
+
+            $data['email'] = $email;
             $studentController = new StudentController($pdo);
-            $studentController->register($data);
+            try {
+                $studentController->register($data);
+            } catch (PDOException $e) {
+                if ($e->getCode() === '23000') {
+                    header('Location: ' . BASE_URL . 'index.php?action=register&error=email');
+                    exit;
+                }
+
+                throw $e;
+            }
 
             unset($_SESSION['reg_data']);
             header('Location: ' . BASE_URL . 'index.php?action=login&registered=success');

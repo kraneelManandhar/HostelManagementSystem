@@ -146,7 +146,11 @@ if ($managerName === '') {
                             $studentName = 'N/A';
                         }
                         ?>
-                        <div class="mc-row" data-search="<?= htmlspecialchars(strtolower($studentName . ' ' . ($complaint['title'] ?? '') . ' ' . ($complaint['description'] ?? '') . ' ' . ($complaint['room_number'] ?? '') . ' ' . ($complaint['status'] ?? ''))) ?>">
+                        <?php
+                        $complaintStatus = trim((string) ($complaint['status'] ?? 'Pending'));
+                        $statusClass = strtolower(str_replace(' ', '-', $complaintStatus));
+                        ?>
+                        <div class="mc-row" data-search="<?= htmlspecialchars(strtolower($studentName . ' ' . ($complaint['title'] ?? '') . ' ' . ($complaint['description'] ?? '') . ' ' . ($complaint['room_number'] ?? '') . ' ' . ($complaintStatus))) ?>">
                             <div class="mc-cell"><?= htmlspecialchars($studentName) ?></div>
                             <div class="mc-cell"><?= htmlspecialchars((string) ($complaint['title'] ?? '')) ?></div>
                             <div class="mc-cell"><?= htmlspecialchars((string) ($complaint['description'] ?? '')) ?></div>
@@ -154,10 +158,10 @@ if ($managerName === '') {
                             <form class="mc-status-form" method="post">
                                 <input type="hidden" name="complaint_id" value="<?= (int) $complaint['id'] ?>">
                                 <input type="hidden" name="current_filter" value="<?= htmlspecialchars($selectedStatus) ?>">
-                                <select class="mc-status-select" name="status" onchange="this.form.submit()">
-                                    <option value="Pending" <?= ($complaint['status'] ?? '') === 'Pending' ? 'selected' : '' ?>>Pending</option>
-                                    <option value="In Progress" <?= ($complaint['status'] ?? '') === 'In Progress' ? 'selected' : '' ?>>In Progress</option>
-                                    <option value="Resolved" <?= ($complaint['status'] ?? '') === 'Resolved' ? 'selected' : '' ?>>Resolved</option>
+                                <select class="mc-status-select <?= htmlspecialchars($statusClass) ?>" name="status" onchange="this.form.submit()">
+                                    <option value="Pending" <?= $complaintStatus === 'Pending' ? 'selected' : '' ?>>Pending</option>
+                                    <option value="In Progress" <?= $complaintStatus === 'In Progress' ? 'selected' : '' ?>>In Progress</option>
+                                    <option value="Resolved" <?= $complaintStatus === 'Resolved' ? 'selected' : '' ?>>Resolved</option>
                                 </select>
                             </form>
                         </div>

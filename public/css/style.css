@@ -907,6 +907,69 @@ body {
     font-weight: 600;
 }
 
+.photo-box {
+    display: grid;
+    gap: 12px;
+    flex: 0 0 170px;
+    align-self: flex-start;
+    margin-top: 0;
+}
+
+.photo-box label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.photo-placeholder {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    min-height: 0;
+    border: 2px dashed #cbd5e1;
+    border-radius: 10px;
+    background: #f8fafc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.photo-placeholder.has-image {
+    border-style: solid;
+    border-color: #1a2b4c;
+    background: #fff;
+}
+
+.photo-placeholder i {
+    font-size: 32px;
+    color: #94a3b8;
+}
+
+.photo-placeholder img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: none;
+}
+
+.photo-placeholder.has-image img {
+    display: block;
+}
+
+.photo-placeholder.has-image i {
+    display: none;
+}
+
+#profilePhotoInput {
+    width: 100%;
+}
+
 .password-card .success-msg {
     color: #16a34a;
     font-size: 13px;

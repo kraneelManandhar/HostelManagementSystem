@@ -89,9 +89,15 @@ document.querySelectorAll('#wardenSearch, .warden-search').forEach(searchInput =
     const searchableText = [
       row.dataset.search,
       row.dataset.roomNumber ? `room ${row.dataset.roomNumber}` : '',
-      controlValues
+      controlValues,
+      row.textContent
     ].filter(Boolean).join(' ');
-    return normalize(searchableText || row.textContent);
+    return `${searchableText.toLowerCase()} ${normalize(searchableText)}`;
+  }
+
+  function setVisible(row, isVisible) {
+    row.hidden = !isVisible;
+    row.style.display = isVisible ? '' : 'none';
   }
 
   if (!emptyState && tableBox) {
@@ -103,7 +109,10 @@ document.querySelectorAll('#wardenSearch, .warden-search').forEach(searchInput =
   }
 
   function filterRows() {
-    const terms = searchInput.value
+    const terms = normalize(searchInput.value)
+      .split(/\s+/)
+      .filter(Boolean);
+    const rawTerms = searchInput.value
       .trim()
       .toLowerCase()
       .split(/\s+/)
@@ -112,8 +121,10 @@ document.querySelectorAll('#wardenSearch, .warden-search').forEach(searchInput =
 
     rows.forEach(row => {
       const haystack = rowText(row);
-      const isMatch = terms.length === 0 || terms.every(term => haystack.includes(term));
-      row.hidden = !isMatch;
+      const hasNormalizedMatch = terms.length > 0 && terms.every(term => haystack.includes(term));
+      const hasRawMatch = rawTerms.length > 0 && rawTerms.every(term => haystack.includes(term));
+      const isMatch = terms.length === 0 || hasNormalizedMatch || hasRawMatch;
+      setVisible(row, isMatch);
       if (isMatch) visibleCount += 1;
     });
 

@@ -6,12 +6,19 @@
         <?php if (isset($_GET['error']) && $_GET['error'] === 'phone'): ?>
             <p class="error-msg">Contact numbers must start with 98 or 97 and contain exactly 10 digits.</p>
         <?php endif; ?>
+        <?php if (isset($_GET['error']) && $_GET['error'] === 'email'): ?>
+            <p class="error-msg">This email is already registered. Please use another email or login.</p>
+        <?php endif; ?>
+        <?php if (isset($_GET['error']) && $_GET['error'] === 'email_invalid'): ?>
+            <p class="error-msg">Please enter a valid email address.</p>
+        <?php endif; ?>
+        <?php if (isset($_GET['error']) && $_GET['error'] === 'photo'): ?>
+            <p class="error-msg">Please upload a valid JPG, PNG, or WEBP passport photo.</p>
+        <?php endif; ?>
         <?php if (isset($_GET['error']) && $_GET['error'] === 'invalid_token'): ?>
             <p class="error-msg">Invalid or expired verification link. Please register again.</p>
         <?php endif; ?>
 
-        <!-- FIXED: Use BASE_URL instead of relative path -->
-        <!-- views/auth/register.php -->
 <form action="<?= BASE_URL ?>index.php?action=register_step1" method="POST" enctype="multipart/form-data">
             
            <div class="reg-section">
@@ -44,9 +51,11 @@
     </div>
     <div class="photo-box">
         <label>Passport photo:</label>
-        <div class="photo-placeholder">
-            <i class="ph ph-image-square"></i> </div>
-        <input type="file" name="profile_photo" accept="image/*">
+        <div class="photo-placeholder" id="photoPreview">
+            <i class="ph ph-image-square"></i>
+            <img id="photoPreviewImg" alt="Preview of uploaded passport photo">
+        </div>
+        <input id="profilePhotoInput" type="file" name="profile_photo" accept="image/jpeg,image/png,image/webp">
     </div>
 </div>
 
@@ -114,9 +123,36 @@
 </div>
 
 <div class="submit-container">
-    <button type="submit" class="main-submit-btn">Continue →</button>
+    <button type="submit" class="main-submit-btn">Continue -></button>
 </div>
-</form>
+    </form>
 </main>
+<script>
+    (function() {
+        const fileInput = document.getElementById('profilePhotoInput');
+        const preview = document.getElementById('photoPreview');
+        const previewImg = document.getElementById('photoPreviewImg');
+
+        if (!fileInput || !preview || !previewImg) {
+            return;
+        }
+
+        fileInput.addEventListener('change', function() {
+            const file = this.files && this.files[0];
+            if (!file || !file.type.startsWith('image/')) {
+                preview.classList.remove('has-image');
+                previewImg.src = '';
+                return;
+            }
+
+            const objectUrl = URL.createObjectURL(file);
+            previewImg.src = objectUrl;
+            preview.classList.add('has-image');
+            previewImg.onload = function() {
+                URL.revokeObjectURL(objectUrl);
+            };
+        });
+    })();
+</script>
 
 <?php include(__DIR__ . '/../layout/footer.php'); ?>

@@ -87,14 +87,14 @@ if ($wardenName === '') {
         <main class="wd-main">
             <div class="wd-title-bar"><?= htmlspecialchars($pageMap[$action]['title']) ?></div>
 
-            <div class="wd-toolbar">
-                <label class="wd-search">
+            <div class="wd-toolbar wd-students-toolbar">
+                <label class="wd-search wd-students-search">
                     <i class="ph ph-magnifying-glass"></i>
-                    <input type="search" id="wardenSearch" placeholder="Search students">
+                    <input type="search" id="wardenSearch" class="warden-search" placeholder="Search">
                 </label>
             </div>
 
-            <div class="table-box">
+            <div class="table-box wd-students-table">
                 <div class="table-header students-header">
                     <span>Student ID</span>
                     <span>Student's name</span>
@@ -113,7 +113,7 @@ if ($wardenName === '') {
                     <div class="cell">
                         <?= htmlspecialchars($s['name']) ?>
                     </div>
-                    <div class="cell">
+                    <div class="cell wd-email-cell">
                         <?= htmlspecialchars($s['email']) ?>
                     </div>
 
