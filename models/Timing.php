@@ -50,25 +50,107 @@ class Timing {
         return $row ?: null;
     }
 
-    public function updateForStudent(int $studentId, ?string $checkIn, ?string $checkOut): bool {
-        $existing = $this->getByStudentId($studentId);
-        $status = ($checkOut && !$checkIn) ? 'OUT' : 'IN';
+    public function updateForStudent(int $studentId, ?string $checkIn, ?string $checkOut): array {
+        $latest = $this->getByStudentId($studentId);
+        $currentStatus = strtoupper((string) ($latest['status'] ?? 'IN'));
 
-        if ($existing) {
-            $stmt = $this->pdo->prepare("
-                UPDATE timing
-                SET check_in = ?, check_out = ?, status = ?
-                WHERE id = ?
-            ");
+        if ($currentStatus === 'OUT') {
+            return $this->checkStudentIn($studentId, $checkIn);
+        }
 
-            return $stmt->execute([$checkIn, $checkOut, $status, $existing['id']]);
+        return $this->checkStudentOut($studentId, $checkOut);
+    }
+
+    private function checkStudentOut(int $studentId, ?string $checkOut): array {
+        if ($checkOut === null) {
+            return [
+                'success' => false,
+                'message' => 'Please enter check out time.',
+            ];
+        }
+
+        if ($this->getOpenCheckout($studentId)) {
+            return [
+                'success' => false,
+                'message' => 'You already have a pending checkout. Please check in first.',
+            ];
         }
 
         $stmt = $this->pdo->prepare("
             INSERT INTO timing (student_id, check_in, check_out, status)
-            VALUES (?, ?, ?, ?)
+            VALUES (?, NULL, ?, 'OUT')
         ");
 
-        return $stmt->execute([$studentId, $checkIn, $checkOut, $status]);
+        if (!$stmt->execute([$studentId, $checkOut])) {
+            return [
+                'success' => false,
+                'message' => 'Could not save timing.',
+            ];
+        }
+
+        return [
+            'success' => true,
+            'message' => 'Timing saved successfully.',
+            'data' => $this->getByStudentId($studentId),
+        ];
+    }
+
+    private function checkStudentIn(int $studentId, ?string $checkIn): array {
+        if ($checkIn === null) {
+            return [
+                'success' => false,
+                'message' => 'Please enter check in time.',
+            ];
+        }
+
+        $openCheckout = $this->getOpenCheckout($studentId);
+
+        if (!$openCheckout) {
+            return [
+                'success' => false,
+                'message' => 'No pending checkout record found.',
+            ];
+        }
+
+        if (!empty($openCheckout['check_out']) && strtotime($checkIn) < strtotime($openCheckout['check_out'])) {
+            return [
+                'success' => false,
+                'message' => 'Check in cannot be before check out.',
+            ];
+        }
+
+        $stmt = $this->pdo->prepare("
+            UPDATE timing
+            SET check_in = ?, status = 'IN'
+            WHERE id = ?
+        ");
+
+        if (!$stmt->execute([$checkIn, $openCheckout['id']])) {
+            return [
+                'success' => false,
+                'message' => 'Could not save timing.',
+            ];
+        }
+
+        return [
+            'success' => true,
+            'message' => 'Timing saved successfully.',
+            'data' => $this->getByStudentId($studentId),
+        ];
+    }
+
+    private function getOpenCheckout(int $studentId): ?array {
+        $stmt = $this->pdo->prepare("
+            SELECT id, student_id, check_in, check_out, status
+            FROM timing
+            WHERE student_id = ?
+              AND check_in IS NULL
+            ORDER BY id DESC
+            LIMIT 1
+        ");
+        $stmt->execute([$studentId]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $row ?: null;
     }
 }

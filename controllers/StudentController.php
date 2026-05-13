@@ -97,22 +97,13 @@ class StudentController {
             exit;
         }
 
-        if ($checkIn && $checkOut && strtotime($checkIn) < strtotime($checkOut)) {
-            echo json_encode(['success' => false, 'message' => 'Check in cannot be before check out.']);
-            exit;
-        }
-
         $timingModel = new Timing($this->pdo);
-        $ok = $timingModel->updateForStudent($student_id, $checkIn, $checkOut);
+        $result = $timingModel->updateForStudent($student_id, $checkIn, $checkOut);
 
         echo json_encode([
-            'success' => $ok,
-            'message' => $ok ? 'Timing saved successfully.' : 'Could not save timing.',
-            'data' => [
-                'check_in' => $checkIn,
-                'check_out' => $checkOut,
-                'status' => ($checkOut && !$checkIn) ? 'OUT' : 'IN',
-            ],
+            'success' => $result['success'],
+            'message' => $result['message'],
+            'data' => $result['data'] ?? null,
         ]);
         exit;
     }
