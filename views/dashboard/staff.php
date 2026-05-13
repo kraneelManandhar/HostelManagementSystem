@@ -256,7 +256,7 @@ $msg = $_GET['msg'] ?? '';
 
                     <div class="sf-field">
                         <label>Contact Number</label>
-                        <input type="tel" name="contact_number" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" title="Enter exactly 10 digits" value="<?= htmlspecialchars($selectedUser['contact_number'] ?? '') ?>" placeholder="10 digit phone number">
+                        <input type="tel" name="contact_number" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" title="Enter exactly 10 digits" value="<?= htmlspecialchars($selectedUser['contact_number'] ?? '') ?>" placeholder="+977">
                     </div>
 
                     <div class="sf-field">
