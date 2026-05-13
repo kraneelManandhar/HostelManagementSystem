@@ -30,6 +30,21 @@ $complaintModel = new Complaint($pdo);
 $noticeModel = new Notice($pdo);
 $userModel = new User($pdo);
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $formAction = $_POST['form_action'] ?? '';
+    $title = trim($_POST['title'] ?? '');
+    $description = trim($_POST['description'] ?? '');
+    $date = $_POST['date'] ?? date('Y-m-d');
+
+    if ($formAction === 'add_notice' && $title !== '' && $description !== '') {
+        $stmt = $pdo->prepare("INSERT INTO notices (title, description, date, time) VALUES (?, ?, ?, ?)");
+        $stmt->execute([$title, $description, $date, date('H:i:s')]);
+    }
+
+    header('Location: ' . $baseUrl . 'index.php?action=owner_dashboard');
+    exit;
+}
+
 $totalStudents = count($studentModel->getAll());
 $totalRooms = (int) $pdo->query("SELECT COUNT(*) FROM rooms")->fetchColumn();
 $occupiedRooms = (int) $pdo->query("
@@ -43,6 +58,7 @@ $pendingComplaints = (int) $pdo->query("SELECT COUNT(*) FROM complaints WHERE LO
 $unpaidFees = (int) $pdo->query("SELECT COUNT(*) FROM fees WHERE LOWER(status) <> 'paid' OR status IS NULL")->fetchColumn();
 $recentNotices = array_slice($noticeModel->all(), 0, 5);
 $recentComplaints = array_slice($complaintModel->all(), 0, 5);
+$showNoticeModal = isset($_GET['post_notice']);
 
 ?>
 <!DOCTYPE html>
@@ -53,7 +69,7 @@ $recentComplaints = array_slice($complaintModel->all(), 0, 5);
     <title>Management Dashboard - Pentatonic Hostel</title>
     <script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="<?= $baseUrl ?>public/css/owner.css?v=2">
+    <link rel="stylesheet" href="<?= $baseUrl ?>public/css/owner.css?v=3">
 </head>
 <body>
 <div class="md-page-wrap">
@@ -134,13 +150,21 @@ $recentComplaints = array_slice($complaintModel->all(), 0, 5);
                     <div class="md-card-title">Fees</div>
                     <div class="md-card-badge"><?= $unpaidFees ?></div>
                 </a>
+
+                <a class="md-card md-post-notice-card js-owner-notice-open" href="<?= $baseUrl ?>index.php?action=owner_dashboard&post_notice=1">
+                    <div class="md-card-title">Post Notice</div>
+                    <div class="md-card-badge">+</div>
+                </a>
             </section>
 
             <section class="md-dashboard-panels">
                 <div class="md-panel">
                     <div class="md-panel-head">
                         <h2>Notices</h2>
-                        <a href="<?= $baseUrl ?>index.php?action=owner_notices">View all</a>
+                        <div class="md-panel-actions">
+                            <a class="js-owner-notice-open" href="<?= $baseUrl ?>index.php?action=owner_dashboard&post_notice=1">Post notice</a>
+                            <a href="<?= $baseUrl ?>index.php?action=owner_notices">View all</a>
+                        </div>
                     </div>
 
                     <?php if (empty($recentNotices)): ?>
@@ -200,9 +224,67 @@ $recentComplaints = array_slice($complaintModel->all(), 0, 5);
                     <?php endif; ?>
                 </div>
             </section>
+
+            <div class="mn-modal-overlay <?= $showNoticeModal ? 'open' : '' ?>" id="ownerNoticeModal" role="dialog" aria-modal="true" aria-labelledby="noticeModalTitle">
+                <a class="mn-modal-backdrop js-owner-notice-close" href="<?= $baseUrl ?>index.php?action=owner_dashboard" aria-label="Close notice form"></a>
+                <div class="mn-modal-wrap">
+                    <div class="mn-form-title" id="noticeModalTitle">Post notice</div>
+
+                    <form method="post">
+                        <input type="hidden" name="form_action" value="add_notice">
+
+                        <div class="mn-form-row">
+                            <div class="mn-form-card">
+                                <label>Notice title</label>
+                                <input type="text" name="title" placeholder="Title" required>
+                            </div>
+
+                            <div class="mn-form-card">
+                                <label>Date</label>
+                                <input type="date" name="date" value="<?= date('Y-m-d') ?>">
+                            </div>
+                        </div>
+
+                        <div class="mn-form-card">
+                            <label>Description</label>
+                            <textarea name="description" placeholder="Write notice details..." required></textarea>
+                        </div>
+
+                        <div class="mn-form-footer">
+                            <a class="mn-back-link js-owner-notice-close" href="<?= $baseUrl ?>index.php?action=owner_dashboard">Back</a>
+                            <button class="mn-submit-btn" type="submit">Send notice</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </main>
     </div>
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const modal = document.getElementById('ownerNoticeModal');
+    const openButtons = document.querySelectorAll('.js-owner-notice-open');
+    const closeButtons = document.querySelectorAll('.js-owner-notice-close');
+
+    if (!modal) {
+        return;
+    }
+
+    openButtons.forEach(function (button) {
+        button.addEventListener('click', function (event) {
+            event.preventDefault();
+            modal.classList.add('open');
+        });
+    });
+
+    closeButtons.forEach(function (button) {
+        button.addEventListener('click', function (event) {
+            event.preventDefault();
+            modal.classList.remove('open');
+        });
+    });
+});
+</script>
 </body>
 </html>
 
