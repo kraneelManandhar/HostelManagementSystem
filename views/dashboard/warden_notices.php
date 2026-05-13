@@ -112,7 +112,10 @@ if ($wardenName === '') {
 
                     <div class="wd-notice-actions">
                         <input type="date" name="date" value="<?= htmlspecialchars($editNotice['date'] ?? date('Y-m-d')) ?>">
-                        <button type="submit"><?= $editNotice ? 'Update notice' : 'Send notice' ?></button>
+                        <button
+                            type="submit"
+                            <?= $editNotice ? 'data-confirm="Are you sure you want to save changes to this notice?"' : '' ?>
+                        ><?= $editNotice ? 'Update notice' : 'Send notice' ?></button>
                         <?php if ($editNotice): ?>
                             <a href="<?= $baseUrl ?>index.php?action=warden_notices">Cancel</a>
                         <?php endif; ?>
@@ -135,7 +138,7 @@ if ($wardenName === '') {
                         <div class="wd-notice-meta">
                             <?= htmlspecialchars($notice['date']) ?> |
                             <?= htmlspecialchars($notice['author'] ?? 'HOSTEL MANAGEMENT') ?>
-                            <a href="<?= $baseUrl ?>index.php?action=warden_notices&edit_notice=<?= (int) $notice['id'] ?>">Edit</a>
+                            <a href="<?= $baseUrl ?>index.php?action=warden_notices&edit_notice=<?= (int) $notice['id'] ?>" data-confirm="Are you sure you want to edit this notice?">Edit</a>
                         </div>
                     </article>
                 <?php endforeach; ?>
@@ -148,5 +151,6 @@ if ($wardenName === '') {
     window.BASE_URL = <?= json_encode($baseUrl) ?>;
 </script>
 <script src="<?= $baseUrl ?>public/js/script.js"></script>
+<script src="<?= $baseUrl ?>public/js/confirm-actions.js?v=1"></script>
 </body>
 </html>

@@ -30,12 +30,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Pentatonic Hostel</title>
+    <link rel="stylesheet" href="<?= BASE_URL ?>public/css/style.css?v=3">
+    <script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web"></script>
+</head>
+<body>
 <main class="login-page" style="background: radial-gradient(circle at center, #ffffff 0%, #a5c1e5 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center;">
     <div class="login-card">
         <button type="button" class="login-back-btn" onclick="goBack()" aria-label="Go back">
             <i class="ph ph-arrow-left" aria-hidden="true"></i>
-            <span>Back</span>
         </button>
         
         <div class="login-logo">
@@ -52,8 +60,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php if (isset($_GET['registered']) && $_GET['registered'] === 'success'): ?>
             <p class="login-success">Registration successful! Please login.</p>
         <?php endif; ?>
-
-        <link rel="stylesheet" href="<?= BASE_URL ?>public/css/style.css?v=2">
 
         <!-- FIXED: Added hidden action field -->
         <form method="POST" action="<?= BASE_URL ?>index.php?action=login">
@@ -84,7 +90,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 </main>
 
-<script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web"></script>
 <script>
 function goBack() {
     window.location.href = "<?= BASE_URL ?>index.php?action=home";
@@ -100,3 +105,5 @@ function togglePassword(id, button) {
     icon.className = isHidden ? 'ph ph-eye-slash' : 'ph ph-eye';
 }
 </script>
+</body>
+</html>

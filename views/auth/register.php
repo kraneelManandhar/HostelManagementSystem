@@ -1,8 +1,33 @@
-<?php include(__DIR__ . '/../layout/header.php'); ?>
+<?php
+if (!defined('BASE_URL')) {
+    define('BASE_URL', '/HostelManagementSystem/');
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Form - Pentatonic Hostel</title>
+    <link rel="stylesheet" href="<?= BASE_URL ?>public/css/style.css?v=3">
+    <script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web"></script>
+</head>
+<body>
 
-<main class="main-content">
+<main class="main-content registration-page">
+    <div class="registration-topbar">
+        <a class="login-back-btn registration-home-back" href="<?= BASE_URL ?>index.php?action=home" aria-label="Back to home">
+            <i class="ph ph-arrow-left" aria-hidden="true"></i>
+        </a>
+
+        <a class="registration-brand" href="<?= BASE_URL ?>index.php">
+            <img src="<?= BASE_URL ?>public/images/logo.png" alt="Pentatonic Hostel logo">
+            <span>Pentatonic hostel</span>
+        </a>
+    </div>
+
     <div class="registration-card">
-        <h2>Registration Form</h2>
+        <h2>Registration</h2>
         <?php if (isset($_GET['error']) && $_GET['error'] === 'phone'): ?>
             <p class="error-msg">Contact numbers must start with 98 or 97 and contain exactly 10 digits.</p>
         <?php endif; ?>
@@ -22,70 +47,68 @@
 <form action="<?= BASE_URL ?>index.php?action=register_step1" method="POST" enctype="multipart/form-data">
             
            <div class="reg-section">
-    <div class="reg-label-side">Personal Identity:</div>
+    <div class="reg-label-side"><i class="ph ph-user"></i> Personal identity</div>
     <div class="reg-input-grid">
-        <div class="full-row">
-            <label>First name:</label>
-            <input type="text" name="first_name" required>
+        <div>
+            <label>First name</label>
+            <input type="text" name="first_name" placeholder="e.g. John" required>
         </div>
         <div>
-            <label>Middle name:</label>
-            <input type="text" name="middle_name">
+            <label>Middle name</label>
+            <input type="text" name="middle_name" placeholder="Optional">
         </div>
         <div>
-            <label>Last name:</label>
-            <input type="text" name="last_name" required>
+            <label>Last name</label>
+            <input type="text" name="last_name" placeholder="e.g. Doe" required>
         </div>
         <div>
-            <label>Date of birth:</label>
+            <label>Date of birth</label>
             <input type="date" name="date_of_birth" required>
         </div>
         <div>
-            <label>Contact number:</label>
-            <input type="tel" name="contact_number" inputmode="numeric" pattern="(98|97)[0-9]{8}" maxlength="10" title="Enter a 10-digit number starting with 98 or 97" required>
+            <label>Contact number</label>
+            <input type="tel" name="contact_number" inputmode="numeric" pattern="(98|97)[0-9]{8}" maxlength="10" title="Enter a 10-digit number starting with 98 or 97" placeholder="+1 (555) 000-0000" required>
         </div>
-        <div class="full-row">
-            <label>Email address:</label>
-            <input type="email" name="email" required>
+        <div>
+            <label>Email address</label>
+            <input type="email" name="email" placeholder="john.doe@university.edu" required>
         </div>
     </div>
     <div class="photo-box">
-        <label>Passport photo:</label>
-        <div class="photo-placeholder" id="photoPreview">
-            <i class="ph ph-image-square"></i>
+        <label>Passport size photo</label>
+        <label class="photo-placeholder" id="photoPreview" for="profilePhotoInput">
+            <i class="ph ph-camera-plus"></i>
+            <span>Upload Photo</span>
+            <small>Max 2MB, JPG/PNG</small>
             <img id="photoPreviewImg" alt="Preview of uploaded passport photo">
-        </div>
+        </label>
         <input id="profilePhotoInput" type="file" name="profile_photo" accept="image/jpeg,image/png,image/webp">
     </div>
 </div>
 
 <div class="reg-section">
-    <div class="reg-label-side">Institutional Details:</div>
+    <div class="reg-label-side"><i class="ph ph-graduation-cap"></i> Institutional details</div>
     <div class="reg-input-grid">
         <div class="full-row">
-            <label>College name:</label>
-            <input type="text" name="college_name" required>
+            <label>College name</label>
+            <input type="text" name="college_name" placeholder="Enter your current educational institution" required>
         </div>
         <div class="full-row">
-            <label>Permanent address:</label>
-            <input type="text" name="permanent_address" required>
+            <label>Permanent address</label>
+            <input type="text" name="permanent_address" placeholder="Street, City, State, ZIP" required>
         </div>
         <div>
-            <label>Date of joining:</label>
+            <label>Date of joining</label>
             <input type="date" name="date_of_joining" required>
         </div>
     </div>
 </div>
 
 <div class="reg-section">
-    <div class="reg-label-side">Emergency Contact:</div>
+    <div class="reg-label-side"><i class="ph ph-asterisk"></i> Emergency contact</div>
     <div class="reg-input-grid">
-        <div class="full-row">
-            <label>Guardian full name:</label>
-            <input type="text" name="guardian_name" required>
-        </div>
         <div>
-            <label>Relationship:</label>
+            <label>Relationship</label>
             <select name="guardian_relationship">
                 <option value="Parent">Parent</option>
                 <option value="Sibling">Sibling</option>
@@ -94,14 +117,18 @@
             </select>
         </div>
         <div>
-            <label>Contact number:</label>
-            <input type="tel" name="guardian_contact" inputmode="numeric" pattern="(98|97)[0-9]{8}" maxlength="10" title="Enter a 10-digit number starting with 98 or 97" required>
+            <label>Guardian full name</label>
+            <input type="text" name="guardian_name" placeholder="Full name" required>
+        </div>
+        <div>
+            <label>Contact number</label>
+            <input type="tel" name="guardian_contact" inputmode="numeric" pattern="(98|97)[0-9]{8}" maxlength="10" title="Enter a 10-digit number starting with 98 or 97" placeholder="+1 (555) 000-0000" required>
         </div>
     </div>
 </div>
 
 <div class="reg-section">
-    <div class="reg-label-side">Room type:</div>
+    <div class="reg-label-side"><i class="ph ph-bed"></i> Room type:</div>
     <div class="reg-input-grid">
         <div class="room-options">
             <label class="radio-card">
@@ -123,7 +150,7 @@
 </div>
 
 <div class="submit-container">
-    <button type="submit" class="main-submit-btn">Continue -></button>
+    <button type="submit" class="main-submit-btn">Submit Registration <i class="ph ph-paper-plane-tilt"></i></button>
 </div>
     </form>
 </main>
@@ -154,5 +181,5 @@
         });
     })();
 </script>
-
-<?php include(__DIR__ . '/../layout/footer.php'); ?>
+</body>
+</html>

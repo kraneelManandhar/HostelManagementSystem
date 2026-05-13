@@ -46,12 +46,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $notices = $noticeModel->all();
+$showNoticeModal = isset($_GET['form']);
 $editId = (int) ($_GET['edit_id'] ?? 0);
 $editNotice = null;
 
 foreach ($notices as $notice) {
     if ((int) $notice['id'] === $editId) {
         $editNotice = $notice;
+        $showNoticeModal = true;
         break;
     }
 }
@@ -102,85 +104,96 @@ if ($managerName === '') {
         </aside>
 
         <main class="mn-main">
-            <?php if (isset($_GET['form']) || $editNotice !== null): ?>
-                <div class="mn-modal-wrap">
-                    <div class="mn-form-title">POST NOTICE</div>
+            <div class="mn-title-bar">NOTICES</div>
 
-                    <form method="post">
-                        <input type="hidden" name="form_action" value="<?= $editNotice ? 'edit' : 'add' ?>">
-                        <input type="hidden" name="notice_id" value="<?= (int) ($editNotice['id'] ?? 0) ?>">
-
-                        <div class="mn-form-card">
-                            <label>Notice title</label>
-                            <input
-                                type="text"
-                                name="title"
-                                placeholder="title"
-                                value="<?= htmlspecialchars($editNotice['title'] ?? '') ?>"
-                                required
-                            >
-                        </div>
-
-                        <div class="mn-form-card">
-                            <label>Description</label>
-                            <textarea name="description" placeholder="message" required><?= htmlspecialchars($editNotice['description'] ?? '') ?></textarea>
-                        </div>
-
-                        <div class="mn-form-footer">
-                            <a class="mn-back-link" href="<?= $baseUrl ?>index.php?action=owner_notices">
-                                <i class="ph ph-arrow-left"></i> BACK
-                            </a>
-                            <button class="mn-submit-btn" type="submit"><?= $editNotice ? 'Update notice' : 'Send notice' ?></button>
-                            <div class="mn-date-input">
-                                <input type="date" name="date" value="<?= htmlspecialchars($editNotice['date'] ?? date('Y-m-d')) ?>">
-                                <i class="ph ph-calendar-blank"></i>
-                            </div>
-                        </div>
-                    </form>
+            <section class="mn-panel">
+                <a class="mn-open-btn" href="<?= $baseUrl ?>index.php?action=owner_notices&form=1">Post notice +</a>
+                <div class="mn-search">
+                    <i class="ph ph-magnifying-glass"></i>
+                    <input type="text" placeholder="Search">
                 </div>
-            <?php else: ?>
-                <div class="mn-title-bar">NOTICES</div>
 
-                <section class="mn-panel">
-                    <a class="mn-open-btn" href="<?= $baseUrl ?>index.php?action=owner_notices&form=1">Post notice +</a>
-                    <div class="mn-search">
-                        <i class="ph ph-magnifying-glass"></i>
-                        <input type="text" placeholder="Search">
+                <?php if (empty($notices)): ?>
+                    <div class="mn-card">
+                        <div class="mn-description" style="margin-bottom:0;">No notices available.</div>
                     </div>
+                <?php else: ?>
+                    <?php foreach ($notices as $notice): ?>
+                        <div class="mn-card searchable-owner-row" data-search="<?= htmlspecialchars(strtolower(($notice['title'] ?? '') . ' ' . ($notice['description'] ?? '') . ' ' . ($notice['date'] ?? '') . ' ' . ($notice['author'] ?? ''))) ?>">
+                            <div class="mn-card-top">
+                                <div class="mn-card-title"><?= htmlspecialchars((string) ($notice['title'] ?? '')) ?></div>
+                                <form method="post" style="margin:0;">
+                                    <input type="hidden" name="form_action" value="delete">
+                                    <input type="hidden" name="notice_id" value="<?= (int) $notice['id'] ?>">
+                                    <button class="mn-delete-btn" type="submit" data-confirm="Are you sure you want to delete this notice?">
+                                        <i class="ph ph-trash"></i> DELETE
+                                    </button>
+                                </form>
+                            </div>
 
-                    <?php if (empty($notices)): ?>
-                        <div class="mn-card">
-                            <div class="mn-description" style="margin-bottom:0;">No notices available.</div>
+                            <div class="mn-description"><?= nl2br(htmlspecialchars((string) ($notice['description'] ?? ''))) ?></div>
+
+                            <div class="mn-card-actions">
+                                <div class="mn-date"><?= htmlspecialchars((string) ($notice['date'] ?? '')) ?></div>
+                                <a class="mn-edit-link" href="<?= $baseUrl ?>index.php?action=owner_notices&edit_id=<?= (int) $notice['id'] ?>" data-confirm="Are you sure you want to edit this notice?">Edit</a>
+                            </div>
                         </div>
-                    <?php else: ?>
-                        <?php foreach ($notices as $notice): ?>
-                            <div class="mn-card searchable-owner-row" data-search="<?= htmlspecialchars(strtolower(($notice['title'] ?? '') . ' ' . ($notice['description'] ?? '') . ' ' . ($notice['date'] ?? '') . ' ' . ($notice['author'] ?? ''))) ?>">
-                                <div class="mn-card-top">
-                                    <div class="mn-card-title"><?= htmlspecialchars((string) ($notice['title'] ?? '')) ?></div>
-                                    <form method="post" style="margin:0;">
-                                        <input type="hidden" name="form_action" value="delete">
-                                        <input type="hidden" name="notice_id" value="<?= (int) $notice['id'] ?>">
-                                        <button class="mn-delete-btn" type="submit">
-                                            <i class="ph ph-trash"></i> DELETE
-                                        </button>
-                                    </form>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </section>
+
+            <?php if ($showNoticeModal): ?>
+                <div class="mn-modal-overlay open" role="dialog" aria-modal="true" aria-labelledby="noticeModalTitle">
+                    <a class="mn-modal-backdrop" href="<?= $baseUrl ?>index.php?action=owner_notices" aria-label="Close notice form"></a>
+                    <div class="mn-modal-wrap">
+                        <div class="mn-form-title" id="noticeModalTitle"><?= $editNotice ? 'Update notice' : 'Post notice' ?></div>
+
+                        <form method="post">
+                            <input type="hidden" name="form_action" value="<?= $editNotice ? 'edit' : 'add' ?>">
+                            <input type="hidden" name="notice_id" value="<?= (int) ($editNotice['id'] ?? 0) ?>">
+
+                            <div class="mn-form-row">
+                                <div class="mn-form-card">
+                                    <label>Notice title</label>
+                                    <input
+                                        type="text"
+                                        name="title"
+                                        placeholder="Title"
+                                        value="<?= htmlspecialchars($editNotice['title'] ?? '') ?>"
+                                        required
+                                    >
                                 </div>
 
-                                <div class="mn-description"><?= nl2br(htmlspecialchars((string) ($notice['description'] ?? ''))) ?></div>
-
-                                <div class="mn-card-actions">
-                                    <div class="mn-date"><?= htmlspecialchars((string) ($notice['date'] ?? '')) ?></div>
-                                    <a class="mn-edit-link" href="<?= $baseUrl ?>index.php?action=owner_notices&edit_id=<?= (int) $notice['id'] ?>">Edit</a>
+                                <div class="mn-form-card">
+                                    <label>Date</label>
+                                    <input type="date" name="date" value="<?= htmlspecialchars($editNotice['date'] ?? date('Y-m-d')) ?>">
                                 </div>
                             </div>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                </section>
+
+                            <div class="mn-form-card">
+                                <label>Description</label>
+                                <textarea name="description" placeholder="Write notice details..." required><?= htmlspecialchars($editNotice['description'] ?? '') ?></textarea>
+                            </div>
+
+                            <div class="mn-form-footer">
+                                <a class="mn-back-link" href="<?= $baseUrl ?>index.php?action=owner_notices">
+                                    Back
+                                </a>
+                                <button
+                                    class="mn-submit-btn"
+                                    type="submit"
+                                    <?= $editNotice ? 'data-confirm="Are you sure you want to save changes to this notice?"' : '' ?>
+                                ><?= $editNotice ? 'Update notice' : 'Send notice' ?></button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             <?php endif; ?>
         </main>
     </div>
 </div>
 <script src="<?= $baseUrl ?>public/js/owner-search.js"></script>
+<script src="<?= $baseUrl ?>public/js/confirm-actions.js?v=1"></script>
 </body>
 </html>
 

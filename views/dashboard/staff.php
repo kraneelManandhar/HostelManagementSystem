@@ -221,7 +221,8 @@ $msg = $_GET['msg'] ?? '';
                         ?>
                         <a class="sf-row <?= (int) $staffUser['id'] === $selectedId ? 'active' : '' ?>"
                            data-search="<?= htmlspecialchars(strtolower($fullName . ' ' . ($staffUser['contact_number'] ?? '') . ' ' . ($staffUser['role'] ?? '') . ' ' . ($staffUser['email'] ?? ''))) ?>"
-                           href="<?= $baseUrl ?>index.php?action=owner_staff&user_id=<?= (int) $staffUser['id'] ?>">
+                           href="<?= $baseUrl ?>index.php?action=owner_staff&user_id=<?= (int) $staffUser['id'] ?>"
+                           data-confirm="Are you sure you want to edit this staff member?">
                             <div class="sf-cell name"><?= htmlspecialchars($fullName ?: 'N/A') ?></div>
                             <div class="sf-cell"><?= htmlspecialchars((string) ($staffUser['contact_number'] ?? '-')) ?></div>
                             <div class="sf-cell role"><span class="<?= $roleClass ?>"><?= htmlspecialchars(ucfirst((string) ($staffUser['role'] ?? 'staff'))) ?></span></div>
@@ -276,7 +277,7 @@ $msg = $_GET['msg'] ?? '';
 
                     <div class="sf-actions">
                         <?php if ($isEditing): ?>
-                            <button class="sf-btn delete" type="submit" name="form_action" value="delete" onclick="return confirm('Are you sure you want to delete this staff member?')">
+                            <button class="sf-btn delete" type="submit" name="form_action" value="delete" data-confirm="Are you sure you want to delete this staff member?">
                                 <i class="ph ph-trash"></i> Delete
                             </button>
                         <?php endif; ?>
@@ -287,7 +288,13 @@ $msg = $_GET['msg'] ?? '';
                             </button>
                         <?php endif; ?>
                         
-                        <button class="sf-btn save" type="submit" name="form_action" value="<?= $isEditing ? 'edit' : 'add' ?>">
+                        <button
+                            class="sf-btn save"
+                            type="submit"
+                            name="form_action"
+                            value="<?= $isEditing ? 'edit' : 'add' ?>"
+                            <?= $isEditing ? 'data-confirm="Are you sure you want to save changes to this staff member?"' : '' ?>
+                        >
                             <i class="ph ph-floppy-disk"></i> <?= $isEditing ? 'Update' : 'Add Staff' ?>
                         </button>
                     </div>
@@ -297,6 +304,7 @@ $msg = $_GET['msg'] ?? '';
     </div>
 </div>
 <script src="<?= $baseUrl ?>public/js/owner-search.js"></script>
+<script src="<?= $baseUrl ?>public/js/confirm-actions.js?v=1"></script>
 </body>
 </html>
 

@@ -158,7 +158,7 @@ if ($managerName === '') {
                             <form class="mc-status-form" method="post">
                                 <input type="hidden" name="complaint_id" value="<?= (int) $complaint['id'] ?>">
                                 <input type="hidden" name="current_filter" value="<?= htmlspecialchars($selectedStatus) ?>">
-                                <select class="mc-status-select <?= htmlspecialchars($statusClass) ?>" name="status" onchange="this.form.submit()">
+                                <select class="mc-status-select <?= htmlspecialchars($statusClass) ?>" name="status" data-confirm-change="Are you sure you want to update this complaint status?">
                                     <option value="Pending" <?= $complaintStatus === 'Pending' ? 'selected' : '' ?>>Pending</option>
                                     <option value="In Progress" <?= $complaintStatus === 'In Progress' ? 'selected' : '' ?>>In Progress</option>
                                     <option value="Resolved" <?= $complaintStatus === 'Resolved' ? 'selected' : '' ?>>Resolved</option>
@@ -172,6 +172,7 @@ if ($managerName === '') {
     </div>
 </div>
 <script src="<?= $baseUrl ?>public/js/owner-search.js"></script>
+<script src="<?= $baseUrl ?>public/js/confirm-actions.js?v=1"></script>
 </body>
 </html>
 

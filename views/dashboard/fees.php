@@ -214,7 +214,11 @@ if ($managerName === '') {
 
                         <div class="mf-form-actions">
                             <a class="mf-cancel-btn" href="<?= $baseUrl ?>index.php?action=owner_fees">Cancel</a>
-                            <button class="mf-save-fee-btn" type="submit"><?= $editFee ? 'Update fee' : 'Save fee' ?></button>
+                            <button
+                                class="mf-save-fee-btn"
+                                type="submit"
+                                <?= $editFee ? 'data-confirm="Are you sure you want to save changes to this fee record?"' : '' ?>
+                            ><?= $editFee ? 'Update fee' : 'Save fee' ?></button>
                         </div>
                     </form>
                 </section>
@@ -266,7 +270,7 @@ if ($managerName === '') {
                                         <form class="mf-status-form" method="post">
                                             <input type="hidden" name="form_action" value="status">
                                             <input type="hidden" name="fee_id" value="<?= (int) $fee['id'] ?>">
-                                            <select class="mf-status-select <?= $isPaid ? 'paid' : 'pending' ?>" name="status" onchange="this.form.submit()">
+                                            <select class="mf-status-select <?= $isPaid ? 'paid' : 'pending' ?>" name="status" data-confirm-change="Are you sure you want to update this fee status?">
                                                 <option value="Paid" <?= $isPaid ? 'selected' : '' ?>>Paid</option>
                                                 <option value="Pending" <?= !$isPaid ? 'selected' : '' ?>>Unpaid</option>
                                             </select>
@@ -274,7 +278,7 @@ if ($managerName === '') {
                                     </td>
                                     <td>
                                         <div class="mf-actions">
-                                            <a class="mf-icon-btn" href="<?= $baseUrl ?>index.php?action=owner_fees&edit_id=<?= (int) $fee['id'] ?>" aria-label="Edit fee">
+                                            <a class="mf-icon-btn" href="<?= $baseUrl ?>index.php?action=owner_fees&edit_id=<?= (int) $fee['id'] ?>" aria-label="Edit fee" data-confirm="Are you sure you want to edit this fee record?">
                                                 <i class="ph ph-pencil-simple"></i>
                                             </a>
                                         </div>
@@ -289,6 +293,7 @@ if ($managerName === '') {
     </div>
 </div>
 <script src="<?= $baseUrl ?>public/js/owner-search.js?v=4"></script>
+<script src="<?= $baseUrl ?>public/js/confirm-actions.js?v=1"></script>
 </body>
 </html>
 

@@ -539,13 +539,13 @@ if (!empty($selectedPhoto)) {
                         </fieldset>
 
                         <div class="ms-footer-actions">
-                            <button class="ms-delete-btn" type="submit" name="form_action" value="delete" <?= $selectedId ? '' : 'disabled' ?>>
+                            <button class="ms-delete-btn" type="submit" name="form_action" value="delete" data-confirm="Are you sure you want to delete this student record?" <?= $selectedId ? '' : 'disabled' ?>>
                                 <i class="ph ph-trash"></i> DELETE RECORDS
                             </button>
-                            <button class="ms-edit-btn" type="button" data-edit-student <?= $selectedId ? '' : 'disabled' ?>>
+                            <button class="ms-edit-btn" type="button" data-edit-student data-confirm="Are you sure you want to edit this student record?" <?= $selectedId ? '' : 'disabled' ?>>
                                 EDIT
                             </button>
-                            <button class="ms-save-btn" type="submit" name="form_action" value="<?= $selectedId ? 'edit' : 'add' ?>" disabled>
+                            <button class="ms-save-btn" type="submit" name="form_action" value="<?= $selectedId ? 'edit' : 'add' ?>" data-confirm="Are you sure you want to save changes to this student record?" disabled>
                                 SAVE CHANGES
                             </button>
                         </div>
@@ -641,6 +641,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 <script src="<?= $baseUrl ?>public/js/owner-search.js?v=3"></script>
+<script src="<?= $baseUrl ?>public/js/confirm-actions.js?v=1"></script>
 </body>
 </html>
 
