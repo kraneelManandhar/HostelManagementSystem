@@ -59,7 +59,7 @@ if ($wardenName === '') {
     <title>Bathroom Cleaning - Pentatonic Hostel</title>
     <script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="<?= $baseUrl ?>public/css/warden.css?v=2">
+    <link rel="stylesheet" href="<?= $baseUrl ?>public/css/warden.css?v=14">
 </head>
 <body>
 <div class="wd-page-wrap">
@@ -134,6 +134,6 @@ if ($wardenName === '') {
 <script>
     window.BASE_URL = <?= json_encode($baseUrl) ?>;
 </script>
-<script src="<?= $baseUrl ?>public/js/script.js"></script>
+<script src="<?= $baseUrl ?>public/js/script.js?v=5"></script>
 </body>
 </html>

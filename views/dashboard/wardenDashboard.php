@@ -28,20 +28,19 @@ $noticeModel = new Notice($pdo);
 $action = 'warden_dashboard';
 
 $pageMap = [
-    'warden_dashboard' => ['label' => 'Dashboard', 'icon' => 'ph-squares-four', 'title' => 'WARDEN DASHBOARD'],
+    'warden_dashboard' => ['label' => 'Dashboard', 'icon' => 'ph-squares-four', 'title' => 'DASHBOARD'],
     'warden_students' => ['label' => 'Students', 'icon' => 'ph-student', 'title' => 'STUDENTS'],
     'warden_food' => ['label' => 'Food', 'icon' => 'ph-bowl-food', 'title' => 'FOOD'],
     'warden_laundry' => ['label' => 'Laundry', 'icon' => 'ph-washing-machine', 'title' => 'WEEKLY LAUNDRY'],
-    'warden_rooms' => ['label' => 'Rooms', 'icon' => 'ph-bed', 'title' => 'ROOM ASSIGNMENT'],
     'warden_cleaning' => ['label' => 'Bathroom cleaning', 'icon' => 'ph-broom', 'title' => 'BATHROOM CLEANING'],
     'warden_timing' => ['label' => 'Timing', 'icon' => 'ph-clock', 'title' => 'TIME OUT RECORDS'],
     'warden_notices' => ['label' => 'Notice', 'icon' => 'ph-warning', 'title' => 'NOTICES'],
 ];
 
 $totalStudents = count($studentModel->getAll());
-$totalRooms = (int) $pdo->query("SELECT COUNT(*) FROM rooms")->fetchColumn();
 $pendingComplaints = (int) $pdo->query("SELECT COUNT(*) FROM complaints WHERE LOWER(status) = 'pending'")->fetchColumn();
-$notices = $noticeModel->all();
+$recentNotices = array_slice($noticeModel->all(), 0, 5);
+$recentComplaints = array_slice($complaintModel->all(), 0, 5);
 
 $wardenName = trim((string) ($_SESSION['user_name'] ?? 'WARDEN'));
 if ($wardenName === '') {
@@ -56,7 +55,7 @@ if ($wardenName === '') {
     <title>Warden Dashboard - Pentatonic Hostel</title>
     <script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="<?= $baseUrl ?>public/css/warden.css?v=2">
+    <link rel="stylesheet" href="<?= $baseUrl ?>public/css/warden.css?v=14">
 </head>
 <body>
 <div class="wd-page-wrap">
@@ -81,10 +80,10 @@ if ($wardenName === '') {
             </a>
         </aside>
 
-        <main class="wd-main">
+        <main class="wd-main wd-dashboard-main">
             <div class="wd-title-bar"><?= htmlspecialchars($pageMap[$action]['title']) ?></div>
 
-            <section class="wd-grid">
+            <section class="wd-grid wd-dashboard-grid">
                 <a class="wd-card" href="<?= $baseUrl ?>index.php?action=warden_students">
                     <div class="wd-card-title">Students</div>
                     <div class="wd-card-badge"><?= $totalStudents ?></div>
@@ -95,10 +94,6 @@ if ($wardenName === '') {
                 <a class="wd-card" href="<?= $baseUrl ?>index.php?action=warden_laundry">
                     <div class="wd-card-title">Laundry</div>
                 </a>
-                <a class="wd-card" href="<?= $baseUrl ?>index.php?action=warden_rooms">
-                    <div class="wd-card-title">Rooms</div>
-                    <div class="wd-card-badge"><?= $totalRooms ?></div>
-                </a>
                 <a class="wd-card" href="<?= $baseUrl ?>index.php?action=warden_cleaning">
                     <div class="wd-card-title">Bathroom Cleaning</div>
                 </a>
@@ -106,23 +101,76 @@ if ($wardenName === '') {
                     <div class="wd-card-title">Timing</div>
                 </a>
                 <a class="wd-card" href="<?= $baseUrl ?>index.php?action=warden_notices">
-                    <div class="wd-card-title">Notice</div>
+                    <div class="wd-card-title">Notices</div>
+                </a>
+                <a class="wd-card" href="#wardenRecentComplaints">
+                    <div class="wd-card-title">Complaints</div>
+                    <div class="wd-card-badge"><?= $pendingComplaints ?></div>
                 </a>
             </section>
 
-            <section class="wd-notices">
-                <h3>Recent Notices</h3>
-                <?php if (empty($notices)): ?>
-                    <p style="font-size:13px; color:#888;">No notices available.</p>
-                <?php else: ?>
-                    <?php foreach (array_slice($notices, 0, 5) as $n): ?>
-                        <div class="wd-notice-card">
-                            <h4><?= htmlspecialchars($n['title']) ?></h4>
-                            <p><?= htmlspecialchars($n['description']) ?></p>
-                            <div class="wd-notice-meta"><?= htmlspecialchars($n['date']) ?> | <?= htmlspecialchars($n['author'] ?? 'HOSTEL MANAGEMENT') ?></div>
+            <section class="wd-dashboard-panels">
+                <div class="wd-panel">
+                    <div class="wd-panel-head">
+                        <h2>Notices</h2>
+                        <a href="<?= $baseUrl ?>index.php?action=warden_notices">View all</a>
+                    </div>
+
+                    <?php if (empty($recentNotices)): ?>
+                        <div class="wd-empty">No notices available.</div>
+                    <?php else: ?>
+                        <div class="wd-summary-list">
+                            <?php foreach ($recentNotices as $notice): ?>
+                                <article class="wd-summary-item">
+                                    <div class="wd-summary-top">
+                                        <h3><?= htmlspecialchars((string) ($notice['title'] ?? 'Untitled notice')) ?></h3>
+                                        <span><?= htmlspecialchars((string) ($notice['date'] ?? '')) ?></span>
+                                    </div>
+                                    <p><?= htmlspecialchars((string) ($notice['description'] ?? '')) ?></p>
+                                </article>
+                            <?php endforeach; ?>
                         </div>
-                    <?php endforeach; ?>
-                <?php endif; ?>
+                    <?php endif; ?>
+                </div>
+
+                <div class="wd-panel" id="wardenRecentComplaints">
+                    <div class="wd-panel-head">
+                        <h2>Complaints</h2>
+                    </div>
+
+                    <?php if (empty($recentComplaints)): ?>
+                        <div class="wd-empty">No complaints found.</div>
+                    <?php else: ?>
+                        <div class="wd-summary-list">
+                            <?php foreach ($recentComplaints as $complaint): ?>
+                                <?php
+                                $studentName = trim(
+                                    ($complaint['first_name'] ?? '') . ' ' .
+                                    ($complaint['middle_name'] ?? '') . ' ' .
+                                    ($complaint['last_name'] ?? '')
+                                );
+                                if ($studentName === '') {
+                                    $studentName = 'N/A';
+                                }
+                                $status = (string) ($complaint['status'] ?? 'Pending');
+                                ?>
+                                <article class="wd-summary-item">
+                                    <div class="wd-summary-top">
+                                        <h3><?= htmlspecialchars((string) ($complaint['title'] ?? 'Complaint')) ?></h3>
+                                        <span><?= htmlspecialchars($status) ?></span>
+                                    </div>
+                                    <p><?= htmlspecialchars((string) ($complaint['description'] ?? '')) ?></p>
+                                    <div class="wd-summary-meta">
+                                        <?= htmlspecialchars($studentName) ?>
+                                        <?php if (!empty($complaint['room_number'])): ?>
+                                            <span>Room <?= htmlspecialchars((string) $complaint['room_number']) ?></span>
+                                        <?php endif; ?>
+                                    </div>
+                                </article>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
             </section>
         </main>
     </div>
@@ -131,6 +179,6 @@ if ($wardenName === '') {
 <script>
     window.BASE_URL = <?= json_encode($baseUrl) ?>;
 </script>
-<script src="<?= $baseUrl ?>public/js/script.js?v=2"></script>
+<script src="<?= $baseUrl ?>public/js/script.js?v=5"></script>
 </body>
 </html>

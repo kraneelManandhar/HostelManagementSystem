@@ -71,7 +71,7 @@ if ($managerName === '') {
     <title>Management Notices - Pentatonic Hostel</title>
     <script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="<?= $baseUrl ?>public/css/owner.css?v=2">
+    <link rel="stylesheet" href="<?= $baseUrl ?>public/css/owner.css?v=11">
 </head>
 <body>
 <div class="mn-page-wrap">
@@ -192,7 +192,7 @@ if ($managerName === '') {
         </main>
     </div>
 </div>
-<script src="<?= $baseUrl ?>public/js/owner-search.js"></script>
+<script src="<?= $baseUrl ?>public/js/owner-search.js?v=5"></script>
 <script src="<?= $baseUrl ?>public/js/confirm-actions.js?v=1"></script>
 </body>
 </html>

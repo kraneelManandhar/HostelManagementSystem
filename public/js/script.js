@@ -142,6 +142,130 @@ document.querySelectorAll('#wardenSearch, .warden-search').forEach(searchInput =
   filterRows();
 });
 
+/* ===== OPEN ROW DETAILS ===== */
+function isWardenInteractiveClick(target) {
+  return Boolean(target.closest('a, button, input, select, textarea, label, form, .status-pill, [data-no-row-details]'));
+}
+
+function escapeDetailHtml(value) {
+  return (value || '').toString().replace(/[&<>"']/g, (char) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+  })[char]);
+}
+
+function getWardenDetailLabel(item, index) {
+  const panel = item.closest('.table-box, .wd-notice-list');
+  const header = panel?.querySelectorAll('.table-header span')[index];
+  if (header) return header.textContent.trim();
+
+  return `Detail ${index + 1}`;
+}
+
+function getWardenDetailValue(cell) {
+  const control = cell.matches('input, select, textarea')
+    ? cell
+    : cell.querySelector('input:not([type="hidden"]), select, textarea');
+
+  if (!control) return cell.textContent.trim();
+  if (control.tagName === 'SELECT') {
+    return control.options[control.selectedIndex]?.text.trim() || control.value.trim();
+  }
+  return control.value.trim();
+}
+
+function getWardenDetailRows(item) {
+  const cells = Array.from(item.querySelectorAll(':scope > .cell, :scope > input.cell, :scope > select.cell'));
+  if (cells.length > 0) {
+    return cells
+      .map((cell, index) => ({
+        label: getWardenDetailLabel(item, index),
+        value: getWardenDetailValue(cell)
+      }))
+      .filter(row => row.value);
+  }
+
+  const title = item.querySelector('h4')?.textContent.trim();
+  const description = item.querySelector('p')?.textContent.trim();
+  const meta = item.querySelector('.wd-notice-meta')?.textContent.trim();
+
+  return [
+    title ? { label: 'Title', value: title } : null,
+    description ? { label: 'Description', value: description } : null,
+    meta ? { label: 'Date', value: meta } : null
+  ].filter(Boolean);
+}
+
+function ensureWardenDetailModal() {
+  let modal = document.querySelector('.list-detail-modal');
+  if (modal) return modal;
+
+  modal = document.createElement('div');
+  modal.className = 'list-detail-modal';
+  modal.hidden = true;
+  modal.innerHTML = `
+    <div class="list-detail-backdrop" data-close-details></div>
+    <section class="list-detail-card" role="dialog" aria-modal="true" aria-labelledby="listDetailTitle">
+      <button class="list-detail-close" type="button" data-close-details aria-label="Close details">&times;</button>
+      <h3 id="listDetailTitle">Details</h3>
+      <div class="list-detail-content"></div>
+    </section>
+  `;
+  document.body.appendChild(modal);
+
+  modal.addEventListener('click', event => {
+    if (event.target.closest('[data-close-details]')) {
+      modal.hidden = true;
+    }
+  });
+
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') modal.hidden = true;
+  });
+
+  return modal;
+}
+
+function openWardenDetails(item) {
+  const rows = getWardenDetailRows(item);
+  if (rows.length === 0) return;
+
+  const modal = ensureWardenDetailModal();
+  const content = modal.querySelector('.list-detail-content');
+  content.innerHTML = rows.map(row => `
+    <div class="list-detail-row">
+      <span>${escapeDetailHtml(row.label)}</span>
+      <strong>${escapeDetailHtml(row.value)}</strong>
+    </div>
+  `).join('');
+  modal.hidden = false;
+  modal.querySelector('.list-detail-close')?.focus();
+}
+
+document.querySelectorAll('.wd-main .searchable-row').forEach(row => {
+  row.classList.add('can-open-details');
+  if (!row.matches('form')) {
+    row.setAttribute('tabindex', '0');
+  }
+});
+
+document.addEventListener('click', event => {
+  const item = event.target.closest('.wd-main .searchable-row');
+  if (!item || isWardenInteractiveClick(event.target)) return;
+  openWardenDetails(item);
+});
+
+document.addEventListener('keydown', event => {
+  if (!['Enter', ' '].includes(event.key)) return;
+  const item = event.target.closest('.wd-main .searchable-row');
+  if (!item || isWardenInteractiveClick(event.target)) return;
+  event.preventDefault();
+  openWardenDetails(item);
+});
+
 /* ===== ROOM EDIT HELPERS ===== */
 document.querySelectorAll('.rooms-row').forEach(row => {
   const typeSelect = row.querySelector('.room-type-select');

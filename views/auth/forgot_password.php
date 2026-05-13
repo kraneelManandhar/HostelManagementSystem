@@ -1,7 +1,28 @@
-<?php include(__DIR__ . '/../layout/header.php'); ?>
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
+if (!defined('BASE_URL')) {
+    define('BASE_URL', '/HostelManagementSystem/');
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forgot Password - Pentatonic Hostel</title>
+    <link rel="stylesheet" href="<?= BASE_URL ?>public/css/style.css?v=4">
+    <script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web"></script>
+</head>
+<body>
 <main class="password-page">
     <div class="password-card">
+        <a class="login-back-btn" href="<?= BASE_URL ?>index.php?action=login" aria-label="Back to login">
+            <i class="ph ph-arrow-left" aria-hidden="true"></i>
+        </a>
+
         <div class="password-logo">
             <img src="<?= BASE_URL ?>public/images/logo.png" alt="Logo">
             <span>Pentatonic Hostel</span>
@@ -27,7 +48,7 @@
         <?php if (!isset($_GET['status'])): ?>
             <form action="<?= BASE_URL ?>index.php?action=forgot_password_submit" method="POST">
                 <div class="form-group">
-                    <label>Email</label>
+                    <label for="email">Email</label>
                     <input
                         type="email"
                         id="email"
@@ -43,10 +64,9 @@
         <?php endif; ?>
 
         <div class="back-link">
-            <a href="<?= BASE_URL ?>index.php?action=login">← Back to Login</a>
+            <a href="<?= BASE_URL ?>index.php?action=login">Back to Login</a>
         </div>
     </div>
 </main>
-
-<?php include(__DIR__ . '/../layout/footer.php'); ?>
-
+</body>
+</html>

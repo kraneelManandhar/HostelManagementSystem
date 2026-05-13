@@ -1,7 +1,28 @@
-<?php include(__DIR__ . '/../layout/header.php'); ?>
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
+if (!defined('BASE_URL')) {
+    define('BASE_URL', '/HostelManagementSystem/');
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reset Password - Pentatonic Hostel</title>
+    <link rel="stylesheet" href="<?= BASE_URL ?>public/css/style.css?v=4">
+    <script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web"></script>
+</head>
+<body>
 <main class="password-page">
     <div class="password-card">
+        <a class="login-back-btn" href="<?= BASE_URL ?>index.php?action=login" aria-label="Back to login">
+            <i class="ph ph-arrow-left" aria-hidden="true"></i>
+        </a>
+
         <div class="password-logo">
             <img src="<?= BASE_URL ?>public/images/logo.png" alt="Logo">
             <span>Pentatonic Hostel</span>
@@ -22,58 +43,62 @@
             <input type="hidden" name="token" value="<?= htmlspecialchars($_GET['token'] ?? '') ?>">
 
             <div class="form-group">
-                <label>New Password</label>
+                <label for="password">New Password</label>
                 <div class="password-wrapper">
                     <input
                         type="password"
                         id="password"
                         name="password"
-                        placeholder="••••••••"
+                        placeholder="New password"
                         minlength="6"
                         pattern="(?=.*[A-Za-z])(?=.*\d).{6,}"
                         title="Use at least 6 characters with letters and numbers"
                         required
                     >
-                    <span onclick="togglePassword('password')" class="toggle-eye">
-                        <i class="ph ph-eye"></i>
-                    </span>
+                    <button type="button" onclick="togglePassword('password', this)" class="toggle-eye" aria-label="Show password">
+                        <i class="ph ph-eye" aria-hidden="true"></i>
+                    </button>
                 </div>
             </div>
 
             <div class="form-group">
-                <label>Re-type Password</label>
+                <label for="confirm_password">Confirm Password</label>
                 <div class="password-wrapper">
                     <input
                         type="password"
                         id="confirm_password"
                         name="confirm_password"
-                        placeholder="••••••••"
+                        placeholder="Confirm password"
                         minlength="6"
                         pattern="(?=.*[A-Za-z])(?=.*\d).{6,}"
                         title="Use at least 6 characters with letters and numbers"
                         required
                     >
-                    <span onclick="togglePassword('confirm_password')" class="toggle-eye">
-                        <i class="ph ph-eye"></i>
-                    </span>
+                    <button type="button" onclick="togglePassword('confirm_password', this)" class="toggle-eye" aria-label="Show password">
+                        <i class="ph ph-eye" aria-hidden="true"></i>
+                    </button>
                 </div>
             </div>
 
             <button type="submit" class="signup-btn">Reset Password</button>
 
             <div class="back-link">
-                <a href="<?= BASE_URL ?>index.php?action=login">← Back to Login</a>
+                <a href="<?= BASE_URL ?>index.php?action=login">Back to Login</a>
             </div>
         </form>
     </div>
 </main>
 
 <script>
-function togglePassword(id) {
+function togglePassword(id, button) {
     const input = document.getElementById(id);
-    input.type = input.type === 'password' ? 'text' : 'password';
+    const icon = button.querySelector('i');
+    const isHidden = input.type === 'password';
+
+    input.type = isHidden ? 'text' : 'password';
+    button.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+    icon.className = isHidden ? 'ph ph-eye-slash' : 'ph ph-eye';
 }
 </script>
-
-<?php include(__DIR__ . '/../layout/footer.php'); ?>
-
+</body>
+</html>

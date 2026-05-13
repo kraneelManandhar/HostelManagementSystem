@@ -160,10 +160,160 @@
     });
   }
 
+  function isInteractiveClick(target) {
+    return Boolean(target.closest('a, button, input, select, textarea, label, form, [data-no-row-details]'));
+  }
+
+  function getDetailLabel(item, index) {
+    const table = item.closest('table');
+    if (table) {
+      const header = table.querySelectorAll('thead th')[index];
+      if (header) return header.textContent.trim();
+    }
+
+    const panel = item.closest('.mc-panel, .table-box, .wd-room-table');
+    const header = panel?.querySelectorAll('.mc-header-pill, .table-header span')[index];
+    if (header) return header.textContent.trim();
+
+    return `Detail ${index + 1}`;
+  }
+
+  function escapeHtml(value) {
+    return (value || '').toString().replace(/[&<>"']/g, (char) => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#039;'
+    })[char]);
+  }
+
+  function getDetailValue(cell) {
+    const control = cell.matches('input, select, textarea')
+      ? cell
+      : cell.querySelector('input:not([type="hidden"]), select, textarea');
+
+    if (!control) return cell.textContent.trim();
+    if (control.tagName === 'SELECT') {
+      return control.options[control.selectedIndex]?.text.trim() || control.value.trim();
+    }
+    return control.value.trim();
+  }
+
+  function getDetailRows(item) {
+    const cells = Array.from(item.querySelectorAll(':scope > .mc-cell, :scope > .cell, :scope > td'));
+    if (cells.length > 0) {
+      return cells
+        .map((cell, index) => ({
+          label: getDetailLabel(item, index),
+          value: getDetailValue(cell)
+        }))
+        .filter((row) => row.value);
+    }
+
+    const title = item.querySelector('.mn-card-title, h4')?.textContent.trim();
+    const description = item.querySelector('.mn-description, p')?.textContent.trim();
+    const meta = item.querySelector('.mn-date, .wd-notice-meta')?.textContent.trim();
+    return [
+      title ? { label: 'Title', value: title } : null,
+      description ? { label: 'Description', value: description } : null,
+      meta ? { label: 'Date', value: meta } : null
+    ].filter(Boolean);
+  }
+
+  function ensureDetailModal() {
+    let modal = document.querySelector('.list-detail-modal');
+    if (modal) return modal;
+
+    modal = document.createElement('div');
+    modal.className = 'list-detail-modal';
+    modal.hidden = true;
+    modal.innerHTML = `
+      <div class="list-detail-backdrop" data-close-details></div>
+      <section class="list-detail-card" role="dialog" aria-modal="true" aria-labelledby="listDetailTitle">
+        <button class="list-detail-close" type="button" data-close-details aria-label="Close details">&times;</button>
+        <h3 id="listDetailTitle">Details</h3>
+        <div class="list-detail-content"></div>
+      </section>
+    `;
+    document.body.appendChild(modal);
+
+    modal.addEventListener('click', (event) => {
+      if (event.target.closest('[data-close-details]')) {
+        modal.hidden = true;
+      }
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') modal.hidden = true;
+    });
+
+    return modal;
+  }
+
+  function openDetails(item) {
+    const url = item.dataset.detailUrl;
+    if (url) {
+      window.location.href = url;
+      return;
+    }
+
+    const rows = getDetailRows(item);
+    if (rows.length === 0) return;
+
+    const modal = ensureDetailModal();
+    const content = modal.querySelector('.list-detail-content');
+    content.innerHTML = rows.map((row) => `
+      <div class="list-detail-row">
+        <span>${escapeHtml(row.label)}</span>
+        <strong>${escapeHtml(row.value)}</strong>
+      </div>
+    `).join('');
+    modal.hidden = false;
+    modal.querySelector('.list-detail-close')?.focus();
+  }
+
+  function bindDetailOpeners() {
+    const selectors = [
+      '.mc-row',
+      '.mf-fees-table tbody tr.searchable-row',
+      '.mn-card.searchable-owner-row',
+      '.sf-row',
+      '.ms-student-item',
+      '.mr-room-item'
+    ].join(', ');
+
+    document.querySelectorAll(selectors).forEach((item) => {
+      item.classList.add('can-open-details');
+      item.setAttribute('tabindex', item.matches('a') ? item.getAttribute('tabindex') || '0' : '0');
+    });
+
+    document.addEventListener('click', (event) => {
+      const item = event.target.closest(selectors);
+      if (!item || isInteractiveClick(event.target)) return;
+      if (item.matches('a')) return;
+
+      openDetails(item);
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (!['Enter', ' '].includes(event.key)) return;
+      const item = event.target.closest(selectors);
+      if (!item || isInteractiveClick(event.target)) return;
+      event.preventDefault();
+      if (item.matches('a')) {
+        item.click();
+        return;
+      }
+      openDetails(item);
+    });
+  }
+
   bindSimpleSearch('.ms-search input', '.ms-student-item');
   bindSimpleSearch('.mr-search input', '.mr-room-item');
   bindSimpleSearch('.mc-search input', '.mc-row');
   bindSimpleSearch('.mn-search input', '.mn-card.searchable-owner-row');
   bindSimpleSearch('.sf-search input', '.sf-row');
   bindTableOrColumnSearch();
+  bindDetailOpeners();
 })();

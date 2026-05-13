@@ -86,15 +86,6 @@ class WardenController {
     }
 
     public function saveNotice(){
-        $noticeId = (int) ($_POST['notice_id'] ?? 0);
-        $title = trim((string) ($_POST['title'] ?? ''));
-        $description = trim((string) ($_POST['description'] ?? ''));
-        $date = trim((string) ($_POST['date'] ?? date('Y-m-d')));
-
-        if ($title !== '' && $description !== '') {
-            $this->model->saveNotice($noticeId, $title, $description, $date);
-        }
-
         header('Location: index.php?action=warden_notices');
         exit;
     }
