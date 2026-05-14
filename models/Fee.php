@@ -10,7 +10,19 @@ class Fee {
 
     public function findByStudent($student_id) {
         $stmt = $this->pdo->prepare("
-            SELECT * FROM fees WHERE student_id=?
+            SELECT
+                f.*,
+                GREATEST(GREATEST(COALESCE(f.total, 0), 0) - LEAST(GREATEST(COALESCE(f.paid, 0), 0), GREATEST(COALESCE(f.total, 0), 0)), 0) AS pending,
+                CASE
+                    WHEN GREATEST(COALESCE(f.total, 0), 0) <= 0
+                        OR LEAST(GREATEST(COALESCE(f.paid, 0), 0), GREATEST(COALESCE(f.total, 0), 0)) / NULLIF(GREATEST(COALESCE(f.total, 0), 0), 0) >= 0.8
+                    THEN 'Paid'
+                    WHEN LEAST(GREATEST(COALESCE(f.paid, 0), 0), GREATEST(COALESCE(f.total, 0), 0)) = 0
+                    THEN 'Pending'
+                    ELSE 'Partial'
+                END AS status
+            FROM fees f
+            WHERE f.student_id=?
         ");
         $stmt->execute([$student_id]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
@@ -21,7 +33,7 @@ class Fee {
      */
     public function markAsPaid($fee_id) {
         $stmt = $this->pdo->prepare("
-            UPDATE fees SET paid = total, status = 'Paid' WHERE id = ?
+            UPDATE fees SET paid = total, pending = 0, status = 'Paid' WHERE id = ?
         ");
         return $stmt->execute([$fee_id]);
     }

@@ -1354,6 +1354,10 @@
             background: #c9f0dc;
             color: #2b4a38;
         }
+        .mf-status-pill.partial {
+            background: #ffe4b2;
+            color: #724e16;
+        }
         .mf-status-pill.unpaid {
             background: #edb4b8;
             color: #5c2f36;
@@ -1409,7 +1413,7 @@
         }
         .mf-fee-form {
             display: grid;
-            grid-template-columns: 1.4fr repeat(3, minmax(130px, 1fr)) auto;
+            grid-template-columns: 1.4fr repeat(2, minmax(130px, 1fr)) auto;
             gap: 12px;
             align-items: end;
         }

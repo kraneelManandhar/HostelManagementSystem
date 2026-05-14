@@ -67,7 +67,7 @@ if (!defined('BASE_URL')) {
         </div>
         <div>
             <label>Contact number</label>
-            <input type="tel" name="contact_number" inputmode="numeric" pattern="(98|97)[0-9]{8}" maxlength="10" title="Enter a 10-digit number starting with 98 or 97" placeholder="+1 (555) 000-0000" required>
+            <input type="tel" name="contact_number" inputmode="numeric" pattern="(98|97)[0-9]{8}" maxlength="10" title="Enter a 10-digit number starting with 98 or 97" placeholder="98000000000" required>
         </div>
         <div>
             <label>Email address</label>
@@ -95,7 +95,7 @@ if (!defined('BASE_URL')) {
         </div>
         <div class="full-row">
             <label>Permanent address</label>
-            <input type="text" name="permanent_address" placeholder="Street, City, State, ZIP" required>
+            <input type="text" name="permanent_address" placeholder="Naxal" required>
         </div>
         <div>
             <label>Date of joining</label>
@@ -117,12 +117,12 @@ if (!defined('BASE_URL')) {
             </select>
         </div>
         <div>
-            <label>Guardian full name</label>
+            <label>Full name</label>
             <input type="text" name="guardian_name" placeholder="Full name" required>
         </div>
         <div>
             <label>Contact number</label>
-            <input type="tel" name="guardian_contact" inputmode="numeric" pattern="(98|97)[0-9]{8}" maxlength="10" title="Enter a 10-digit number starting with 98 or 97" placeholder="+1 (555) 000-0000" required>
+            <input type="tel" name="guardian_contact" inputmode="numeric" pattern="(98|97)[0-9]{8}" maxlength="10" title="Enter a 10-digit number starting with 98 or 97" placeholder="98000000000" required>
         </div>
     </div>
 </div>
