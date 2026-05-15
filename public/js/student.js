@@ -138,6 +138,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   if (typeof SD_INITIAL_TAB !== "undefined" && SD_INITIAL_TAB) {
     switchPage(SD_INITIAL_TAB);
+    clearInitialTabFromUrl();
   }
 
   if (typeof SD_FLASH !== "undefined" && SD_FLASH?.message) {
@@ -156,6 +157,16 @@ document.addEventListener("DOMContentLoaded", function () {
       .querySelector(`.sd-nav-btn[data-page="${pageKey}"]`)
       ?.classList.add("active");
     targetPage.classList.add("active");
+  }
+
+  function clearInitialTabFromUrl() {
+    if (!window.history?.replaceState) return;
+
+    const url = new URL(window.location.href);
+    if (!url.searchParams.has("tab")) return;
+
+    url.searchParams.delete("tab");
+    window.history.replaceState({}, "", url.toString());
   }
 
   function showStudentToast(message, type) {
