@@ -1,36 +1,77 @@
-/* ===== STATUS TOGGLE ===== */
-document.querySelectorAll('.status-pill').forEach(btn => {
+/* ===== STATUS CONTROLS ===== */
+function wardenStatusLabel(type, value) {
+  if (type === 'cleaning') return value === '1' ? 'Done' : 'Pending';
+  return value === '1' ? 'Yes' : 'No';
+}
 
-  btn.addEventListener('click', function(){
+function setWardenStatusVisual(control, value) {
+  const normalizedValue = value === '1' ? '1' : '0';
 
-    const isYes = this.classList.contains('yes');
-    const type = this.dataset.type;
-    const activeText = type === 'cleaning' ? 'Done' : 'Yes';
-    const inactiveText = type === 'cleaning' ? 'Pending' : 'No';
+  control.classList.toggle('yes', normalizedValue === '1');
+  control.classList.toggle('no', normalizedValue !== '1');
 
-    this.classList.toggle('yes');
-    this.classList.toggle('no');
-    this.innerText = isYes ? inactiveText : activeText;
+  if (control.tagName === 'SELECT') {
+    control.value = normalizedValue;
+    return;
+  }
 
-    const fd = new FormData();
-    fd.append('id', this.dataset.id);
-    fd.append('status', isYes ? 0 : 1);
+  control.innerText = wardenStatusLabel(control.dataset.type, normalizedValue);
+}
 
-    fetch(getWardenUrl(type),{method:'POST',body:fd})
-    .then(r=>r.json())
+function refreshWardenSearch(control) {
+  const scope = control.closest('.wd-main') || document;
+  const searchInput = scope.querySelector('#wardenSearch, .warden-search');
+  searchInput && searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+}
+
+function saveWardenStatus(control, nextValue, previousValue) {
+  const fd = new FormData();
+  fd.append('id', control.dataset.id);
+  fd.append('status', nextValue);
+
+  control.classList.add('is-saving');
+  if ('disabled' in control) control.disabled = true;
+
+  fetch(getWardenUrl(control.dataset.type), { method: 'POST', body: fd })
+    .then(r => r.json())
     .then(data => {
       if (!data.success) throw new Error('Update failed');
+      control.dataset.previousValue = nextValue;
       showToast("Updated successfully");
     })
     .catch(() => {
-      this.classList.toggle('yes');
-      this.classList.toggle('no');
-      this.innerText = isYes ? activeText : inactiveText;
+      setWardenStatusVisual(control, previousValue);
+      control.dataset.previousValue = previousValue;
+      refreshWardenSearch(control);
       showToast("Could not update");
+    })
+    .finally(() => {
+      control.classList.remove('is-saving');
+      if ('disabled' in control) control.disabled = false;
     });
+}
 
+document.querySelectorAll('.wd-status-select').forEach(select => {
+  setWardenStatusVisual(select, select.value);
+  select.dataset.previousValue = select.value === '1' ? '1' : '0';
+
+  select.addEventListener('change', function(){
+    const previousValue = this.dataset.previousValue || '0';
+    const nextValue = this.value === '1' ? '1' : '0';
+
+    setWardenStatusVisual(this, nextValue);
+    saveWardenStatus(this, nextValue, previousValue);
   });
+});
 
+document.querySelectorAll('.status-pill').forEach(btn => {
+  btn.addEventListener('click', function(){
+    const previousValue = this.classList.contains('yes') ? '1' : '0';
+    const nextValue = previousValue === '1' ? '0' : '1';
+
+    setWardenStatusVisual(this, nextValue);
+    saveWardenStatus(this, nextValue, previousValue);
+  });
 });
 
 /* ===== TIMING AUTO SAVE ===== */
@@ -86,11 +127,16 @@ document.querySelectorAll('#wardenSearch, .warden-search').forEach(searchInput =
       .filter(Boolean)
       .join(' ');
 
+    const rowTextOnly = row.cloneNode(true);
+    rowTextOnly
+      .querySelectorAll('input, select, textarea, option, script, style')
+      .forEach(control => control.remove());
+
     const searchableText = [
       row.dataset.search,
       row.dataset.roomNumber ? `room ${row.dataset.roomNumber}` : '',
       controlValues,
-      row.textContent
+      rowTextOnly.textContent
     ].filter(Boolean).join(' ');
     return `${searchableText.toLowerCase()} ${normalize(searchableText)}`;
   }
@@ -140,6 +186,130 @@ document.querySelectorAll('#wardenSearch, .warden-search').forEach(searchInput =
     });
   });
   filterRows();
+});
+
+/* ===== OPEN ROW DETAILS ===== */
+function isWardenInteractiveClick(target) {
+  return Boolean(target.closest('a, button, input, select, textarea, label, form, .status-pill, [data-no-row-details]'));
+}
+
+function escapeDetailHtml(value) {
+  return (value || '').toString().replace(/[&<>"']/g, (char) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+  })[char]);
+}
+
+function getWardenDetailLabel(item, index) {
+  const panel = item.closest('.table-box, .wd-notice-list');
+  const header = panel?.querySelectorAll('.table-header span')[index];
+  if (header) return header.textContent.trim();
+
+  return `Detail ${index + 1}`;
+}
+
+function getWardenDetailValue(cell) {
+  const control = cell.matches('input, select, textarea')
+    ? cell
+    : cell.querySelector('input:not([type="hidden"]), select, textarea');
+
+  if (!control) return cell.textContent.trim();
+  if (control.tagName === 'SELECT') {
+    return control.options[control.selectedIndex]?.text.trim() || control.value.trim();
+  }
+  return control.value.trim();
+}
+
+function getWardenDetailRows(item) {
+  const cells = Array.from(item.querySelectorAll(':scope > .cell, :scope > input.cell, :scope > select.cell, :scope > .wd-status-select'));
+  if (cells.length > 0) {
+    return cells
+      .map((cell, index) => ({
+        label: getWardenDetailLabel(item, index),
+        value: getWardenDetailValue(cell)
+      }))
+      .filter(row => row.value);
+  }
+
+  const title = item.querySelector('h4')?.textContent.trim();
+  const description = item.querySelector('p')?.textContent.trim();
+  const meta = item.querySelector('.wd-notice-meta')?.textContent.trim();
+
+  return [
+    title ? { label: 'Title', value: title } : null,
+    description ? { label: 'Description', value: description } : null,
+    meta ? { label: 'Date', value: meta } : null
+  ].filter(Boolean);
+}
+
+function ensureWardenDetailModal() {
+  let modal = document.querySelector('.list-detail-modal');
+  if (modal) return modal;
+
+  modal = document.createElement('div');
+  modal.className = 'list-detail-modal';
+  modal.hidden = true;
+  modal.innerHTML = `
+    <div class="list-detail-backdrop" data-close-details></div>
+    <section class="list-detail-card" role="dialog" aria-modal="true" aria-labelledby="listDetailTitle">
+      <button class="list-detail-close" type="button" data-close-details aria-label="Close details">&times;</button>
+      <h3 id="listDetailTitle">Details</h3>
+      <div class="list-detail-content"></div>
+    </section>
+  `;
+  document.body.appendChild(modal);
+
+  modal.addEventListener('click', event => {
+    if (event.target.closest('[data-close-details]')) {
+      modal.hidden = true;
+    }
+  });
+
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') modal.hidden = true;
+  });
+
+  return modal;
+}
+
+function openWardenDetails(item) {
+  const rows = getWardenDetailRows(item);
+  if (rows.length === 0) return;
+
+  const modal = ensureWardenDetailModal();
+  const content = modal.querySelector('.list-detail-content');
+  content.innerHTML = rows.map(row => `
+    <div class="list-detail-row">
+      <span>${escapeDetailHtml(row.label)}</span>
+      <strong>${escapeDetailHtml(row.value)}</strong>
+    </div>
+  `).join('');
+  modal.hidden = false;
+  modal.querySelector('.list-detail-close')?.focus();
+}
+
+document.querySelectorAll('.wd-main .searchable-row').forEach(row => {
+  row.classList.add('can-open-details');
+  if (!row.matches('form')) {
+    row.setAttribute('tabindex', '0');
+  }
+});
+
+document.addEventListener('click', event => {
+  const item = event.target.closest('.wd-main .searchable-row');
+  if (!item || isWardenInteractiveClick(event.target)) return;
+  openWardenDetails(item);
+});
+
+document.addEventListener('keydown', event => {
+  if (!['Enter', ' '].includes(event.key)) return;
+  const item = event.target.closest('.wd-main .searchable-row');
+  if (!item || isWardenInteractiveClick(event.target)) return;
+  event.preventDefault();
+  openWardenDetails(item);
 });
 
 /* ===== ROOM EDIT HELPERS ===== */

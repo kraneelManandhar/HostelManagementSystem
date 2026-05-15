@@ -32,13 +32,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $role = 'staff';
     }
 
+    $formReturnUrl = $baseUrl . 'index.php?action=owner_staff';
+    if ($formAction === 'add') {
+        $formReturnUrl .= '&mode=add';
+    } elseif ($formAction === 'edit' && $userId > 0) {
+        $formReturnUrl .= '&user_id=' . $userId;
+    }
+
     if ($contactNumber !== '' && !preg_match('/^\d{10}$/', $contactNumber)) {
-        header('Location: ' . $baseUrl . 'index.php?action=owner_staff&msg=invalid_phone');
+        header('Location: ' . $formReturnUrl . '&msg=invalid_phone');
         exit;
     }
 
     if (($formAction === 'add' || $password !== '') && !preg_match('/^(?=.*[A-Za-z])(?=.*\d).{6,}$/', $password)) {
-        header('Location: ' . $baseUrl . 'index.php?action=owner_staff&msg=invalid_password');
+        header('Location: ' . $formReturnUrl . '&msg=invalid_password');
         exit;
     }
 
@@ -106,6 +113,7 @@ $staffUsers = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $selectedId = (int) ($_GET['user_id'] ?? 0);
 $selectedUser = null;
 $isEditing = false;
+$isAdding = ($_GET['mode'] ?? '') === 'add';
 
 if ($selectedId > 0) {
     foreach ($staffUsers as $user) {
@@ -116,6 +124,8 @@ if ($selectedId > 0) {
         }
     }
 }
+
+$showForm = $isAdding || $isEditing;
 
 $managerName = trim((string) ($_SESSION['user_name'] ?? 'FULL NAME'));
 if ($managerName === '') {
@@ -133,7 +143,7 @@ $msg = $_GET['msg'] ?? '';
     <title>Staff - Pentatonic Hostel</title>
     <script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="<?= $baseUrl ?>public/css/owner.css?v=2">
+    <link rel="stylesheet" href="<?= $baseUrl ?>public/css/owner.css?v=11">
 </head>
 <body>
 <div class="sf-page-wrap">
@@ -192,11 +202,9 @@ $msg = $_GET['msg'] ?? '';
                         <input type="text" name="search" placeholder="Search by name, email, or phone..." value="<?= htmlspecialchars($search) ?>">
                     </form>
                 </div>
-                <?php if ($isEditing): ?>
-                    <button class="sf-btn-add" onclick="window.location.href='<?= $baseUrl ?>index.php?action=owner_staff'">
-                        <i class="ph ph-plus"></i> Add New
-                    </button>
-                <?php endif; ?>
+                <a class="sf-btn-add" href="<?= $baseUrl ?>index.php?action=owner_staff&mode=add">
+                    <i class="ph ph-plus"></i> Add Staff
+                </a>
             </div>
 
             <!-- Staff Table -->
@@ -232,78 +240,78 @@ $msg = $_GET['msg'] ?? '';
                 <?php endif; ?>
             </div>
 
-            <!-- Add/Edit Form -->
-            <div class="sf-form-section">
-                <div class="sf-form-title"><?= $isEditing ? 'Edit Staff Member' : 'Add New Staff Member' ?></div>
-                
-                <form class="sf-form" method="post">
-                    <input type="hidden" name="user_id" value="<?= (int) ($selectedUser['id'] ?? 0) ?>">
+            <?php if ($showForm): ?>
+                <!-- Add/Edit Form -->
+                <div class="sf-form-section">
+                    <div class="sf-form-title"><?= $isEditing ? 'Edit Staff Member' : 'Add Staff Member' ?></div>
+                    
+                    <form class="sf-form" method="post">
+                        <input type="hidden" name="user_id" value="<?= (int) ($selectedUser['id'] ?? 0) ?>">
 
-                    <div class="sf-field">
-                        <label>First name *</label>
-                        <input type="text" name="first_name" value="<?= htmlspecialchars($selectedUser['first_name'] ?? '') ?>" required>
-                    </div>
+                        <div class="sf-field">
+                            <label>First name *</label>
+                            <input type="text" name="first_name" value="<?= htmlspecialchars($selectedUser['first_name'] ?? '') ?>" required>
+                        </div>
 
-                    <div class="sf-field">
-                        <label>Last name *</label>
-                        <input type="text" name="last_name" value="<?= htmlspecialchars($selectedUser['last_name'] ?? '') ?>" required>
-                    </div>
+                        <div class="sf-field">
+                            <label>Last name *</label>
+                            <input type="text" name="last_name" value="<?= htmlspecialchars($selectedUser['last_name'] ?? '') ?>" required>
+                        </div>
 
-                    <div class="sf-field full">
-                        <label>Email *</label>
-                        <input type="email" name="email" value="<?= htmlspecialchars($selectedUser['email'] ?? '') ?>" required>
-                    </div>
+                        <div class="sf-field full">
+                            <label>Email *</label>
+                            <input type="email" name="email" value="<?= htmlspecialchars($selectedUser['email'] ?? '') ?>" required>
+                        </div>
 
-                    <div class="sf-field">
-                        <label>Contact Number</label>
-                        <input type="tel" name="contact_number" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" title="Enter exactly 10 digits" value="<?= htmlspecialchars($selectedUser['contact_number'] ?? '') ?>" placeholder="+977">
-                    </div>
+                        <div class="sf-field">
+                            <label>Contact Number</label>
+                            <input type="tel" name="contact_number" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" title="Enter exactly 10 digits" value="<?= htmlspecialchars($selectedUser['contact_number'] ?? '') ?>" placeholder="+977">
+                        </div>
 
-                    <div class="sf-field">
-                        <label>Role *</label>
-                        <select name="role" required>
-                            <?php foreach ($allowedRoles as $role): ?>
-                                <option value="<?= $role ?>" <?= (($selectedUser['role'] ?? 'staff') === $role) ? 'selected' : '' ?>>
-                                    <?= htmlspecialchars(ucfirst($role)) ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
+                        <div class="sf-field">
+                            <label>Role *</label>
+                            <select name="role" required>
+                                <?php foreach ($allowedRoles as $role): ?>
+                                    <option value="<?= $role ?>" <?= (($selectedUser['role'] ?? 'staff') === $role) ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars(ucfirst($role)) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
 
-                    <div class="sf-field full">
-                        <label>Password <?= $isEditing ? '(leave blank to keep current)' : '*' ?></label>
-                        <input type="password" name="password" minlength="6" pattern="(?=.*[A-Za-z])(?=.*\d).{6,}" title="Use at least 6 characters with letters and numbers" placeholder="<?= $isEditing ? 'Enter new password (optional)' : 'Enter password' ?>" <?= $isEditing ? '' : 'required' ?>>
-                    </div>
+                        <div class="sf-field full">
+                            <label>Password <?= $isEditing ? '(leave blank to keep current)' : '*' ?></label>
+                            <input type="password" name="password" minlength="6" pattern="(?=.*[A-Za-z])(?=.*\d).{6,}" title="Use at least 6 characters with letters and numbers" placeholder="<?= $isEditing ? 'Enter new password (optional)' : 'Enter password' ?>" <?= $isEditing ? '' : 'required' ?>>
+                        </div>
 
-                    <div class="sf-actions">
-                        <?php if ($isEditing): ?>
-                            <button class="sf-btn delete" type="submit" name="form_action" value="delete" data-confirm="Are you sure you want to delete this staff member?">
-                                <i class="ph ph-trash"></i> Delete
-                            </button>
-                        <?php endif; ?>
-                        
-                        <?php if ($isEditing): ?>
+                        <div class="sf-actions">
+                            <?php if ($isEditing): ?>
+                                <button class="sf-btn delete" type="submit" name="form_action" value="delete" data-confirm="Are you sure you want to delete this staff member?">
+                                    <i class="ph ph-trash"></i> Delete
+                                </button>
+                            <?php endif; ?>
+                            
                             <button class="sf-btn cancel" type="button" onclick="window.location.href='<?= $baseUrl ?>index.php?action=owner_staff'">
                                 Cancel
                             </button>
-                        <?php endif; ?>
-                        
-                        <button
-                            class="sf-btn save"
-                            type="submit"
-                            name="form_action"
-                            value="<?= $isEditing ? 'edit' : 'add' ?>"
-                            <?= $isEditing ? 'data-confirm="Are you sure you want to save changes to this staff member?"' : '' ?>
-                        >
-                            <i class="ph ph-floppy-disk"></i> <?= $isEditing ? 'Update' : 'Add Staff' ?>
-                        </button>
-                    </div>
-                </form>
-            </div>
+                            
+                            <button
+                                class="sf-btn save"
+                                type="submit"
+                                name="form_action"
+                                value="<?= $isEditing ? 'edit' : 'add' ?>"
+                                <?= $isEditing ? 'data-confirm="Are you sure you want to save changes to this staff member?"' : '' ?>
+                            >
+                                <i class="ph ph-floppy-disk"></i> <?= $isEditing ? 'Update' : 'Add Staff' ?>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            <?php endif; ?>
         </main>
     </div>
 </div>
-<script src="<?= $baseUrl ?>public/js/owner-search.js"></script>
+<script src="<?= $baseUrl ?>public/js/owner-search.js?v=5"></script>
 <script src="<?= $baseUrl ?>public/js/confirm-actions.js?v=1"></script>
 </body>
 </html>

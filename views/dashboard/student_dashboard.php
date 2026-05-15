@@ -232,6 +232,7 @@ if ($showRoomModal) {
                             $badgeClass = match(strtolower($status)) {
                                 'overdue' => 'badge-overdue',
                                 'pending' => 'badge-pending',
+                                'partial' => 'badge-partial',
                                 'paid'    => 'badge-paid',
                                 default   => ''
                             };

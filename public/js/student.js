@@ -207,12 +207,6 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
       }
 
-      if (checkIn && checkOut && new Date(checkIn) < new Date(checkOut)) {
-        showStudentToast("Check in cannot be before check out.", "error");
-        checkInInput?.focus();
-        return;
-      }
-
       const formData = new FormData(timingForm);
 
       try {

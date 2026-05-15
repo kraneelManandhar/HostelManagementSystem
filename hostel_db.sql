@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 12, 2026 at 08:13 PM
+-- Generation Time: May 14, 2026 at 08:35 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -69,7 +69,8 @@ CREATE TABLE `complaints` (
 
 INSERT INTO `complaints` (`id`, `student_id`, `room_id`, `title`, `description`, `status`, `created_at`) VALUES
 (14, 5, 1, 'Unhygienic Bathroom', 'Bathroom is not maintained.', 'Pending', '2026-04-27 19:20:34'),
-(17, 2, 2, 'Hukumbasi nikal', 'Desh bata nikl', 'Pending', '2026-05-12 17:15:15');
+(17, 2, 2, 'Hukumbasi nikal', 'Desh bata nikl', 'Resolved', '2026-05-12 17:15:15'),
+(19, 19, 20, 'User Interface Problem', 'Very disturbing design, to much simulation on eyes', 'Pending', '2026-05-13 07:06:22');
 
 -- --------------------------------------------------------
 
@@ -92,19 +93,20 @@ CREATE TABLE `fees` (
 
 INSERT INTO `fees` (`id`, `student_id`, `total`, `paid`, `status`) VALUES
 (1, 5, 670.00, 670.00, 'Paid'),
-(2, 2, 0.00, 0.00, 'Pending'),
-(3, 3, 0.00, 0.00, 'Pending'),
-(4, 8, 0.00, 0.00, 'Pending'),
-(5, 9, 0.00, 0.00, 'Pending'),
-(6, 10, 0.00, 0.00, 'Paid'),
-(7, 11, 0.00, 0.00, 'Pending'),
-(8, 12, 0.00, 0.00, 'Pending'),
+(2, 2, 0.00, 0.00, 'Paid'),
+(3, 3, 0.00, 0.00, 'Paid'),
+(4, 8, 0.00, 0.00, 'Paid'),
+(5, 9, 0.00, 0.00, 'Paid'),
+(6, 10, 764.00, 764.00, 'Paid'),
+(7, 11, 0.00, 0.00, 'Paid'),
+(8, 12, 0.00, 0.00, 'Paid'),
 (10, 14, 0.00, 0.00, 'Paid'),
-(11, 15, 0.00, 0.00, 'Pending'),
-(12, 16, 0.00, 0.00, ''),
-(13, 11, 0.00, 0.00, 'Pending'),
-(14, 18, 0.00, 0.00, 'Pending'),
-(15, 19, 10000.00, 2000.00, 'Pending');
+(11, 15, 100000.00, 10000.00, ''),
+(12, 16, 0.00, 0.00, 'Paid'),
+(13, 11, 10000.00, 10000.00, 'Paid'),
+(14, 18, 99999.00, 99999.00, 'Paid'),
+(15, 19, 10000.00, 10000.00, 'Paid'),
+(17, 22, 0.00, 0.00, 'Paid');
 
 -- --------------------------------------------------------
 
@@ -178,8 +180,7 @@ CREATE TABLE `notices` (
 
 INSERT INTO `notices` (`id`, `title`, `description`, `date`, `time`, `author`, `created_at`) VALUES
 (1, 'Laundry Update', 'Laundry open until midnight on weekends', '2026-10-24', '10:00:00', 'HOSTEL MANAGEMENT', '2026-04-12 18:13:25'),
-(2, 'Holiday notice', 'Tommorrow I have decided to give you a hostel wide holiday.\r\n\r\n\r\n-The Management', '2026-04-28', '17:43:45', 'HOSTEL MANAGEMENT', '2026-04-28 15:43:45'),
-(3, 'hello', 'Hello everyone', '2026-05-06', '07:46:39', 'WARDEN', '2026-05-06 05:46:39');
+(2, 'Holiday notice', 'Tommorrow I have decided to give you a hostel wide holiday.\r\n\r\n\r\n-The Management', '2026-04-28', '17:43:45', 'HOSTEL MANAGEMENT', '2026-04-28 15:43:45');
 
 -- --------------------------------------------------------
 
@@ -204,7 +205,8 @@ INSERT INTO `password_resets` (`id`, `email`, `token`, `expires_at`, `used`, `cr
 (5, 'shirisha@gmail.com', '1d94e98f94a1caed297acd8b5f4318eac251206bdebe5432d513ab4877bbd331', '2026-05-02 18:17:42', 0, '2026-05-02 15:17:42'),
 (13, 'mahhansykto@gmail.com', '376c8751a7102a42b9f41ce1005466eba8232799ecbb89513ec3d9f37dd05987', '2026-05-04 13:44:04', 0, '2026-05-04 06:59:04'),
 (14, 'ysw8e@deltajohnsons.com', 'f25173abbe985b627fd7d08efe77c755433228bf39847085c55330e811f5da94', '2026-05-05 13:59:42', 1, '2026-05-05 07:14:42'),
-(16, 'np03cs4a240241@heraldcollege.edu.np', '47f3b4aaad150baff05b3f5447625447f017921fba4308b47a20c958c2c5c086', '2026-05-06 12:00:39', 0, '2026-05-06 05:15:39');
+(17, 'gmrsrijit@gmail.com', 'f99f5b2015033fa65da484333feb52f8e0a6d99492f22b22a6ece5aa1caaf639', '2026-05-13 13:48:51', 1, '2026-05-13 07:03:51'),
+(18, 'np03cs4a240241@heraldcollege.edu.np', '7e41e19f2cf31e10f0e39bb648eceb6632445d7a567bcdd28a0328258eff0edb', '2026-05-13 22:27:25', 1, '2026-05-13 15:42:25');
 
 -- --------------------------------------------------------
 
@@ -233,7 +235,7 @@ INSERT INTO `rooms` (`id`, `number`, `type`, `student1_id`, `student2_id`) VALUE
 (6, 'B2', 'double', 16, 5),
 (7, 'B3', 'single', NULL, NULL),
 (8, 'B4', 'single', NULL, NULL),
-(9, 'C1', 'single', NULL, NULL),
+(9, 'C1', 'single', 22, NULL),
 (10, 'C2', 'single', NULL, NULL),
 (11, 'C3', 'single', 18, NULL),
 (12, 'C4', 'double', 15, 9),
@@ -278,7 +280,7 @@ CREATE TABLE `students` (
 --
 
 INSERT INTO `students` (`id`, `first_name`, `middle_name`, `last_name`, `contact_number`, `date_of_birth`, `email`, `password`, `profile_photo`, `college_name`, `permanent_address`, `date_of_joining`, `guardian_name`, `guardian_relationship`, `guardian_contact`, `preferred_room_type`, `room_id`, `created_at`) VALUES
-(2, 'Kraneel', NULL, 'Manandhar', '9841243263', '2006-09-21', 'np03cs4a240241@heraldcollege.edu.np', '$2y$10$IWEGEfbBvojFb452tTvI6OJ8ZZ/ppuSOcMqsTSLJHqn5arJXz8Ds2', 'student_69f0cbe7bbe944.48522978.jpg', 'Herald College', 'Gongabu', '2023-11-15', 'Gagdjabcjchaokcnakjc cajcbkjack', 'Parent', '9812345678', 'double', 2, '2026-04-25 09:47:34'),
+(2, 'Kraneel', NULL, 'Manandhar', '9841243263', '2006-09-21', 'np03cs4a240241@heraldcollege.edu.np', '$2y$10$hi7W8JXkIYzCxv4cbwjtXe5HdKS7DKPjCjKtdG7llQWJtGXa6KC5C', 'student_69f0cbe7bbe944.48522978.jpg', 'Herald College', 'Gongabu', '2023-11-15', 'Gagdjabcjchaokcnakjc cajcbkjack', 'Parent', '9812345678', 'double', 2, '2026-04-25 09:47:34'),
 (3, 'Mega', NULL, 'Knight', '00000000000', '2024-03-07', 'nvflzivunjxkexexis@vtmpj.net', '$2y$10$yfF4mmux7YVo5Q3Y2donxee9qRN60.ra7vFTnIWojiVqyCeQnp8p6', 'public/uploads/69ecabe5ddef8_192754067.png', 'Herald College', 'Samakhushi', '2023-03-15', 'Normal Knight', 'Sibling', '9999999999', 'single', 4, '2026-04-25 11:56:41'),
 (5, 'Abibsha', 'Rani', 'Ghaju', '9800000000', '2006-03-19', 'abibshag@gmail.com', '$2y$10$7uJiz4TECM2jerM9bzOHreVwv8/v3/ECVQTnQrCy75dndglxsRr8e', '69efa7e89ca1a_721605999.png', 'Global College', 'Bhaktapur', '2026-04-27', 'Srijana Ghaju', 'Parent', '9841234560', 'single', 6, '2026-04-27 18:16:18'),
 (8, 'Prajwal', 'Raj', 'Bansi', '00000000000', '2014-10-15', 'mahhansykto@gmail.com', '$2y$10$kZ6CmkWSfcoUzMvYrT/gBeK2gGNcM575cjXILMvbieK9kQYpZdCpG', '69f05760b81e4_577959422.jpg', 'Herald College', 'Samakhushi', '2033-11-21', 'Ryal Bhattarai', 'Sibling', '2222222222', 'double', 5, '2026-04-28 06:45:09'),
@@ -291,7 +293,8 @@ INSERT INTO `students` (`id`, `first_name`, `middle_name`, `last_name`, `contact
 (16, 'Ishan', NULL, 'Manandhar', '0000000000', '2007-02-01', 'manandharishan63@gmail.com', '$2y$10$uBxjxCCMLlN6hBkqA.m6bepF./OZ57bJpmsCISHHmLYSjYccj4ECW', 'student_69fa2b7d3e6637.48486337.jpg', 'Patan Multiple Campus', 'Patan', '2025-10-08', 'Kraneel Manandhar', 'Sibling', '9841243263', 'double', 6, '2026-05-05 17:07:32'),
 (17, 'Xiaomi', NULL, 'Laptop', '9810100129', '2005-07-18', 'xiaomi@gmail.com', '$2y$10$2Rxb/tL7Uw7DNwUmbWR6P..gYoA6UGcjf12g6DVZaURRlHy4uc5za', '69fa3a57ebbe6_162470425.jpg', 'Herald College', 'Lumbini', '2017-06-28', 'China', 'Other', '9820830685', 'double', 14, '2026-05-05 18:44:10'),
 (18, 'lakshya', NULL, 'Gurung', '9843878297', '2004-03-28', 'lakshya@gmail.com', '$2y$10$gY1U9IMWCSq/SOVJxqfI6emVlQuoHtdSoJ2IBAmL0jGukelFpIAsi', '69fae7bed13df_752953558.png', 'Herald College', 'Patan', '2025-10-05', 'Nischal Raj Bansi', 'Parent', '2222222222', 'single', 11, '2026-05-06 07:04:07'),
-(19, 'Srijit', NULL, 'Ghimire', '9809854678', '2006-04-26', 'gmrsrijit@gmail.com', '$2y$10$HNd4wkrPobLSEI82T0vwYevV5QLBZ8BqXtYkhaB3skyxfvwsxx1Ga', NULL, 'KhanaPinaJina College', 'Ghar', '2009-02-20', 'Walalalalallalala', 'Other', '9763618969', 'single', 20, '2026-05-10 02:12:37');
+(19, 'Srijit', NULL, 'Ghimire', '9809854678', '2006-04-26', 'gmrsrijit@gmail.com', '$2y$10$pRBQ2mMUakAvQajhm1tmC.Ivg1jqkr0M4k4gCys/02w8ou7BGf/Rq', 'student_6a04230f72c692.79737283.png', 'KhanaPinaJina College', 'Ghar', '2009-02-20', 'Walalalalallalala', 'Other', '9763618969', 'single', 20, '2026-05-10 02:12:37'),
+(22, 'Krish', NULL, 'Soul Society', '9841243263', '2006-09-11', 'prajwaldulal54@gmail.com', '$2y$10$tHQwcgmQgFwssfL9gOKIyOll3.fU6EBvzTL3dVOo9L9YVIeOi5fye', 'student_6a0568bd007aa0.85936841.jpg', 'Herald College', 'Ghar', '2006-02-02', 'Gagdjabcjchaokcnakjc cajcbkjack', 'Sibling', '9763618969', 'single', 9, '2026-05-14 06:17:03');
 
 --
 -- Triggers `students`
@@ -299,7 +302,7 @@ INSERT INTO `students` (`id`, `first_name`, `middle_name`, `last_name`, `contact
 DELIMITER $$
 CREATE TRIGGER `after_student_insert` AFTER INSERT ON `students` FOR EACH ROW BEGIN
     INSERT INTO fees (student_id, total, paid, status)
-    VALUES (NEW.id, 0.00, 0.00, 'Pending');
+    VALUES (NEW.id, 100000.00, 0.00, 'Pending');
 END
 $$
 DELIMITER ;
@@ -349,7 +352,8 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`id`, `first_name`, `last_name`, `email`, `password`, `role`, `contact_number`, `created_at`) VALUES
 (1, 'Zhadu', 'Wala', 'zhadumylyfe@gmail.com', '$2y$10$P59vR43dtuggGRoR64MleO5zlHdYn1EXx0YuXmlqMILZjvMJGqREi', 'staff', '00000000000', '2026-04-28 15:42:34'),
-(2, 'abc', 'def', 'abcdef@gmail.com', '$2y$10$H/IHG2WCg3Nbu053bMxPkud1opWsxFdr7YtftF5t6/BIyCYbzkoXu', 'staff', '1234567890', '2026-04-28 16:37:11');
+(2, 'abc', 'def', 'abcdef@gmail.com', '$2y$10$H/IHG2WCg3Nbu053bMxPkud1opWsxFdr7YtftF5t6/BIyCYbzkoXu', 'staff', '1234567890', '2026-04-28 16:37:11'),
+(3, 'Watashino', 'Soul Society', 'watashino@gmail.com', '$2y$10$5gAqNzQWvlchRVwDxq0RhOzGI9d8C.eQWGOJaiEj.5UWzPUzxPhFm', 'staff', '9812345678', '2026-05-13 05:08:49');
 
 --
 -- Indexes for dumped tables
@@ -448,13 +452,13 @@ ALTER TABLE `cleaning`
 -- AUTO_INCREMENT for table `complaints`
 --
 ALTER TABLE `complaints`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT for table `fees`
 --
 ALTER TABLE `fees`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `food`
@@ -478,7 +482,7 @@ ALTER TABLE `notices`
 -- AUTO_INCREMENT for table `password_resets`
 --
 ALTER TABLE `password_resets`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `rooms`
@@ -490,19 +494,19 @@ ALTER TABLE `rooms`
 -- AUTO_INCREMENT for table `students`
 --
 ALTER TABLE `students`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT for table `timing`
 --
 ALTER TABLE `timing`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- Constraints for dumped tables

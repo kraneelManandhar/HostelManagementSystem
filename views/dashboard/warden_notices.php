@@ -15,16 +15,12 @@ if (
 
 require_once __DIR__ . '/../../config/db.php';
 require_once __DIR__ . '/../../models/Student.php';
-require_once __DIR__ . '/../../models/Complaint.php';
 require_once __DIR__ . '/../../models/Notice.php';
-require_once __DIR__ . '/../../controllers/WardenController.php';
 
 $pdo = DB::connect();
 
 $studentModel = new Student($pdo);
-$complaintModel = new Complaint($pdo);
 $noticeModel = new Notice($pdo);
-$wardenController = new WardenController($pdo);
 
 $action = 'warden_notices';
 
@@ -39,21 +35,9 @@ $pageMap = [
     'warden_notices' => ['label' => 'Notice', 'icon' => 'ph-warning', 'title' => 'NOTICES'],
 ];
 
-$totalStudents = count($studentModel->getAll());
-$totalRooms = (int) $pdo->query("SELECT COUNT(*) FROM rooms")->fetchColumn();
-$pendingComplaints = (int) $pdo->query("SELECT COUNT(*) FROM complaints WHERE LOWER(status) = 'pending'")->fetchColumn();
 $notices = $noticeModel->all();
 
 $data = $notices;
-
-$noticeEditId = (int) ($_GET['edit_notice'] ?? 0);
-$editNotice = null;
-foreach ($notices as $notice) {
-    if ((int) ($notice['id'] ?? 0) === $noticeEditId) {
-        $editNotice = $notice;
-        break;
-    }
-}
 
 $wardenName = trim((string) ($_SESSION['user_name'] ?? 'WARDEN'));
 if ($wardenName === '') {
@@ -68,7 +52,7 @@ if ($wardenName === '') {
     <title>Notices - Pentatonic Hostel</title>
     <script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="<?= $baseUrl ?>public/css/warden.css?v=2">
+    <link rel="stylesheet" href="<?= $baseUrl ?>public/css/warden.css?v=18">
 </head>
 <body>
 <div class="wd-page-wrap">
@@ -96,33 +80,6 @@ if ($wardenName === '') {
         <main class="wd-main">
             <div class="wd-title-bar"><?= htmlspecialchars($pageMap[$action]['title']) ?></div>
 
-            <div class="wd-notice-editor">
-                <form method="post" action="<?= $baseUrl ?>index.php?action=warden_save_notice">
-                    <input type="hidden" name="notice_id" value="<?= (int) ($editNotice['id'] ?? 0) ?>">
-
-                    <div class="wd-notice-field">
-                        <label>Notice title</label>
-                        <input type="text" name="title" placeholder="title" value="<?= htmlspecialchars($editNotice['title'] ?? '') ?>" required>
-                    </div>
-
-                    <div class="wd-notice-field">
-                        <label>Description</label>
-                        <textarea name="description" placeholder="message" required><?= htmlspecialchars($editNotice['description'] ?? '') ?></textarea>
-                    </div>
-
-                    <div class="wd-notice-actions">
-                        <input type="date" name="date" value="<?= htmlspecialchars($editNotice['date'] ?? date('Y-m-d')) ?>">
-                        <button
-                            type="submit"
-                            <?= $editNotice ? 'data-confirm="Are you sure you want to save changes to this notice?"' : '' ?>
-                        ><?= $editNotice ? 'Update notice' : 'Send notice' ?></button>
-                        <?php if ($editNotice): ?>
-                            <a href="<?= $baseUrl ?>index.php?action=warden_notices">Cancel</a>
-                        <?php endif; ?>
-                    </div>
-                </form>
-            </div>
-
             <div class="wd-notice-list">
                 <div class="wd-toolbar notice-search">
                     <label class="wd-search">
@@ -131,17 +88,20 @@ if ($wardenName === '') {
                     </label>
                 </div>
 
-                <?php foreach ($data as $notice): ?>
-                    <article class="wd-notice-card searchable-row" data-search="<?= htmlspecialchars(strtolower(($notice['title'] ?? '') . ' ' . ($notice['description'] ?? '') . ' ' . ($notice['date'] ?? ''))) ?>">
-                        <h4><?= htmlspecialchars($notice['title']) ?></h4>
-                        <p><?= htmlspecialchars($notice['description']) ?></p>
-                        <div class="wd-notice-meta">
-                            <?= htmlspecialchars($notice['date']) ?> |
-                            <?= htmlspecialchars($notice['author'] ?? 'HOSTEL MANAGEMENT') ?>
-                            <a href="<?= $baseUrl ?>index.php?action=warden_notices&edit_notice=<?= (int) $notice['id'] ?>" data-confirm="Are you sure you want to edit this notice?">Edit</a>
-                        </div>
-                    </article>
-                <?php endforeach; ?>
+                <?php if (empty($data)): ?>
+                    <div class="wd-search-empty" style="display:block;">No notices available.</div>
+                <?php else: ?>
+                    <?php foreach ($data as $notice): ?>
+                        <article class="wd-notice-card searchable-row" data-search="<?= htmlspecialchars(strtolower(($notice['title'] ?? '') . ' ' . ($notice['description'] ?? '') . ' ' . ($notice['date'] ?? ''))) ?>">
+                            <h4><?= htmlspecialchars($notice['title']) ?></h4>
+                            <p><?= htmlspecialchars($notice['description']) ?></p>
+                            <div class="wd-notice-meta">
+                                <?= htmlspecialchars($notice['date']) ?> |
+                                <?= htmlspecialchars($notice['author'] ?? 'HOSTEL MANAGEMENT') ?>
+                            </div>
+                        </article>
+                    <?php endforeach; ?>
+                <?php endif; ?>
             </div>
         </main>
     </div>
@@ -150,7 +110,6 @@ if ($wardenName === '') {
 <script>
     window.BASE_URL = <?= json_encode($baseUrl) ?>;
 </script>
-<script src="<?= $baseUrl ?>public/js/script.js"></script>
-<script src="<?= $baseUrl ?>public/js/confirm-actions.js?v=1"></script>
+<script src="<?= $baseUrl ?>public/js/script.js?v=6"></script>
 </body>
 </html>

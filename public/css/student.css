@@ -400,6 +400,9 @@ textarea {
 .badge-pending {
   color: var(--danger) !important;
 }
+.badge-partial {
+  color: #ff9800;
+}
 .badge-paid {
   color: #4caf50;
 }

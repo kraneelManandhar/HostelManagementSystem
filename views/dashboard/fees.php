@@ -16,39 +16,32 @@ if (
 require_once __DIR__ . '/../../config/db.php';
 require_once __DIR__ . '/../../models/Fee.php';
 
+function getFeeStatus(float $paid, float $total): string {
+    if ($total <= 0 || ($paid / $total) >= 0.8) {
+        return 'Paid';
+    }
+    if ($paid <= 0) {
+        return 'Pending';
+    }
+    return 'Partial';
+}
+
 $pdo = DB::connect();
 $feeModel = new Fee($pdo);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $formAction = $_POST['form_action'] ?? 'status';
+    $formAction = $_POST['form_action'] ?? 'edit';
     $feeId = (int) ($_POST['fee_id'] ?? 0);
 
-    if (in_array($formAction, ['add', 'edit'], true)) {
+    if ($formAction === 'edit') {
         $studentId = (int) ($_POST['student_id'] ?? 0);
         $total = max(0, (float) ($_POST['total'] ?? 0));
         $paid = max(0, (float) ($_POST['paid'] ?? 0));
         $paid = min($paid, $total);
         $pending = max(0, $total - $paid);
-        $status = trim($_POST['status'] ?? '');
+        $status = getFeeStatus($paid, $total);
 
-        if (!in_array($status, ['Paid', 'Pending'], true)) {
-            $status = $pending <= 0 ? 'Paid' : 'Pending';
-        }
-
-        if ($status === 'Paid') {
-            $paid = $total;
-            $pending = 0;
-        }
-
-        if ($formAction === 'add' && $studentId > 0) {
-            $stmt = $pdo->prepare("
-                INSERT INTO fees (student_id, total, paid, pending, status)
-                VALUES (?, ?, ?, ?, ?)
-            ");
-            $stmt->execute([$studentId, $total, $paid, $pending, $status]);
-        }
-
-        if ($formAction === 'edit' && $feeId > 0 && $studentId > 0) {
+        if ($feeId > 0 && $studentId > 0) {
             $stmt = $pdo->prepare("
                 UPDATE fees
                 SET student_id = ?, total = ?, paid = ?, pending = ?, status = ?
@@ -60,23 +53,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header('Location: ' . $baseUrl . 'index.php?action=owner_fees');
         exit;
     }
-
-    if ($formAction === 'status' && $feeId > 0) {
-        $status = $_POST['status'] ?? '';
-        if (in_array($status, ['Paid', 'Pending'], true)) {
-            if ($status === 'Paid') {
-                $stmt = $pdo->prepare("UPDATE fees SET paid = total, pending = 0, status = 'Paid' WHERE id = ?");
-                $stmt->execute([$feeId]);
-            } else {
-                $stmt = $pdo->prepare("UPDATE fees SET pending = GREATEST(total - paid, 0), status = 'Pending' WHERE id = ?");
-                $stmt->execute([$feeId]);
-            }
-        }
-
-        header('Location: ' . $baseUrl . 'index.php?action=owner_fees');
-        exit;
-    }
 }
+
+$pdo->exec("
+    UPDATE fees
+    SET
+        paid = LEAST(GREATEST(COALESCE(paid, 0), 0), GREATEST(COALESCE(total, 0), 0)),
+        pending = GREATEST(GREATEST(COALESCE(total, 0), 0) - LEAST(GREATEST(COALESCE(paid, 0), 0), GREATEST(COALESCE(total, 0), 0)), 0),
+        status = CASE
+            WHEN GREATEST(COALESCE(total, 0), 0) <= 0
+                OR LEAST(GREATEST(COALESCE(paid, 0), 0), GREATEST(COALESCE(total, 0), 0)) / NULLIF(GREATEST(COALESCE(total, 0), 0), 0) >= 0.8
+            THEN 'Paid'
+            WHEN LEAST(GREATEST(COALESCE(paid, 0), 0), GREATEST(COALESCE(total, 0), 0)) = 0
+            THEN 'Pending'
+            ELSE 'Partial'
+        END
+");
 
 $stmt = $pdo->query("
     SELECT f.*, s.first_name, s.middle_name, s.last_name, s.contact_number
@@ -93,7 +85,7 @@ $students = $pdo->query("
 ")->fetchAll(PDO::FETCH_ASSOC);
 
 $editId = (int) ($_GET['edit_id'] ?? 0);
-$showForm = isset($_GET['form']) || $editId > 0;
+$showForm = $editId > 0;
 $editFee = null;
 
 foreach ($fees as $fee) {
@@ -116,7 +108,7 @@ if ($managerName === '') {
     <title>Fees - Pentatonic Hostel</title>
     <script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="<?= $baseUrl ?>public/css/owner.css?v=2">
+    <link rel="stylesheet" href="<?= $baseUrl ?>public/css/owner.css?v=11">
 </head>
 <body>
 <div class="mf-page-wrap">
@@ -156,22 +148,16 @@ if ($managerName === '') {
                     <i class="ph ph-magnifying-glass"></i>
                     <input type="text" placeholder="Search">
                 </div>
-
-                <a class="mf-add-fee-btn" href="<?= $baseUrl ?>index.php?action=owner_fees&form=1">
-                    <i class="ph ph-plus"></i>
-                    <span>Add Fees</span>
-                </a>
             </div>
 
-            <?php if ($showForm): ?>
+            <?php if ($showForm && $editFee): ?>
                 <?php
-                $formFee = $editFee ?? [];
-                $formAction = $editFee ? 'edit' : 'add';
+                $formFee = $editFee;
                 ?>
                 <section class="mf-fee-form-panel">
-                    <div class="mf-form-title"><?= $editFee ? 'Edit fee' : 'Add fee' ?></div>
+                    <div class="mf-form-title">Edit fee</div>
                     <form class="mf-fee-form" method="post">
-                        <input type="hidden" name="form_action" value="<?= htmlspecialchars($formAction) ?>">
+                        <input type="hidden" name="form_action" value="edit">
                         <input type="hidden" name="fee_id" value="<?= (int) ($formFee['id'] ?? 0) ?>">
 
                         <label class="mf-form-field">
@@ -194,7 +180,7 @@ if ($managerName === '') {
                         </label>
 
                         <label class="mf-form-field">
-                            <span>Total</span>
+                            <span>Due</span>
                             <input type="number" name="total" min="0" step="0.01" value="<?= htmlspecialchars((string) ($formFee['total'] ?? '0.00')) ?>" required>
                         </label>
 
@@ -203,22 +189,13 @@ if ($managerName === '') {
                             <input type="number" name="paid" min="0" step="0.01" value="<?= htmlspecialchars((string) ($formFee['paid'] ?? '0.00')) ?>" required>
                         </label>
 
-                        <label class="mf-form-field">
-                            <span>Status</span>
-                            <select name="status">
-                                <?php $formStatus = strtolower((string) ($formFee['status'] ?? 'Pending')); ?>
-                                <option value="Pending" <?= $formStatus !== 'paid' ? 'selected' : '' ?>>Pending</option>
-                                <option value="Paid" <?= $formStatus === 'paid' ? 'selected' : '' ?>>Paid</option>
-                            </select>
-                        </label>
-
                         <div class="mf-form-actions">
                             <a class="mf-cancel-btn" href="<?= $baseUrl ?>index.php?action=owner_fees">Cancel</a>
                             <button
                                 class="mf-save-fee-btn"
                                 type="submit"
-                                <?= $editFee ? 'data-confirm="Are you sure you want to save changes to this fee record?"' : '' ?>
-                            ><?= $editFee ? 'Update fee' : 'Save fee' ?></button>
+                                data-confirm="Are you sure you want to save changes to this fee record?"
+                            >Update fee</button>
                         </div>
                     </form>
                 </section>
@@ -233,7 +210,7 @@ if ($managerName === '') {
                             <tr>
                                 <th>Student name</th>
                                 <th>Contact number</th>
-                                <th>Total</th>
+                                <th>Due</th>
                                 <th>Paid</th>
                                 <th>Pending</th>
                                 <th>Status</th>
@@ -251,15 +228,16 @@ if ($managerName === '') {
                                 if ($studentName === '') {
                                     $studentName = 'N/A';
                                 }
-                                $status = strtolower(trim((string) ($fee['status'] ?? 'pending')));
-                                $isPaid = $status === 'paid';
-                                $total = (float) ($fee['total'] ?? 0);
+                                $total = max(0, (float) ($fee['total'] ?? 0));
                                 $paid = (float) ($fee['paid'] ?? 0);
-                                $pending = array_key_exists('pending', $fee) ? (float) $fee['pending'] : max(0, $total - $paid);
+                                $paid = min(max(0, $paid), $total);
+                                $pending = max(0, $total - $paid);
+                                $statusLabel = getFeeStatus($paid, $total);
+                                $statusClass = $statusLabel === 'Paid' ? 'paid' : ($statusLabel === 'Partial' ? 'partial' : 'unpaid');
                                 ?>
                                 <tr
                                     class="searchable-row"
-                                    data-search="<?= htmlspecialchars(strtolower($studentName . ' ' . ($fee['contact_number'] ?? '') . ' ' . $total . ' ' . $paid . ' ' . $pending . ' ' . ($fee['status'] ?? ''))) ?>"
+                                    data-search="<?= htmlspecialchars(strtolower($studentName . ' ' . ($fee['contact_number'] ?? '') . ' ' . $total . ' ' . $paid . ' ' . $pending . ' ' . $statusLabel)) ?>"
                                 >
                                     <td><span class="mf-fee-cell"><?= htmlspecialchars($studentName) ?></span></td>
                                     <td><span class="mf-fee-cell"><?= htmlspecialchars((string) ($fee['contact_number'] ?? '')) ?></span></td>
@@ -267,14 +245,7 @@ if ($managerName === '') {
                                     <td><span class="mf-fee-cell">Rs.<?= htmlspecialchars(number_format($paid, 2)) ?></span></td>
                                     <td><span class="mf-fee-cell">Rs.<?= htmlspecialchars(number_format($pending, 2)) ?></span></td>
                                     <td>
-                                        <form class="mf-status-form" method="post">
-                                            <input type="hidden" name="form_action" value="status">
-                                            <input type="hidden" name="fee_id" value="<?= (int) $fee['id'] ?>">
-                                            <select class="mf-status-select <?= $isPaid ? 'paid' : 'pending' ?>" name="status" data-confirm-change="Are you sure you want to update this fee status?">
-                                                <option value="Paid" <?= $isPaid ? 'selected' : '' ?>>Paid</option>
-                                                <option value="Pending" <?= !$isPaid ? 'selected' : '' ?>>Unpaid</option>
-                                            </select>
-                                        </form>
+                                        <span class="mf-status-pill <?= $statusClass ?>"><?= htmlspecialchars($statusLabel) ?></span>
                                     </td>
                                     <td>
                                         <div class="mf-actions">
@@ -292,7 +263,7 @@ if ($managerName === '') {
         </main>
     </div>
 </div>
-<script src="<?= $baseUrl ?>public/js/owner-search.js?v=4"></script>
+<script src="<?= $baseUrl ?>public/js/owner-search.js?v=5"></script>
 <script src="<?= $baseUrl ?>public/js/confirm-actions.js?v=1"></script>
 </body>
 </html>
