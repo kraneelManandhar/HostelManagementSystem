@@ -83,7 +83,6 @@ if ($showRoomModal) {
                 <?= htmlspecialchars($student['first_name'] ?? '') ?>
                 <?= htmlspecialchars($student['last_name']  ?? '') ?>
             </div>
-            <div class="sd-student-role" style="margin-top:4px;">ID #<?= (int) ($student['id'] ?? 0) ?></div>
             <div class="sd-student-role">STUDENT</div>
         </div>
 
