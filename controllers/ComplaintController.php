@@ -10,8 +10,6 @@ class ComplaintController {
     }
 
     public function store() {
-        header("Content-Type: application/json");
-
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
@@ -20,10 +18,7 @@ class ComplaintController {
         $role       = $_SESSION['user_role'] ?? null;
 
         if (!$student_id || $role !== 'student') {
-            echo json_encode([
-                "success" => false,
-                "message" => "Not authenticated as a student."
-            ]);
+            $this->redirectWithFlash('error', 'Not authenticated as a student.');
             return;
         }
 
@@ -32,59 +27,48 @@ class ComplaintController {
         $room        = trim($_POST['room_number'] ?? '');
 
         if (!$title) {
-            echo json_encode([
-                "success" => false,
-                "message" => "Issue is required."
-            ]);
+            $this->redirectWithFlash('error', 'Issue is required.');
             return;
         }
 
         if (!$description) {
-            echo json_encode([
-                "success" => false,
-                "message" => "Description is required."
-            ]);
+            $this->redirectWithFlash('error', 'Description is required.');
             return;
         }
 
         $model = new Complaint($this->pdo);
-        $id    = $model->create($student_id, $title, $description, $room);
+        $model->create($student_id, $title, $description, $room);
 
-        echo json_encode([
-            "success" => true,
-            "data"    => [
-                "id"          => $id,
-                "issue"       => $title,
-                "description" => $description,
-                "room"        => $room
-            ]
-        ]);
+        $this->redirectWithFlash('success', 'Complaint submitted successfully.');
     }
 
     public function delete() {
-        header("Content-Type: application/json");
-
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
 
-        $input = json_decode(file_get_contents("php://input"), true);
-
-        $id         = $input['id']           ?? null;
+        $id         = $_POST['complaint_id'] ?? null;
         $student_id = $_SESSION['user_id']   ?? null;
         $role       = $_SESSION['user_role'] ?? null;
 
         if (!$id || !$student_id || $role !== 'student') {
-            echo json_encode([
-                "success" => false,
-                "message" => "Not authorized."
-            ]);
+            $this->redirectWithFlash('error', 'Please select a complaint first.');
             return;
         }
 
         $model = new Complaint($this->pdo);
         $model->delete($id, $student_id);
 
-        echo json_encode(["success" => true]);
+        $this->redirectWithFlash('success', 'Complaint deleted successfully.');
+    }
+
+    private function redirectWithFlash(string $type, string $message): void {
+        $_SESSION['sd_flash'] = [
+            'type' => $type,
+            'message' => $message,
+        ];
+
+        header('Location: ' . BASE_URL . 'index.php?action=student_dashboard&tab=complaints');
+        exit;
     }
 }
