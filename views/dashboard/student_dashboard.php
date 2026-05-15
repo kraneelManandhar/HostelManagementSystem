@@ -55,8 +55,7 @@ if ($showRoomModal) {
 
     <!-- SIDEBAR -->
     <aside class="sd-sidebar">
-        <div class="sd-sidebar-logo" id="goDashboard" style="cursor:pointer;"
-             onclick="window.location.href='<?= BASE_URL ?>index.php?action=student_dashboard'">
+        <div class="sd-sidebar-logo">
             <img src="<?= BASE_URL ?>public/images/logo.png" alt="Logo">
             <span>Pentatonic hostel</span>
         </div>
@@ -84,7 +83,6 @@ if ($showRoomModal) {
                 <?= htmlspecialchars($student['first_name'] ?? '') ?>
                 <?= htmlspecialchars($student['last_name']  ?? '') ?>
             </div>
-            <div class="sd-student-role" style="margin-top:4px;">ID #<?= (int) ($student['id'] ?? 0) ?></div>
             <div class="sd-student-role">STUDENT</div>
         </div>
 
@@ -259,10 +257,10 @@ if ($showRoomModal) {
                 <button class="sd-write-btn" id="openComplaintForm">WRITE YOUR COMPLAINT +</button>
             </div>
 
-            <div class="sd-complaint-list-box">
+            <form class="sd-complaint-list-box" id="deleteComplaintForm" method="POST" action="<?= BASE_URL ?>index.php?action=complaint_delete">
                 <div class="sd-complaint-list-header">
                     <div class="sd-section-pill">Your complaints</div>
-                    <button class="sd-trash-btn" id="deleteComplaint"><i class="ph ph-trash"></i></button>
+                    <button class="sd-trash-btn" id="deleteComplaint" type="submit"><i class="ph ph-trash"></i></button>
                 </div>
                 <div class="sd-complaint-col-headers">
                     <span></span><span>Issue</span><span>Description</span><span>Room</span><span>Status</span>
@@ -271,7 +269,7 @@ if ($showRoomModal) {
                     <?php if (!empty($complaints)): ?>
                         <?php foreach ($complaints as $c): ?>
                             <div class="sd-complaint-item">
-                                <input type="radio" name="selected-complaint" value="<?= $c['id'] ?>">
+                                <input type="radio" name="complaint_id" value="<?= $c['id'] ?>">
                                 <span class="sd-c-title"><?= htmlspecialchars($c['title']) ?></span>
                                 <span class="sd-c-desc"><?= htmlspecialchars($c['description']) ?></span>
                                 <span class="sd-c-room"><?= htmlspecialchars($c['room_number'] ?? '—') ?></span>
@@ -282,7 +280,7 @@ if ($showRoomModal) {
                         <p style="font-size:13px;color:#888;padding:12px 8px;">No complaints found.</p>
                     <?php endif; ?>
                 </div>
-            </div>
+            </form>
         </div>
         </div>
 
@@ -323,7 +321,7 @@ if ($showRoomModal) {
                 </span>
             </div>
 
-            <form class="sd-timing-card" id="studentTimingForm">
+            <form class="sd-timing-card" id="studentTimingForm" method="POST" action="<?= BASE_URL ?>index.php?action=student_timing_update">
                 <div class="sd-timing-grid">
                     <label class="sd-timing-field">
                         <span>Check out</span>
@@ -484,7 +482,7 @@ if ($showRoomModal) {
 <div class="sd-modal-overlay" id="complaintModal">
 <div class="sd-modal-box">
     <h2>Write your complaints</h2>
-    <form id="complaintForm">
+    <form id="complaintForm" method="POST" action="<?= BASE_URL ?>index.php?action=complaint_add">
         <div class="sd-form-row">
             <div class="sd-form-group">
                 <label>Student name</label>
@@ -505,7 +503,7 @@ if ($showRoomModal) {
         </div>
         <div class="sd-form-actions">
             <button id="closeComplaintForm" type="button" class="sd-btn-back">Back</button>
-            <button id="submitComplaint"    type="button" class="sd-btn-submit">Submit</button>
+            <button id="submitComplaint"    type="submit" class="sd-btn-submit">Submit</button>
         </div>
     </form>
 </div>
