@@ -392,11 +392,6 @@ switch ($action) {
         include 'views/dashboard/warden_students.php';
         break;
 
-    case 'warden_rooms':
-        requireRole('warden');
-        include 'views/dashboard/warden_rooms.php';
-        break;
-
     case 'warden_notices':
         requireRole('warden');
         include 'views/dashboard/warden_notices.php';
@@ -420,18 +415,6 @@ switch ($action) {
     case 'warden_timing':
         requireRole('warden');
         include 'views/dashboard/timing.php';
-        break;
-
-    case 'warden_save_room':
-        requireRole('warden');
-        $wardenController = new WardenController(DB::connect());
-        $wardenController->saveRoom();
-        break;
-
-    case 'warden_add_room':
-        requireRole('warden');
-        $wardenController = new WardenController(DB::connect());
-        $wardenController->addRoom();
         break;
 
     case 'warden_save_notice':

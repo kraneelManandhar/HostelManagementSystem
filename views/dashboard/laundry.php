@@ -5,6 +5,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 $baseUrl = defined('BASE_URL') ? BASE_URL : '/HostelManagementSystem/';
 
+// Warden pages are protected so students/owners cannot open them directly.
 if (
     empty($_SESSION['logged_in']) ||
     ($_SESSION['user_role'] ?? '') !== 'warden'
@@ -28,19 +29,19 @@ $wardenController = new WardenController($pdo);
 
 $action = 'warden_laundry';
 
+// This map builds the sidebar links and the current page title.
 $pageMap = [
     'warden_dashboard' => ['label' => 'Dashboard', 'icon' => 'ph-squares-four', 'title' => 'WARDEN DASHBOARD'],
     'warden_students' => ['label' => 'Students', 'icon' => 'ph-student', 'title' => 'STUDENTS'],
     'warden_food' => ['label' => 'Food', 'icon' => 'ph-bowl-food', 'title' => 'FOOD'],
     'warden_laundry' => ['label' => 'Laundry', 'icon' => 'ph-washing-machine', 'title' => 'WEEKLY LAUNDRY'],
-    'warden_rooms' => ['label' => 'Rooms', 'icon' => 'ph-bed', 'title' => 'ROOM ASSIGNMENT'],
     'warden_cleaning' => ['label' => 'Bathroom cleaning', 'icon' => 'ph-broom', 'title' => 'BATHROOM CLEANING'],
     'warden_timing' => ['label' => 'Timing', 'icon' => 'ph-clock', 'title' => 'TIME OUT RECORDS'],
     'warden_notices' => ['label' => 'Notice', 'icon' => 'ph-warning', 'title' => 'NOTICES'],
 ];
 
+// Fetch page data before rendering the HTML table.
 $totalStudents = count($studentModel->getAll());
-$totalRooms = (int) $pdo->query("SELECT COUNT(*) FROM rooms")->fetchColumn();
 $pendingComplaints = (int) $pdo->query("SELECT COUNT(*) FROM complaints WHERE LOWER(status) = 'pending'")->fetchColumn();
 $notices = $noticeModel->all();
 
