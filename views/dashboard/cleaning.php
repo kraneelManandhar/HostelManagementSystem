@@ -59,7 +59,7 @@ if ($wardenName === '') {
     <title>Bathroom Cleaning - Pentatonic Hostel</title>
     <script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="<?= $baseUrl ?>public/css/warden.css?v=14">
+    <link rel="stylesheet" href="<?= $baseUrl ?>public/css/warden.css?v=18">
 </head>
 <body>
 <div class="wd-page-wrap">
@@ -107,20 +107,23 @@ if ($wardenName === '') {
                 <div
                     class="row searchable-row"
                     data-room-number="<?= htmlspecialchars((string) ($r['number'] ?? '')) ?>"
-                    data-search="<?= htmlspecialchars(strtolower('room ' . ($r['number'] ?? '') . ' ' . ($isYes ? 'done yes' : 'pending no'))) ?>"
+                    data-search="<?= htmlspecialchars(strtolower('room ' . ($r['number'] ?? ''))) ?>"
                 >
 
                     <div class="cell">
                         Room <?= htmlspecialchars($r['number']) ?>
                     </div>
 
-                    <div class="status-pill <?= $isYes ? 'yes' : 'no' ?>"
-                         data-id="<?= (int) $r['room_id'] ?>"
-                         data-type="cleaning">
-
-                        <?= $isYes ? 'Done' : 'Pending' ?>
-
-                    </div>
+                    <select
+                        class="wd-status-select cleaning-status-select <?= $isYes ? 'yes' : 'no' ?>"
+                        data-id="<?= (int) $r['room_id'] ?>"
+                        data-type="cleaning"
+                        data-previous-value="<?= $isYes ? '1' : '0' ?>"
+                        aria-label="Cleaning status for room <?= htmlspecialchars((string) $r['number']) ?>"
+                    >
+                        <option value="1" <?= $isYes ? 'selected' : '' ?>>Done</option>
+                        <option value="0" <?= !$isYes ? 'selected' : '' ?>>Pending</option>
+                    </select>
 
                 </div>
 
@@ -134,6 +137,6 @@ if ($wardenName === '') {
 <script>
     window.BASE_URL = <?= json_encode($baseUrl) ?>;
 </script>
-<script src="<?= $baseUrl ?>public/js/script.js?v=5"></script>
+<script src="<?= $baseUrl ?>public/js/script.js?v=7"></script>
 </body>
 </html>

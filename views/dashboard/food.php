@@ -59,7 +59,7 @@ if ($wardenName === '') {
     <title>Food - Pentatonic Hostel</title>
     <script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="<?= $baseUrl ?>public/css/warden.css?v=14">
+    <link rel="stylesheet" href="<?= $baseUrl ?>public/css/warden.css?v=18">
 </head>
 <body>
 <div class="wd-page-wrap">
@@ -104,17 +104,20 @@ if ($wardenName === '') {
                     $isYes = $s['food'] ?? 0;
                 ?>
 
-                <div class="row searchable-row" data-search="<?= htmlspecialchars(strtolower(($s['name'] ?? '') . ' ' . ($isYes ? 'yes' : 'no'))) ?>">
+                <div class="row searchable-row" data-search="<?= htmlspecialchars(strtolower((string) ($s['name'] ?? ''))) ?>">
 
                     <div class="cell"><?= htmlspecialchars($s['name']) ?></div>
 
-                    <div class="status-pill <?= $isYes ? 'yes' : 'no' ?>"
-                         data-id="<?= $s['id'] ?>"
-                         data-type="food">
-
-                        <?= $isYes ? 'Yes' : 'No' ?>
-
-                    </div>
+                    <select
+                        class="wd-status-select <?= $isYes ? 'yes' : 'no' ?>"
+                        data-id="<?= (int) $s['id'] ?>"
+                        data-type="food"
+                        data-previous-value="<?= $isYes ? '1' : '0' ?>"
+                        aria-label="Food status for <?= htmlspecialchars($s['name']) ?>"
+                    >
+                        <option value="1" <?= $isYes ? 'selected' : '' ?>>Yes</option>
+                        <option value="0" <?= !$isYes ? 'selected' : '' ?>>No</option>
+                    </select>
 
                 </div>
 
@@ -127,6 +130,6 @@ if ($wardenName === '') {
 <script>
     window.BASE_URL = <?= json_encode($baseUrl) ?>;
 </script>
-<script src="<?= $baseUrl ?>public/js/script.js?v=5"></script>
+<script src="<?= $baseUrl ?>public/js/script.js?v=6"></script>
 </body>
 </html>
