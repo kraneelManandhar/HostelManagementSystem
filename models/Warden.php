@@ -7,7 +7,9 @@ class Warden {
         $this->pdo = $pdo;
     }
 
-    /* ===== FETCH DATA ===== */
+    /* ===== FETCH DATA =====
+       Each query returns the latest visible state for the Warden pages.
+       LEFT JOIN keeps students/rooms visible even if no status record exists yet. */
 
     public function getStudents(){
         return $this->pdo->query("
@@ -29,6 +31,7 @@ class Warden {
             COALESCE(f.status, 0) AS food
             FROM students s
             LEFT JOIN (
+                -- Latest food row per student is used as the current status.
                 SELECT f1.student_id, f1.status
                 FROM food f1
                 INNER JOIN (
@@ -49,6 +52,7 @@ class Warden {
             COALESCE(l.status, 'Pending') AS laundry_status
             FROM students s
             LEFT JOIN (
+                -- Latest laundry row per student is used as the current status.
                 SELECT l1.student_id, l1.status
                 FROM laundry l1
                 INNER JOIN (
@@ -69,6 +73,7 @@ class Warden {
             COALESCE(c.status, 'Pending') AS cleaning_status
             FROM rooms r
             LEFT JOIN (
+                -- Latest cleaning row per room is used as the current status.
                 SELECT c1.room_id, c1.status
                 FROM cleaning c1
                 INNER JOIN (
@@ -81,41 +86,6 @@ class Warden {
         ")->fetchAll();
     }
 
-    public function getRooms(){
-        return $this->pdo->query("
-            SELECT
-                r.id,
-                r.number,
-                r.type,
-                r.student1_id,
-                r.student2_id,
-                TRIM(CONCAT(COALESCE(s1.first_name, ''), ' ', COALESCE(s1.middle_name, ''), ' ', COALESCE(s1.last_name, ''))) AS student1_name,
-                COALESCE(s1.contact_number, '') AS student1_contact,
-                TRIM(CONCAT(COALESCE(s2.first_name, ''), ' ', COALESCE(s2.middle_name, ''), ' ', COALESCE(s2.last_name, ''))) AS student2_name,
-                COALESCE(s2.contact_number, '') AS student2_contact
-            FROM rooms r
-            LEFT JOIN students s1 ON s1.id = r.student1_id
-            LEFT JOIN students s2 ON s2.id = r.student2_id
-            ORDER BY r.number
-        ")->fetchAll();
-    }
-
-    public function getRoomStudentOptions($roomId = 0){
-        $stmt = $this->pdo->prepare("
-            SELECT
-                s.id,
-                CONCAT(s.first_name,' ',s.last_name) AS name,
-                s.room_id,
-                r.number AS room_number
-            FROM students s
-            LEFT JOIN rooms r ON r.id = s.room_id
-            WHERE s.room_id IS NULL OR s.room_id = ?
-            ORDER BY s.first_name, s.last_name
-        ");
-        $stmt->execute([(int) $roomId]);
-        return $stmt->fetchAll();
-    }
-
     public function getTimingData(){
         return $this->pdo->query("
             SELECT s.id,
@@ -123,6 +93,7 @@ class Warden {
             t.check_in,t.check_out
             FROM students s
             LEFT JOIN (
+                -- Latest timing row per student is used for the editable time fields.
                 SELECT t1.student_id, t1.check_in, t1.check_out
                 FROM timing t1
                 INNER JOIN (
@@ -141,7 +112,9 @@ class Warden {
         ")->fetch();
     }
 
-    /* ===== UPDATE (UPSERT) ===== */
+    /* ===== UPDATE (UPSERT) =====
+       Update the latest row if one exists; otherwise insert a new row.
+       This keeps the views simple because every student/room can be edited directly. */
 
     public function updateFood($id,$status){
         $existing = $this->latestRecordId('food', 'student_id', $id);
@@ -196,75 +169,6 @@ class Warden {
         return $stmt->execute([$id,$in,$out,$status]);
     }
 
-    public function addRoom($number,$type){
-        $stmt = $this->pdo->prepare("INSERT INTO rooms(number,type) VALUES(?,?)");
-        return $stmt->execute([$number,$type]);
-    }
-
-    public function saveRoom($roomId,$number,$type,$student1Id,$student2Id){
-        if ($type === 'single') {
-            $student2Id = 0;
-        }
-
-        if ($student1Id > 0 && $student1Id === $student2Id) {
-            $student2Id = 0;
-        }
-
-        $this->pdo->beginTransaction();
-
-        try {
-            $stmt = $this->pdo->prepare("SELECT student1_id, student2_id FROM rooms WHERE id=? FOR UPDATE");
-            $stmt->execute([$roomId]);
-            $current = $stmt->fetch();
-
-            if ($current) {
-                foreach ([(int) $current['student1_id'], (int) $current['student2_id']] as $oldStudentId) {
-                    if ($oldStudentId > 0) {
-                        $clearStudent = $this->pdo->prepare("UPDATE students SET room_id=NULL WHERE id=?");
-                        $clearStudent->execute([$oldStudentId]);
-                    }
-                }
-            }
-
-            foreach ([$student1Id, $student2Id] as $studentId) {
-                if ($studentId > 0) {
-                    $clearSlots = $this->pdo->prepare("
-                        UPDATE rooms
-                        SET
-                            student1_id = CASE WHEN student1_id = ? THEN NULL ELSE student1_id END,
-                            student2_id = CASE WHEN student2_id = ? THEN NULL ELSE student2_id END
-                    ");
-                    $clearSlots->execute([$studentId,$studentId]);
-
-                    $clearStudentRoom = $this->pdo->prepare("UPDATE students SET room_id=NULL WHERE id=?");
-                    $clearStudentRoom->execute([$studentId]);
-                }
-            }
-
-            $stmt = $this->pdo->prepare("UPDATE rooms SET number=?, type=?, student1_id=?, student2_id=? WHERE id=?");
-            $stmt->execute([
-                $number,
-                $type,
-                $student1Id > 0 ? $student1Id : null,
-                $student2Id > 0 ? $student2Id : null,
-                $roomId
-            ]);
-
-            foreach ([$student1Id, $student2Id] as $studentId) {
-                if ($studentId > 0) {
-                    $assignStudent = $this->pdo->prepare("UPDATE students SET room_id=? WHERE id=?");
-                    $assignStudent->execute([$roomId,$studentId]);
-                }
-            }
-
-            $this->pdo->commit();
-            return true;
-        } catch (Throwable $e) {
-            $this->pdo->rollBack();
-            return false;
-        }
-    }
-
     public function saveNotice($noticeId,$title,$description,$date){
         if ($noticeId > 0) {
             $stmt = $this->pdo->prepare("UPDATE notices SET title=?, description=?, date=? WHERE id=?");
@@ -279,6 +183,7 @@ class Warden {
         $allowedTables = ['food', 'laundry', 'cleaning', 'timing'];
         $allowedColumns = ['student_id', 'room_id'];
 
+        // Whitelisting protects the dynamic table/column names used below.
         if (!in_array($table, $allowedTables, true) || !in_array($column, $allowedColumns, true)) {
             return null;
         }

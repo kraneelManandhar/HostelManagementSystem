@@ -5,6 +5,7 @@ function wardenStatusLabel(type, value) {
 }
 
 function setWardenStatusVisual(control, value) {
+  // Keep the dropdown color and selected value in sync with the saved status.
   const normalizedValue = value === '1' ? '1' : '0';
 
   control.classList.toggle('yes', normalizedValue === '1');
@@ -25,6 +26,7 @@ function refreshWardenSearch(control) {
 }
 
 function saveWardenStatus(control, nextValue, previousValue) {
+  // All Warden status dropdowns post the same id/status format to PHP.
   const fd = new FormData();
   fd.append('id', control.dataset.id);
   fd.append('status', nextValue);
@@ -81,6 +83,7 @@ document.querySelectorAll('.row').forEach(row => {
   const tout=row.querySelector('.time-out');
 
   function send(){
+    // Timing rows save immediately when check-in or check-out changes.
     const fd=new FormData();
     fd.append('id',tin.dataset.id);
     fd.append('check_in',tin.value);
@@ -116,6 +119,7 @@ document.querySelectorAll('#wardenSearch, .warden-search').forEach(searchInput =
   }
 
   function rowText(row) {
+    // Include the selected dropdown text, but not every hidden option.
     const controlValues = Array.from(row.querySelectorAll('input, select, textarea'))
       .filter(control => control.type !== 'hidden')
       .map(control => {
@@ -142,6 +146,7 @@ document.querySelectorAll('#wardenSearch, .warden-search').forEach(searchInput =
   }
 
   function setVisible(row, isVisible) {
+    // hidden + display keeps filtering reliable for both grid rows and cards.
     row.hidden = !isVisible;
     row.style.display = isVisible ? '' : 'none';
   }

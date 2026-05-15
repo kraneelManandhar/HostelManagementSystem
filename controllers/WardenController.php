@@ -9,18 +9,20 @@ class WardenController {
         $this->model = new Warden($pdo);
     }
 
-    /* ===== PAGE DATA ===== */
+    /* ===== PAGE DATA =====
+       These methods are used by the PHP views to load rows for each page.
+       The controller stays small and sends database work to the Warden model. */
 
     public function getDashboard(){ return $this->model->getDashboardData(); }
     public function getStudents(){  return $this->model->getStudents(); }
     public function getFood(){      return $this->model->getFoodData(); }
     public function getLaundry(){   return $this->model->getLaundryData(); }
-    public function getRooms(){     return $this->model->getRooms(); }
-    public function getRoomStudentOptions($roomId = 0){ return $this->model->getRoomStudentOptions($roomId); }
     public function getCleaning(){  return $this->model->getCleaningData(); }
     public function getTiming(){    return $this->model->getTimingData(); }
 
-    /* ===== AJAX ===== */
+    /* ===== AJAX UPDATES =====
+       The dropdowns/time fields call these methods through public/js/script.js.
+       Each method returns JSON so JavaScript can show success or rollback on error. */
 
     public function ajaxFood(){
         header('Content-Type: application/json');
@@ -33,6 +35,7 @@ class WardenController {
     public function ajaxLaundry(){
         header('Content-Type: application/json');
         $id = (int)($_POST['id'] ?? 0);
+        // The UI sends 1/0, while the database stores readable laundry text.
         $status = ($_POST['status'] ?? 0) == 1 ? 'Completed' : 'Pending';
         $ok = $this->model->updateLaundry($id,$status);
         echo json_encode(['success'=>$ok]);
@@ -41,6 +44,7 @@ class WardenController {
     public function ajaxCleaning(){
         header('Content-Type: application/json');
         $room_id = (int)($_POST['id'] ?? 0);
+        // The bathroom cleaning dropdown shows Done/Pending to match this mapping.
         $status = ($_POST['status'] ?? 0) == 1 ? 'Done' : 'Pending';
         $ok = $this->model->updateCleaning($room_id,$status);
         echo json_encode(['success'=>$ok]);
@@ -51,38 +55,12 @@ class WardenController {
         $id  = (int)($_POST['id'] ?? 0);
         $inValue = trim((string) ($_POST['check_in'] ?? ''));
         $outValue = trim((string) ($_POST['check_out'] ?? ''));
+        // Empty date/time inputs are stored as NULL instead of invalid dates.
         $in  = $inValue !== '' ? date('Y-m-d H:i:s', strtotime($inValue)) : null;
         $out = $outValue !== '' ? date('Y-m-d H:i:s', strtotime($outValue)) : null;
 
         $ok = $this->model->updateTiming($id,$in,$out);
         echo json_encode(['success'=>$ok]);
-    }
-
-    public function saveRoom(){
-        $roomId = (int)($_POST['room_id'] ?? 0);
-        $number = trim((string) ($_POST['number'] ?? ''));
-        $type = ($_POST['type'] ?? 'double') === 'single' ? 'single' : 'double';
-        $student1Id = (int)($_POST['student1_id'] ?? 0);
-        $student2Id = $type === 'double' ? (int)($_POST['student2_id'] ?? 0) : 0;
-
-        if ($roomId > 0 && $number !== '') {
-            $this->model->saveRoom($roomId, $number, $type, $student1Id, $student2Id);
-        }
-
-        header('Location: index.php?action=warden_rooms');
-        exit;
-    }
-
-    public function addRoom(){
-        $number = trim((string) ($_POST['number'] ?? ''));
-        $type = ($_POST['type'] ?? 'double') === 'single' ? 'single' : 'double';
-
-        if ($number !== '') {
-            $this->model->addRoom($number, $type);
-        }
-
-        header('Location: index.php?action=warden_rooms');
-        exit;
     }
 
     public function saveNotice(){

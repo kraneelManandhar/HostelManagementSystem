@@ -5,6 +5,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 $baseUrl = defined('BASE_URL') ? BASE_URL : '/HostelManagementSystem/';
 
+// Warden pages are protected so students/owners cannot open them directly.
 if (
     empty($_SESSION['logged_in']) ||
     ($_SESSION['user_role'] ?? '') !== 'warden'
@@ -27,6 +28,7 @@ $noticeModel = new Notice($pdo);
 
 $action = 'warden_dashboard';
 
+// This map builds the sidebar links and dashboard page title.
 $pageMap = [
     'warden_dashboard' => ['label' => 'Dashboard', 'icon' => 'ph-squares-four', 'title' => 'DASHBOARD'],
     'warden_students' => ['label' => 'Students', 'icon' => 'ph-student', 'title' => 'STUDENTS'],
@@ -37,6 +39,7 @@ $pageMap = [
     'warden_notices' => ['label' => 'Notice', 'icon' => 'ph-warning', 'title' => 'NOTICES'],
 ];
 
+// Dashboard counters and summaries are prepared before rendering HTML.
 $totalStudents = count($studentModel->getAll());
 $pendingComplaints = (int) $pdo->query("SELECT COUNT(*) FROM complaints WHERE LOWER(status) = 'pending'")->fetchColumn();
 $recentNotices = array_slice($noticeModel->all(), 0, 5);
