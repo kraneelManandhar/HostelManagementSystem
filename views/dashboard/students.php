@@ -397,7 +397,7 @@ if (!empty($selectedPhoto)) {
                                     </div>
                                     <div class="ms-field">
                                         <label>Contact number</label>
-                                        <input type="tel" name="contact_number" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" title="Enter exactly 10 digits" value="<?= htmlspecialchars($selectedStudent['contact_number'] ?? '') ?>">
+                                        <input type="tel" name="contact_number" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" title="Enter exactly 10 digits" value="<?= htmlspecialchars($selectedStudent['contact_number'] ?? '') ?>" placeholder="+977">
                                     </div>
                                     <div class="ms-field full">
                                         <label>Email address</label>
@@ -439,7 +439,7 @@ if (!empty($selectedPhoto)) {
                                     </div>
                                     <div class="ms-field">
                                         <label>Contact number</label>
-                                        <input type="tel" name="guardian_contact" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" title="Enter exactly 10 digits" value="<?= htmlspecialchars($selectedStudent['guardian_contact'] ?? '') ?>">
+                                        <input type="tel" name="guardian_contact" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" title="Enter exactly 10 digits" value="<?= htmlspecialchars($selectedStudent['guardian_contact'] ?? '') ?>" placeholder="+977">
                                     </div>
                                 </div>
                             </section>
