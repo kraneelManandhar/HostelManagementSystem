@@ -2704,3 +2704,25 @@ body {
     text-decoration: none !important;
 }
 
+/* Owner notices should use the full dashboard width. */
+.mn-panel {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 18px !important;
+}
+
+.mn-panel .mn-open-btn {
+    margin: 0 0 14px;
+}
+
+.mn-search {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 0 18px !important;
+}
+
+.mn-card {
+    width: 100%;
+}
+
