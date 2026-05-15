@@ -74,10 +74,8 @@ class StudentController {
     }
 
     public function updateOwnTiming(int $student_id): void {
-        header('Content-Type: application/json');
-
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            echo json_encode(['success' => false, 'message' => 'Invalid request method.']);
+            header('Location: ' . BASE_URL . 'index.php?action=student_dashboard&tab=timing');
             exit;
         }
 
@@ -85,7 +83,11 @@ class StudentController {
         $checkOutValue = trim((string) ($_POST['check_out'] ?? ''));
 
         if ($checkInValue === '' && $checkOutValue === '') {
-            echo json_encode(['success' => false, 'message' => 'Please enter at least one timing.']);
+            $_SESSION['sd_flash'] = [
+                'type' => 'error',
+                'message' => 'Please enter at least one timing.'
+            ];
+            header('Location: ' . BASE_URL . 'index.php?action=student_dashboard&tab=timing');
             exit;
         }
 
@@ -93,18 +95,23 @@ class StudentController {
         $checkOut = $checkOutValue !== '' ? $this->normalizeDateTime($checkOutValue) : null;
 
         if (($checkInValue !== '' && $checkIn === null) || ($checkOutValue !== '' && $checkOut === null)) {
-            echo json_encode(['success' => false, 'message' => 'Please enter a valid date and time.']);
+            $_SESSION['sd_flash'] = [
+                'type' => 'error',
+                'message' => 'Please enter a valid date and time.'
+            ];
+            header('Location: ' . BASE_URL . 'index.php?action=student_dashboard&tab=timing');
             exit;
         }
 
         $timingModel = new Timing($this->pdo);
         $result = $timingModel->updateForStudent($student_id, $checkIn, $checkOut);
 
-        echo json_encode([
-            'success' => $result['success'],
+        $_SESSION['sd_flash'] = [
+            'type' => $result['success'] ? 'success' : 'error',
             'message' => $result['message'],
-            'data' => $result['data'] ?? null,
-        ]);
+        ];
+
+        header('Location: ' . BASE_URL . 'index.php?action=student_dashboard&tab=timing');
         exit;
     }
 

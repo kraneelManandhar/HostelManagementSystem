@@ -28,129 +28,58 @@ document.addEventListener("DOMContentLoaded", function () {
     modal.classList.remove("open");
   }
 
-  // 3. SUBMIT COMPLAINT
-  const submitBtn = document.getElementById("submitComplaint");
-  if (submitBtn) {
-    submitBtn.addEventListener("click", async function () {
-      const form = document.getElementById("complaintForm");
-      const titleInput = form.querySelector('input[name="title"]');
-      const descriptionInput = form.querySelector(
+  // 3. COMPLAINT FORM VALIDATION
+  const complaintForm = document.getElementById("complaintForm");
+  if (complaintForm) {
+    complaintForm.addEventListener("submit", function (e) {
+      const titleInput = complaintForm.querySelector('input[name="title"]');
+      const descriptionInput = complaintForm.querySelector(
         'textarea[name="description"]',
       );
       const issue = titleInput?.value?.trim();
       const description = descriptionInput?.value?.trim();
 
       if (!issue) {
+        e.preventDefault();
         showStudentToast("Please fill in the Issue field.", "error");
         titleInput?.focus();
         return;
       }
 
       if (!description) {
+        e.preventDefault();
         showStudentToast("Please fill in the Description field.", "error");
         descriptionInput?.focus();
-        return;
-      }
-
-      const formData = new FormData(form);
-
-      try {
-        const response = await fetch(
-          BASE_URL + "index.php?action=complaint_add",
-          { method: "POST", body: formData },
-        );
-        const result = await response.json();
-
-        if (!result.success) {
-          showStudentToast(
-            result.message || "Failed to submit complaint.",
-            "error",
-          );
-          return;
-        }
-
-        addComplaintToUI(result.data);
-        closeModal();
-        form.reset();
-
-        // Switch UI to complaints tab
-        switchPage("complaints");
-        showStudentToast("Complaint submitted successfully.", "success");
-      } catch (error) {
-        console.error("Error:", error);
-        showStudentToast("Server error while submitting complaint.", "error");
       }
     });
   }
 
-  // 4. ADD COMPLAINT TO UI
-  function addComplaintToUI(data) {
-    const list = document.getElementById("sd-complaints-list");
-    if (!list) return;
-
-    // Remove "no complaints" placeholder if present
-    const empty = list.querySelector("p");
-    if (empty) empty.remove();
-
-    const item = document.createElement("div");
-    item.className = "sd-complaint-item";
-    item.innerHTML = `
-      <input type="radio" name="selected-complaint" value="${data.id}">
-      <span class="sd-c-title">${escHtml(data.issue)}</span>
-      <span class="sd-c-desc">${escHtml(data.description || "—")}</span>
-      <span class="sd-c-room">${escHtml(data.room || "—")}</span>
-      <span class="sd-badge">Pending</span>
-    `;
-    list.appendChild(item);
-  }
-
-  // 5. DELETE COMPLAINT
-  const trashBtn = document.getElementById("deleteComplaint");
-  if (trashBtn) {
-    trashBtn.addEventListener("click", async function () {
+  // 4. DELETE COMPLAINT CONFIRMATION
+  const deleteComplaintForm = document.getElementById("deleteComplaintForm");
+  if (deleteComplaintForm) {
+    deleteComplaintForm.addEventListener("submit", async function (e) {
       const selected = document.querySelector(
-        ".sd-complaint-item input[type='radio']:checked",
+        ".sd-complaint-item input[name='complaint_id']:checked",
       );
 
       if (!selected) {
+        e.preventDefault();
         showStudentToast("Please select a complaint first.", "error");
         return;
       }
 
+      e.preventDefault();
       const confirmed = await showStudentConfirm({
         title: "Are you sure you want to delete the complaint?",
         confirmText: "Delete",
       });
       if (!confirmed) return;
 
-      const complaintId = selected.value;
-
-      try {
-        const res = await fetch(
-          BASE_URL + "index.php?action=complaint_delete",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ id: complaintId }),
-          },
-        );
-        const result = await res.json();
-
-        if (!result.success) {
-          showStudentToast(result.message || "Delete failed.", "error");
-          return;
-        }
-
-        selected.closest(".sd-complaint-item").remove();
-        showStudentToast("Complaint deleted successfully.", "success");
-      } catch (err) {
-        console.error(err);
-        showStudentToast("Server error while deleting complaint.", "error");
-      }
+      deleteComplaintForm.submit();
     });
   }
 
-  // 6. PROFILE FORM VALIDATION
+  // 5. PROFILE FORM VALIDATION
   const profileForm = document.getElementById("studentProfileForm");
   if (profileForm) {
     profileForm.addEventListener("submit", function (e) {
@@ -190,91 +119,33 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // 7. TIMING FORM
+  // 6. TIMING FORM VALIDATION
   const timingForm = document.getElementById("studentTimingForm");
   if (timingForm) {
-    timingForm.addEventListener("submit", async function (e) {
-      e.preventDefault();
-
+    timingForm.addEventListener("submit", function (e) {
       const checkInInput = timingForm.querySelector('input[name="check_in"]');
       const checkOutInput = timingForm.querySelector('input[name="check_out"]');
       const checkIn = checkInInput?.value || "";
       const checkOut = checkOutInput?.value || "";
 
       if (!checkIn && !checkOut) {
+        e.preventDefault();
         showStudentToast("Please enter at least one timing.", "error");
         checkInInput?.focus();
-        return;
-      }
-
-      const formData = new FormData(timingForm);
-
-      try {
-        const response = await fetch(
-          BASE_URL + "index.php?action=student_timing_update",
-          { method: "POST", body: formData },
-        );
-        const result = await response.json();
-
-        if (!result.success) {
-          showStudentToast(result.message || "Could not save timing.", "error");
-          return;
-        }
-
-        updateTimingSummary(result.data || {});
-        showStudentToast(result.message || "Timing saved successfully.", "success");
-      } catch (error) {
-        console.error("Error:", error);
-        showStudentToast("Server error while saving timing.", "error");
       }
     });
-  }
-
-  function updateTimingSummary(data) {
-    const status = document.getElementById("studentTimingStatus");
-    const inText = document.getElementById("studentTimingInText");
-    const outText = document.getElementById("studentTimingOutText");
-
-    if (status && data.status) {
-      status.textContent = data.status;
-      status.classList.toggle("is-out", data.status === "OUT");
-      status.classList.toggle("is-in", data.status !== "OUT");
-    }
-
-    if (inText) inText.textContent = formatTiming(data.check_in);
-    if (outText) outText.textContent = formatTiming(data.check_out);
-  }
-
-  function formatTiming(value) {
-    if (!value) return "Not set";
-
-    const date = new Date(String(value).replace(" ", "T"));
-    if (Number.isNaN(date.getTime())) return "Not set";
-
-    return date.toLocaleString(undefined, {
-      month: "long",
-      day: "numeric",
-      year: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-    });
-  }
-
-  // 8. LOGO : switch back to dashboard tab
-  const logo = document.getElementById("goDashboard");
-  if (logo) {
-    logo.addEventListener("click", () => switchPage("dashboard"));
   }
 
   if (typeof SD_INITIAL_TAB !== "undefined" && SD_INITIAL_TAB) {
     switchPage(SD_INITIAL_TAB);
+    clearInitialTabFromUrl();
   }
 
   if (typeof SD_FLASH !== "undefined" && SD_FLASH?.message) {
     showStudentToast(SD_FLASH.message, SD_FLASH.type || "success");
   }
 
-  // 9. HELPERS
+  // 7. HELPERS
   function switchPage(pageKey) {
     const targetPage = document.getElementById(`page-${pageKey}`);
     if (!targetPage) return;
@@ -288,13 +159,14 @@ document.addEventListener("DOMContentLoaded", function () {
     targetPage.classList.add("active");
   }
 
-  function escHtml(str) {
-    if (!str) return "";
-    return String(str)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;");
+  function clearInitialTabFromUrl() {
+    if (!window.history?.replaceState) return;
+
+    const url = new URL(window.location.href);
+    if (!url.searchParams.has("tab")) return;
+
+    url.searchParams.delete("tab");
+    window.history.replaceState({}, "", url.toString());
   }
 
   function showStudentToast(message, type) {

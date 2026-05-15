@@ -13,6 +13,40 @@ function buildAbsoluteUrl(string $relativePath): string
     return $relativePath;
 }
 
+function buildVerificationEmailBody(string $fullName, string $verificationLink): string
+{
+    $safeName = htmlspecialchars($fullName, ENT_QUOTES, 'UTF-8');
+    $safeLink = htmlspecialchars($verificationLink, ENT_QUOTES, 'UTF-8');
+
+    return <<<HTML
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; padding: 0; }
+    .container { max-width: 520px; margin: 40px auto; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+    .body { padding: 32px; color: #333; line-height: 1.6; }
+    h2 { margin: 0 0 16px; color: #2c3e50; font-size: 21px; }
+    .btn { display: inline-block; margin: 24px 0 16px; padding: 12px 28px; background: #2c3e50; color: #fff !important; text-decoration: none; border-radius: 5px; font-size: 15px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="body">
+      <h2>Email Verification Required</h2>
+      <p>Dear {$safeName},</p>
+      <p>Thank you for registering with Hostel Management System. Please verify your email to continue setting your password.</p>
+      <a href="{$safeLink}" class="btn">Verify Email and Set Password</a>
+      <p>If the button does not work, copy and paste this link into your browser:</p>
+      <p style="word-break:break-all;font-size:13px;color:#555;">{$safeLink}</p>
+    </div>
+  </div>
+</body>
+</html>
+HTML;
+}
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -143,19 +177,12 @@ switch ($action) {
             // Send verification email
             try {
                 $mail = getMailer();
-                $mail->addAddress($_POST['email'], $_POST['first_name'] . ' ' . $_POST['last_name']);
+                $fullName = trim(($_POST['first_name'] ?? '') . ' ' . ($_POST['last_name'] ?? ''));
+                $mail->addAddress($_POST['email'], $fullName);
                 $mail->Subject = 'Verify Your Email - Hostel Management System';
                 $verificationLink = buildAbsoluteUrl(BASE_URL . 'index.php?action=set_password&token=' . $token);
-                $mail->Body    = "
-                    <h2>Email Verification Required</h2>
-                    <p>Dear {$_POST['first_name']} {$_POST['last_name']},</p>
-                    <p>Thank you for registering with Hostel Management System.</p>
-                    <p>Please click the link below to verify your email and continue with setting your password:</p>
-                    <p><a href='{$verificationLink}'>Verify Email and Set Password</a></p>
-                    <p>If the link doesn't work, copy and paste this URL into your browser: {$verificationLink}</p>
-                    <br>
-                    <p>Best regards,<br>Hostel Management Team</p>
-                ";
+                $mail->Body = buildVerificationEmailBody($fullName, $verificationLink);
+                $mail->AltBody = "Verify your email and set your password using this link:\n\n{$verificationLink}";
                 $mail->send();
             } catch (Exception $e) {
                 // Log error but don't stop registration
