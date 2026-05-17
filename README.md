@@ -1,6 +1,6 @@
 # Hostel Management System
 
-A web-based Hostel Management System built with PHP and MySQL that streamlines hostel operations for administrators, wardens, owners, and students.
+A web-based Hostel Management System built with PHP and MySQL that streamlines hostel operations for Owner/Management, warden, and students.
 
 ---
 
@@ -14,25 +14,26 @@ A web-based Hostel Management System built with PHP and MySQL that streamlines h
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
 - [User Roles](#user-roles)
-- [Contributing](#contributing)
+- [Contributors](#contributors)
 
 ---
 
 ## About
 
-The Hostel Management System is a full-stack PHP application that provides a centralized platform for managing hostel operations. It supports multiple user roles — Owner, Admin, Warden, and Student — each with their own dedicated dashboard and access controls.
+The Hostel Management System is a full-stack PHP application that provides a centralized platform for managing hostel operations. It supports multiple user roles — Owner, Warden, and Student — each with their own dedicated dashboard and access controls.
 
 ---
 
 ## Features
 
-- **Multi-role authentication** — Separate dashboards and permissions for Owner, Admin, Warden, and Student
+- **Multi-role authentication** — Separate dashboards and permissions for Owner, Warden, and Student
 - **Student registration** — Multi-step registration with profile photo upload
 - **Room management** — Track and manage single and double occupancy rooms
 - **Fee management** — View and manage student fee records
 - **Complaint system** — Students can submit and delete complaints; owners can review them
 - **Notice board** — Post and manage hostel notices
 - **Staff management** — View and manage hostel staff
+- **AI Chat Bot** — Integrated AI assistant for hostel-related queries
 - **Session-based access control** — Role-based route protection throughout the app
 
 ---
@@ -111,7 +112,7 @@ HostelManagementSystem/
    - Update the credentials to match your local setup:
      ```php
      define('DB_HOST', 'localhost');
-     define('DB_NAME', 'hostel_management');
+     define('DB_NAME', 'hostel_db');
      define('DB_USER', 'root');
      define('DB_PASS', '');
      ```
@@ -124,27 +125,24 @@ HostelManagementSystem/
 
 ## User Roles
 
-| Role    | Access                                                                 |
-|---------|------------------------------------------------------------------------|
-| **Owner**   | Full access — students, rooms, fees, complaints, notices, staff    |
-| **Admin**   | Admin dashboard with management capabilities                       |
-| **Warden**  | Warden dashboard for day-to-day hostel supervision                 |
-| **Student** | Personal dashboard — view room info, fees, notices; submit/delete complaints |
+| Role        | Access                                                                                       |
+|-------------|----------------------------------------------------------------------------------------------|
+| **Owner**   | Full access — students, rooms, fees, complaints, notices, staff                              |
+| **Warden**  | Warden dashboard for day-to-day hostel supervision                                           |
+| **Student** | Personal dashboard — view room info, fees, notices; submit/delete complaints                 |
 
 Each role is protected by session-based middleware (`requireRole()`), so users are automatically redirected if they try to access an unauthorized page.
 
 ---
 
-## Contributing
+## Contributors
 
-Contributions are welcome! To get started:
-
-1. Fork the repository
-2. Create a new branch (`git checkout -b feature/your-feature`)
-3. Commit your changes (`git commit -m 'Add your feature'`)
-4. Push to the branch (`git push origin feature/your-feature`)
-5. Open a Pull Request
+| Name | Role | Contributions |
+|------|------|---------------|
+| **Kraneel Manandhar** | Project Manager | Built the Login/Signup system, Registration System, authentication system, and password reset system. Developed the AI chatbot and the complete Owner module. Assisted Prayash in building the Warden module. Performed overall bug fixing and project coordination. |
+| **Abibsha Ghaju** | Developer | Handled the complete Student module, dashboard, and related features. Also contributed to bug fixing across the project. |
+| **Prayash Shrestha** | Developer | Handled the Warden module, implementing warden dashboard features and day-to-day hostel supervision functionality. |
 
 ---
 
-> Built with ❤️ by [kraneelManandhar](https://github.com/kraneelManandhar)
+> Built by [kraneelManandhar](https://github.com/kraneelManandhar) and the team
