@@ -15,10 +15,12 @@ if (
 
 require_once __DIR__ . '/../../config/db.php';
 require_once __DIR__ . '/../../models/Student.php';
+require_once __DIR__ . '/../../models/User.php';
 require_once __DIR__ . '/../../models/Room.php';
 
 $pdo = DB::connect();
 $studentModel = new Student($pdo);
+$userModel = new User($pdo);
 
 function ownerAssignStudentRoom(PDO $pdo, int $studentId, int $roomId, string $bedSlot): bool
 {
@@ -134,6 +136,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($formAction === 'add') {
+        $email = strtolower(trim($_POST['email'] ?? ''));
+        if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL) || $studentModel->findByEmail($email) || $userModel->findByEmail($email)) {
+            ownerRedirect($baseUrl, null, 'email');
+        }
+
         $profilePhoto = null;
         if (!empty($_FILES['profile_photo']['name'])) {
             $uploadDir = __DIR__ . '/../../public/uploads/';
@@ -146,13 +153,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $profilePhoto = $filename;
         }
 
-        $studentModel->registerStudent([
+        $newStudentId = (int) $studentModel->registerStudent([
             'first_name' => trim($_POST['first_name'] ?? ''),
             'middle_name' => trim($_POST['middle_name'] ?? ''),
             'last_name' => trim($_POST['last_name'] ?? ''),
             'date_of_birth' => $_POST['date_of_birth'] ?? null,
             'contact_number' => trim($_POST['contact_number'] ?? ''),
-            'email' => trim($_POST['email'] ?? ''),
+            'email' => $email,
             'password' => password_hash('student123', PASSWORD_DEFAULT),
             'profile_photo' => $profilePhoto,
             'college_name' => trim($_POST['college_name'] ?? ''),
@@ -165,7 +172,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'room_id' => null,
         ]);
 
-        ownerRedirect($baseUrl);
+        $changeRoom = ($_POST['change_room'] ?? '') === '1';
+        $newRoomId = (int) ($_POST['new_room_id'] ?? 0);
+        $newBedSlot = trim($_POST['new_bed_slot'] ?? '');
+        if ($newStudentId > 0 && $changeRoom && $newRoomId > 0 && $newBedSlot !== '') {
+            ownerAssignStudentRoom($pdo, $newStudentId, $newRoomId, $newBedSlot);
+        }
+
+        ownerRedirect($baseUrl, $newStudentId ?: null, 'registered');
     }
 
     if ($formAction === 'edit') {
@@ -241,17 +255,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $students = $studentModel->getAll();
 $selectedId = (int) ($_GET['student_id'] ?? 0);
 $selectedStudent = null;
+$isAddMode = ($_GET['mode'] ?? '') === 'add';
 
-foreach ($students as $studentItem) {
-    if ((int) $studentItem['id'] === $selectedId) {
-        $selectedStudent = $studentItem;
-        break;
+if (!$isAddMode) {
+    foreach ($students as $studentItem) {
+        if ((int) $studentItem['id'] === $selectedId) {
+            $selectedStudent = $studentItem;
+            break;
+        }
     }
-}
 
-if ($selectedStudent === null && !empty($students)) {
-    $selectedStudent = $students[0];
-    $selectedId = (int) $selectedStudent['id'];
+    if ($selectedStudent === null && !empty($students)) {
+        $selectedStudent = $students[0];
+        $selectedId = (int) $selectedStudent['id'];
+    }
+} else {
+    $selectedId = 0;
 }
 
 $managerName = trim((string) ($_SESSION['user_name'] ?? 'FULL NAME'));
@@ -326,6 +345,10 @@ if (!empty($selectedPhoto)) {
             <div class="ms-title-bar">STUDENTS</div>
             <?php if ($msg === 'invalid_phone'): ?>
                 <div class="ms-alert error">Contact numbers must contain exactly 10 digits.</div>
+            <?php elseif ($msg === 'email'): ?>
+                <div class="ms-alert error">Please enter a valid email address that is not already registered.</div>
+            <?php elseif ($msg === 'registered'): ?>
+                <div class="ms-alert success">Student registered successfully. Default password: student123</div>
             <?php endif; ?>
 
             <div class="ms-content">
@@ -358,14 +381,14 @@ if (!empty($selectedPhoto)) {
                             <i class="ph ph-magnifying-glass"></i>
                             <input type="text" placeholder="Search">
                         </div>
-                        <a class="ms-action-btn" href="<?= $baseUrl ?>index.php?action=register">REGISTER NOW</a>
+                        <a class="ms-action-btn" href="<?= $baseUrl ?>index.php?action=owner_students&mode=add">REGISTER NOW</a>
                     </div>
 
                     <form class="ms-student-form" method="post" enctype="multipart/form-data">
                         <input type="hidden" name="student_id" value="<?= (int) ($selectedStudent['id'] ?? 0) ?>">
                         <input type="hidden" name="current_photo" value="<?= htmlspecialchars($selectedStudent['profile_photo'] ?? '') ?>">
 
-                        <fieldset class="ms-view-fieldset" disabled>
+                        <fieldset class="ms-view-fieldset" <?= $isAddMode ? '' : 'disabled' ?>>
                             <section class="ms-section">
                                 <div class="ms-grid-3">
                                     <div class="ms-field">
@@ -405,7 +428,7 @@ if (!empty($selectedPhoto)) {
                                     </div>
                                     <div class="ms-field">
                                         <label>Student ID</label>
-                                        <input type="text" value="#<?= (int) ($selectedStudent['id'] ?? 0) ?>" readonly>
+                                        <input type="text" value="<?= $isAddMode ? 'New student' : '#' . (int) ($selectedStudent['id'] ?? 0) ?>" readonly>
                                     </div>
                                 </div>
                             </section>
@@ -539,14 +562,14 @@ if (!empty($selectedPhoto)) {
                         </fieldset>
 
                         <div class="ms-footer-actions">
-                            <button class="ms-delete-btn" type="submit" name="form_action" value="delete" data-confirm="Are you sure you want to delete this student record?" <?= $selectedId ? '' : 'disabled' ?>>
+                            <button class="ms-delete-btn" type="submit" name="form_action" value="delete" data-confirm="Are you sure you want to delete this student record?" <?= $selectedId && !$isAddMode ? '' : 'disabled' ?>>
                                 <i class="ph ph-trash"></i> DELETE RECORDS
                             </button>
-                            <button class="ms-edit-btn" type="button" data-edit-student data-confirm="Are you sure you want to edit this student record?" <?= $selectedId ? '' : 'disabled' ?>>
+                            <button class="ms-edit-btn" type="button" data-edit-student data-confirm="Are you sure you want to edit this student record?" <?= $selectedId && !$isAddMode ? '' : 'disabled' ?>>
                                 EDIT
                             </button>
-                            <button class="ms-save-btn" type="submit" name="form_action" value="<?= $selectedId ? 'edit' : 'add' ?>" data-confirm="Are you sure you want to save changes to this student record?" disabled>
-                                SAVE CHANGES
+                            <button class="ms-save-btn" type="submit" name="form_action" value="<?= $isAddMode ? 'add' : 'edit' ?>" data-confirm="Are you sure you want to save changes to this student record?" <?= $isAddMode ? '' : 'disabled' ?>>
+                                <?= $isAddMode ? 'REGISTER STUDENT' : 'SAVE CHANGES' ?>
                             </button>
                         </div>
                     </form>

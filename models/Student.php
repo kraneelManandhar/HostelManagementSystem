@@ -76,7 +76,7 @@ class Student {
         )";
 
         $stmt = $this->conn->prepare($sql);
-        return $stmt->execute([
+        $stmt->execute([
             ':first_name'            => $data['first_name'] ?? '',
             ':middle_name'           => !empty($data['middle_name']) ? $data['middle_name'] : null,
             ':last_name'             => $data['last_name'] ?? '',
@@ -94,6 +94,8 @@ class Student {
             ':preferred_room_type'   => $data['preferred_room_type'] ?? 'double',
             ':room_id'               => $data['room_id'] ?? null
         ]);
+
+        return $this->conn->lastInsertId();
     }
 
     public function updateSecondaryInfo(int $id, array $data): bool {
