@@ -42,7 +42,7 @@ class AuthController {
             ];
         }
 
-        // Database users: admin/warden/owner from users table
+        // Database users from users table
         $user = $this->userModel->findByEmail($email);
 
         if ($user && password_verify($password, $user['password'])) {

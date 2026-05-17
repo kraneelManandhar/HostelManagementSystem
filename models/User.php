@@ -13,7 +13,7 @@ class User {
     }
 
     /**
-     * Find user by email (for admin/warden login)
+     * Find user by email
      */
     public function findByEmail($email) {
         $stmt = $this->conn->prepare("SELECT * FROM users WHERE email = ?");
@@ -31,7 +31,7 @@ class User {
     }
 
     /**
-     * Add new admin/warden (for admin use)
+     * Add new staff/warden user
      */
     public function add($data) {
         $sql = "INSERT INTO users (first_name, last_name, email, password, role, contact_number) 

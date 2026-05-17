@@ -341,7 +341,7 @@ CREATE TABLE `users` (
   `last_name` varchar(100) DEFAULT NULL,
   `email` varchar(150) DEFAULT NULL,
   `password` varchar(255) DEFAULT NULL,
-  `role` enum('admin','warden','staff') NOT NULL,
+  `role` enum('warden','staff') NOT NULL,
   `contact_number` varchar(20) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
