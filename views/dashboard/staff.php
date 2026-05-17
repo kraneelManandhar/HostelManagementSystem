@@ -15,7 +15,7 @@ require_once __DIR__ . '/../../models/User.php';
 
 $pdo = DB::connect();
 $userModel = new User($pdo);
-$allowedRoles = ['staff', 'warden', 'admin'];
+$allowedRoles = ['staff', 'warden'];
 
 // Handle CRUD Operations
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -104,7 +104,7 @@ $search = trim($_GET['search'] ?? '');
 
 $stmt = $pdo->query("
     SELECT * FROM users
-    WHERE role IN ('staff', 'warden', 'admin')
+    WHERE role IN ('staff', 'warden')
     ORDER BY id DESC
 ");
 $staffUsers = $stmt->fetchAll(PDO::FETCH_ASSOC);

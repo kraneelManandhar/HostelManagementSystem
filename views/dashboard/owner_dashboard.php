@@ -54,7 +54,6 @@ $occupiedRooms = (int) $pdo->query("
        OR r.student2_id IS NOT NULL
        OR EXISTS (SELECT 1 FROM students s WHERE s.room_id = r.id)
 ")->fetchColumn();
-$pendingComplaints = (int) $pdo->query("SELECT COUNT(*) FROM complaints WHERE LOWER(status) = 'pending'")->fetchColumn();
 $unpaidFees = (int) $pdo->query("SELECT COUNT(*) FROM fees WHERE LOWER(status) <> 'paid' OR status IS NULL")->fetchColumn();
 $recentNotices = array_slice($noticeModel->all(), 0, 5);
 $recentComplaints = array_slice($complaintModel->all(), 0, 5);
@@ -141,19 +140,9 @@ $showNoticeModal = isset($_GET['post_notice']);
                     <div class="md-card-badge"><?= $occupiedRooms ?></div>
                 </a>
 
-                <a class="md-card" href="<?= $baseUrl ?>index.php?action=owner_complaints">
-                    <div class="md-card-title">Complaints</div>
-                    <div class="md-card-badge"><?= $pendingComplaints ?></div>
-                </a>
-
                 <a class="md-card" href="<?= $baseUrl ?>index.php?action=owner_fees">
                     <div class="md-card-title">Fees</div>
                     <div class="md-card-badge"><?= $unpaidFees ?></div>
-                </a>
-
-                <a class="md-card md-post-notice-card js-owner-notice-open" href="<?= $baseUrl ?>index.php?action=owner_dashboard&post_notice=1">
-                    <div class="md-card-title">Post Notice</div>
-                    <div class="md-card-badge">+</div>
                 </a>
             </section>
 
@@ -287,5 +276,3 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 </body>
 </html>
-
-
