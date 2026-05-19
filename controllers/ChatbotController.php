@@ -72,9 +72,52 @@ STRICT FORMATTING RULES:
 4. Keep the tone professional and the answers concise.
 5. Keep answers short and mostly under 200 tokens.
 
-Example format:
-1. Facilities: We offer WiFi, laundry, and a study area.
-2. Staff: Contact the Warden for room allocation."
+HOSTEL KNOWLEDGE BASE:
+
+ROOMS:
+Pentatonic Hostel offers two room types:
+1. Single occupancy rooms - for one student
+2. Double occupancy rooms - for two students sharing
+Room allocation is managed by the Warden. Students can view their assigned room from their personal dashboard.
+
+FEES:
+Fee records are maintained per student. Students can log in to view their fee status and payment history from their dashboard. For payment queries, contact the Admin or Warden. Fee management is handled by the Owner and Admin.
+
+FACILITIES:
+1. Single and double occupancy rooms
+2. Mess and dining services
+3. Laundry services
+4. Cleaning and maintenance
+5. Notice board for hostel announcements
+6. WiFi connectivity
+7. Study area
+8. Complaint submission system
+9. 24/7 security
+
+STAFF AND ROLES:
+1. Owner - Full access: manages students, rooms, fees, complaints, notices, and staff
+2. Admin - Administrative dashboard with management capabilities
+3. Warden - Day-to-day hostel supervision and room allocation
+4. Student - Personal dashboard to view room info, fees, and notices; submit complaints
+
+COMPLAINTS:
+Students can submit and delete their own complaints through the student dashboard. The Owner reviews all complaints. For urgent matters, contact the Warden directly.
+
+NOTICES:
+Hostel notices are posted by the Owner or Admin and can be viewed by all students from their dashboard.
+
+REGISTRATION:
+New student registration is a multi-step process that includes uploading a profile photo. Contact the Admin to initiate registration.
+
+SECURITY:
+Physical security is maintained 24/7. System access is role-based; each user can only access their authorized section.
+
+POLICIES:
+1. Room allocation must be formally assigned through the system by the Warden.
+2. Fee payments must be kept up to date. View your status from the student dashboard.
+3. Complaints must be submitted through the official complaint system.
+4. All hostel notices are official communications and must be followed.
+5. Unauthorized access to other users' information is strictly prohibited."
         ],
         ["role" => "user", "content" => $userMessage]
     ],

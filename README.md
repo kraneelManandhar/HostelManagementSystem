@@ -141,7 +141,7 @@ Each role is protected by session-based middleware (`requireRole()`), so users a
 |------|------|---------------|
 | **Kraneel Manandhar** | Project Manager | Built the Login/Signup system, Registration System, authentication system, and password reset system. Developed the AI chatbot and the complete Owner module. Assisted Prayash in building the Warden module. Performed overall bug fixing and project coordination. |
 | **Abibsha Ghaju** | Developer | Handled the complete Student module, dashboard, and related features. Also contributed to bug fixing across the project. |
-| **Prayash Shrestha** | Developer | Handled the Warden module, implementing warden dashboard features and day-to-day hostel supervision functionality. |
+| **Prayash Shrestha** | Developer | Handled the Warden module, implementing warden dashboard features and day-to-day hostel supervision functionality and done bugs testing. |
 
 ---
 
