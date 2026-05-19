@@ -13,7 +13,7 @@ class Complaint {
             SELECT c.*, r.number AS room_number
             FROM complaints c
             LEFT JOIN rooms r ON r.id = c.room_id
-            WHERE c.student_id=? 
+            WHERE c.student_id=? AND c.student_deleted = 0
             ORDER BY c.id DESC
         ");
         $stmt->execute([$id]);
@@ -66,7 +66,8 @@ class Complaint {
 
     public function delete($id, $student_id) {
         $stmt = $this->pdo->prepare("
-            DELETE FROM complaints 
+            UPDATE complaints
+            SET student_deleted = 1
             WHERE id=? AND student_id=?
         ");
         return $stmt->execute([$id, $student_id]);
