@@ -60,6 +60,7 @@ CREATE TABLE `complaints` (
   `title` varchar(255) DEFAULT NULL,
   `description` text DEFAULT NULL,
   `status` enum('Pending','In Progress','Resolved') DEFAULT 'Pending',
+  `student_deleted` tinyint(1) NOT NULL DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -67,10 +68,10 @@ CREATE TABLE `complaints` (
 -- Dumping data for table `complaints`
 --
 
-INSERT INTO `complaints` (`id`, `student_id`, `room_id`, `title`, `description`, `status`, `created_at`) VALUES
-(14, 5, 1, 'Unhygienic Bathroom', 'Bathroom is not maintained.', 'Pending', '2026-04-27 19:20:34'),
-(17, 2, 2, 'Hukumbasi nikal', 'Desh bata nikl', 'Resolved', '2026-05-12 17:15:15'),
-(19, 19, 20, 'User Interface Problem', 'Very disturbing design, to much simulation on eyes', 'Pending', '2026-05-13 07:06:22');
+INSERT INTO `complaints` (`id`, `student_id`, `room_id`, `title`, `description`, `status`, `student_deleted`, `created_at`) VALUES
+(14, 5, 1, 'Unhygienic Bathroom', 'Bathroom is not maintained.', 'Pending', 0, '2026-04-27 19:20:34'),
+(17, 2, 2, 'Hukumbasi nikal', 'Desh bata nikl', 'Resolved', 0, '2026-05-12 17:15:15'),
+(19, 19, 20, 'User Interface Problem', 'Very disturbing design, to much simulation on eyes', 'Pending', 0, '2026-05-13 07:06:22');
 
 -- --------------------------------------------------------
 
