@@ -317,21 +317,21 @@ document.addEventListener('keydown', event => {
   openWardenDetails(item);
 });
 
-// /* ===== ROOM EDIT HELPERS ===== */
-// document.querySelectorAll('.rooms-row').forEach(row => {
-//   const typeSelect = row.querySelector('.room-type-select');
-//   const secondStudent = row.querySelector('.second-student-select');
+/* ===== ROOM EDIT HELPERS ===== */
+document.querySelectorAll('.rooms-row').forEach(row => {
+  const typeSelect = row.querySelector('.room-type-select');
+  const secondStudent = row.querySelector('.second-student-select');
 
-//   function syncRoomType(){
-//     if (!typeSelect || !secondStudent) return;
-//     const isSingle = typeSelect.value === 'single';
-//     secondStudent.disabled = isSingle;
-//     if (isSingle) secondStudent.value = '0';
-//   }
+  function syncRoomType(){
+    if (!typeSelect || !secondStudent) return;
+    const isSingle = typeSelect.value === 'single';
+    secondStudent.disabled = isSingle;
+    if (isSingle) secondStudent.value = '0';
+  }
 
-//   typeSelect && typeSelect.addEventListener('change', syncRoomType);
-//   syncRoomType();
-// });
+  typeSelect && typeSelect.addEventListener('change', syncRoomType);
+  syncRoomType();
+});
 
 /* ===== TOAST ===== */
 function showToast(msg){
