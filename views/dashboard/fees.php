@@ -263,7 +263,7 @@ if ($managerName === '') {
         </main>
     </div>
 </div>
-<script src="<?= $baseUrl ?>public/js/owner-search.js?v=5"></script>
+<script src="<?= $baseUrl ?>public/js/owner-search.js?v=6"></script>
 <script src="<?= $baseUrl ?>public/js/confirm-actions.js?v=1"></script>
 </body>
 </html>

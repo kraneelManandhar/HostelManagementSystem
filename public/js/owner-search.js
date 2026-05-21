@@ -99,7 +99,7 @@
   function bindTableOrColumnSearch() {
     document.querySelectorAll('.mf-search input').forEach((field) => {
       const scope = getScope(field);
-      const table = scope.querySelector('.mf-table');
+      const table = scope.querySelector('.mf-table, .mf-fees-table');
       if (!table) return;
 
       const rows = Array.from(table.querySelectorAll('tbody tr.searchable-row'));
